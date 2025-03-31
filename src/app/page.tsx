@@ -1,17 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Languages } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-const apps = [
-  {
-    title: "Translator",
-    description: "A Google Translate-like interface r quick translations",
-    icon: Languages,
-    href: "/translate",
-  },
-]
-const GITHUB_URL = "https://github.com/SuicaLondon/suica-no-toy-box";
+import { apps } from "@/lib/constants/toys";
+import { GITHUB_URL } from "@/lib/constants/urls";
 
 export default function Home() {
   return (
