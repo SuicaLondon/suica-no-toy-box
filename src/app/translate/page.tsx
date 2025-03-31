@@ -9,18 +9,16 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeftRight, Copy, Languages } from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { languages } from "@/lib/constants/languages";
-import { translateSchema, TranslateFormValues } from "@/lib/schemas/translate";
-import { useState } from "react";
+import { useTranslate } from "@/lib/hooks/use-translate";
+import { translateFormSchema, TranslateFormValues } from "@/lib/schemas/translate";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeftRight, Copy, Languages } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 
 export default function TranslatePage() {
-    const [isTranslating, setIsTranslating] = useState(false);
-
     const form = useForm<TranslateFormValues>({
-        resolver: zodResolver(translateSchema),
+        resolver: zodResolver(translateFormSchema),
         defaultValues: {
             sourceText: "",
             targetText: "",
@@ -28,6 +26,8 @@ export default function TranslatePage() {
             targetLang: "es",
         },
     });
+
+    const { mutate: translateMutation, isPending: isTranslating } = useTranslate();
 
     const handleSwapLanguages = () => {
         const currentValues = form.getValues();
@@ -37,22 +37,32 @@ export default function TranslatePage() {
         form.setValue("targetText", currentValues.sourceText);
     };
 
-    const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text);
+    const handleCopy = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            alert("Copied to clipboard!");
+        } catch (error) {
+            console.error("Failed to copy:", error);
+        }
     };
 
     const onSubmit = async (data: TranslateFormValues) => {
-        setIsTranslating(true);
-        try {
-            // Here you would typically make an API call to translate the text
-            // For now, we'll just simulate a delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            form.setValue("targetText", `Translated: ${data.sourceText}`);
-        } catch (error) {
-            console.error("Translation failed:", error);
-        } finally {
-            setIsTranslating(false);
-        }
+        translateMutation(
+            {
+                sourceText: data.sourceText,
+                sourceLang: data.sourceLang,
+                targetLang: data.targetLang,
+            },
+            {
+                onSuccess: (data) => {
+                    form.setValue("targetText", data.translation);
+                },
+                onError: (error) => {
+                    console.error("Translation failed:", error);
+                    alert("Translation failed. Please try again.");
+                },
+            }
+        );
     };
 
     return (
