@@ -1,32 +1,35 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { openai } from '@/lib/config/openai';
+import { openai } from '@ai-sdk/openai';
 import { translateRequestSchema } from '@/lib/schemas/translate';
+import { streamText } from 'ai';
+import { createTranslationPrompt, SYSTEM_PROMPT } from '@/lib/prompts/translate-promot';
+
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { sourceText, sourceLang, targetLang } = translateRequestSchema.parse(body);
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o",
+        const { textStream } = streamText({
+            model: openai('gpt-4o'),
+            system: SYSTEM_PROMPT,
             messages: [
                 {
                     role: "system",
-                    content: `You are a professional translator. Translate the following text from ${sourceLang} to ${targetLang}. Only respond with the translation, nothing else.`
+                    content: SYSTEM_PROMPT
                 },
                 {
                     role: "user",
-                    content: sourceText
+                    content: createTranslationPrompt(sourceLang, targetLang, sourceText)
                 }
             ],
-            temperature: 0.3,
-            max_tokens: 1000,
+            maxTokens: 2000,
+            presencePenalty: -0.1, // Slightly discourage introducing new concepts
+            frequencyPenalty: 0.1, // Slightly encourage varied word choice
         });
 
-        const translation = response.choices[0]?.message?.content || '';
-
-        return NextResponse.json({ translation });
+        return new Response(textStream);
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: 'Invalid request data' }, { status: 400 });
