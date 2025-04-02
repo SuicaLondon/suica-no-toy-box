@@ -47,16 +47,19 @@ export default function TranslatePage() {
     };
 
     const onSubmit = async (data: TranslateFormValues) => {
+        form.setValue("targetText", "");
+
         translateMutation(
             {
                 sourceText: data.sourceText,
                 sourceLang: data.sourceLang,
                 targetLang: data.targetLang,
+                onProgress: (text) => {
+                    const oldText = form.getValues("targetText");
+                    form.setValue("targetText", oldText + text);
+                },
             },
             {
-                onSuccess: (data) => {
-                    form.setValue("targetText", data.translation);
-                },
                 onError: (error) => {
                     console.error("Translation failed:", error);
                     alert("Translation failed. Please try again.");
