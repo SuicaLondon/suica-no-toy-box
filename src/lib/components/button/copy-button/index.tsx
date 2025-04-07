@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Copy } from "lucide-react";
 
 type CopyButtonProps = {

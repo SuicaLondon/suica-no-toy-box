@@ -6,13 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { languages } from "@/lib/constants/languages";
-import {
-  Control,
-  Controller,
-  FieldPath,
-  FieldValues,
-  Path,
-} from "react-hook-form";
+import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
 type LanguageSelectProps<T extends FieldValues> = {
   name: FieldPath<T>;
