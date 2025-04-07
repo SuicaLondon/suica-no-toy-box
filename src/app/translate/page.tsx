@@ -43,15 +43,6 @@ export default function TranslatePage() {
     form.setValue("targetText", currentValues.sourceText);
   };
 
-  const handleCopy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      alert("Copied to clipboard!");
-    } catch (error) {
-      console.error("Failed to copy:", error);
-    }
-  };
-
   const onSubmit = async (data: TranslateFormValues) => {
     form.setValue("targetText", "");
 
@@ -98,10 +89,15 @@ export default function TranslatePage() {
               <Controller
                 name="sourceText"
                 control={form.control}
-                render={({ field, fieldState: { error } }) => (
+                render={({
+                  field,
+                  fieldState: { error },
+                  formState: { isSubmitting },
+                }) => (
                   <>
                     <Textarea
                       {...field}
+                      disabled={isSubmitting}
                       placeholder="Enter text to translate"
                       className="min-h-[200px] pr-10"
                     />
@@ -120,7 +116,7 @@ export default function TranslatePage() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col space-y-2">
             <LanguageSelect name="targetLang" control={form.control} />
             <div className="relative">
               <Controller
@@ -142,7 +138,7 @@ export default function TranslatePage() {
             </div>
             <Button
               type="submit"
-              className="w-32 self-end"
+              className="sticky top-4 bottom-4 w-32 self-end"
               disabled={isTranslating}
             >
               {isTranslating ? "Translating..." : "Translate"}
