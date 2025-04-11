@@ -36,13 +36,13 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
-    "husky": "^9.1.7",
-    "tailwindcss": "^4",
-    "typescript": "^5",
     "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
     "prettier": "3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "lint-staged": "^15.3.0"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
