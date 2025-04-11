@@ -27,7 +27,7 @@ export async function POST(request: Request) {
           content: createTranslationPrompt(sourceLang, targetLang, sourceText),
         },
       ],
-      maxTokens: 2000,
+      maxTokens: 4000,
       presencePenalty: -0.1,
       frequencyPenalty: 0.1,
     });
