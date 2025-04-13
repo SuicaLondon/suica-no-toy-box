@@ -1,12 +1,16 @@
+type SponsorListNotFoundProps = {
+  companyName?: string;
+};
+
 export default function SponsorListNotFound({
   companyName,
-}: {
-  companyName: string;
-}) {
+}: SponsorListNotFoundProps) {
   return (
     <div className="py-8 text-center">
       <p className="text-muted-foreground">
-        No results found for {companyName}
+        {companyName
+          ? `No results found for ${companyName}`
+          : "No results found"}
       </p>
     </div>
   );

@@ -1,13 +1,13 @@
 import { prefetchSponsorshipSearch } from "@/actions/prefetch-sponsorship-search";
 import SponsorList from "@/lib/features/sponsorship/sponsor-list";
 
-export default function SponsorListPage({
+export default async function SponsorListPage({
   searchParams,
 }: {
-  searchParams: { companyName?: string };
+  searchParams: Promise<{ companyName?: string }>;
 }) {
-  const companyName = searchParams.companyName;
-  prefetchSponsorshipSearch(companyName);
+  const { companyName } = await searchParams;
+  await prefetchSponsorshipSearch(companyName);
 
   return <SponsorList companyName={companyName} />;
 }

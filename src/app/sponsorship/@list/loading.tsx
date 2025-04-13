@@ -1,1 +1,1 @@
-export * as default from "@/lib/features/sponsorship/sponsor-list-placeholder";
+export * as default from "@/lib/features/sponsorship/sponsor-list-loading";

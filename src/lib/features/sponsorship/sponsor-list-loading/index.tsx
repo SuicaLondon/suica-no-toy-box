@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function SponsorListPlaceholder() {
+export default function SponsorListLoading() {
   return (
     <div className="space-y-4">
       {Array(3)

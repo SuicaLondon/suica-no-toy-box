@@ -1,15 +1,12 @@
-"use client";
-import { useSearchParams } from "next/navigation";
+import { prefetchSponsorshipDetail } from "@/actions/prefetch-sponsorship-detail";
+import SponsorDetail from "@/lib/features/sponsorship/sponsor-detail";
 
-export default function SponsorDetail() {
-  const searchParams = useSearchParams();
-  const selectedCompany = searchParams.get("selectedCompany");
-
-  if (!selectedCompany) return null;
-
-  return (
-    <div>
-      <h1>{selectedCompany} Sponsorship Detail</h1>
-    </div>
-  );
+export default async function SponsorDetailPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ companyId: string }>;
+}) {
+  const { companyId } = await searchParams;
+  await prefetchSponsorshipDetail(companyId);
+  return <SponsorDetail />;
 }

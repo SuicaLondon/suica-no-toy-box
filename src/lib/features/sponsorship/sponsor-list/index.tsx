@@ -3,16 +3,16 @@ import { useSponsorshipSearch } from "@/hooks/use-sponsorship-search";
 import SponsorCard from "../sponsor-card";
 import SponsorListError from "../sponsor-list-error";
 import SponsorListNotFound from "../sponsor-list-not-found";
-import SponsorListPlaceholder from "../sponsor-list-placeholder";
+import SponsorListLoading from "../sponsor-list-loading";
 
 type SponsorListProps = {
-  companyName: string;
+  companyName?: string;
 };
 
 export default function SponsorList({ companyName }: SponsorListProps) {
   const { data: results, isLoading, error, isError } = useSponsorshipSearch();
 
-  if (isLoading) return <SponsorListPlaceholder />;
+  if (isLoading) return <SponsorListLoading />;
 
   if (isError) return <SponsorListError error={error} />;
 
