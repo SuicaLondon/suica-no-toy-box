@@ -1,14 +1,8 @@
-interface SponsorResult {
-  name: string;
-  city: string;
-  county: string;
-  type: string;
-  rate: string;
-}
+import { Company } from "@prisma/client";
 
 export const searchSponsorship = async (
   companyName: string,
-): Promise<SponsorResult[]> => {
+): Promise<Omit<Company, "id" | "createdAt" | "updatedAt">[]> => {
   try {
     const response = await fetch(
       `/api/sponsorship?name=${encodeURIComponent(companyName)}`,
