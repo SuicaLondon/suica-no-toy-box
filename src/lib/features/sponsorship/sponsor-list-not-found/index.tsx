@@ -1,10 +1,8 @@
-type SponsorListNotFoundProps = {
-  companyName: string;
-};
-
 export default function SponsorListNotFound({
   companyName,
-}: SponsorListNotFoundProps) {
+}: {
+  companyName: string;
+}) {
   return (
     <div className="py-8 text-center">
       <p className="text-muted-foreground">

@@ -34,12 +34,12 @@ export default function SponsorPage() {
   const companyName = form.watch("companyName");
   useEffect(() => {
     if (companyName) {
-      router.push(`/sponsorship?companyName=${companyName}`);
+      router.replace(`/sponsorship?companyName=${companyName}`);
     }
   }, [companyName, router]);
 
   const onSubmit = (data: SearchFormData) => {
-    router.push(`/sponsorship?companyName=${data.companyName}`);
+    router.replace(`/sponsorship?companyName=${data.companyName}`);
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@/components/ui/separator";
 
 type SponsorshipLayoutProps = {
   children: React.ReactNode;
@@ -11,7 +11,6 @@ export default function SponsorshipLayout({
   list,
   detail,
 }: SponsorshipLayoutProps) {
-  console.log(list);
   return (
     <div className="mx-auto space-y-4 px-4 py-8">
       <div className="mx-auto max-w-4xl">
@@ -20,13 +19,13 @@ export default function SponsorshipLayout({
           <p className="text-muted-foreground text-lg">
             Search for company sponsorship information in the UK
           </p>
+          {children}
         </div>
-        {children}
-        <Separator className="my-8" />
-        <div className="flex space-x-4">
-          <div className="flex-1">{list}</div>
-          <div className="flex-1">{detail}</div>
-        </div>
+      </div>
+      <Separator className="my-8" />
+      <div className="flex space-x-4">
+        <div className="flex-1">{list}</div>
+        <div className="flex-1">{detail}</div>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { Company } from "@prisma/client";
 
 export const searchSponsorship = async (
   companyName: string,
-): Promise<Omit<Company, "id" | "createdAt" | "updatedAt">[]> => {
+): Promise<Company[]> => {
   try {
     const response = await fetch(
       `/api/sponsorship?name=${encodeURIComponent(companyName)}`,
