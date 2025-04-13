@@ -6,7 +6,7 @@ import { streamText } from "ai";
 import {
   createTranslationPrompt,
   SYSTEM_PROMPT,
-} from "@/lib/prompts/translate-promot";
+} from "@/lib/prompts/translate-prompt";
 
 export async function POST(request: Request) {
   try {

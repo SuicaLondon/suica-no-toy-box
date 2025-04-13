@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function SponsorListPlaceholder() {
+export default function SponsorListLoading() {
   return (
     <div className="space-y-4">
       {Array(3)
@@ -9,10 +9,10 @@ export default function SponsorListPlaceholder() {
         .map((_, i) => (
           <Card key={i}>
             <CardHeader>
-              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-8 w-full" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-24 w-full" />
             </CardContent>
           </Card>
         ))}
