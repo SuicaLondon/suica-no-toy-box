@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/lib/components/ui/button";
+import { Textarea } from "@/lib/components/ui/textarea";
 import CopyButton from "@/lib/components/button/copy-button";
 import LanguageSelect from "@/lib/components/select/language-select";
 import { useTranslate } from "@/lib/hooks/use-translate";
