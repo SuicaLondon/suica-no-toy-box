@@ -30,7 +30,7 @@ export default function SponsorCard({
       <CardContent className="space-y-2">
         <div className="flex items-center gap-2">
           <Badge variant="outline">{city}</Badge>
-          <Badge variant="outline">{county}</Badge>
+          {county && <Badge variant="outline">{county}</Badge>}
         </div>
         <p className="text-muted-foreground text-sm">Type: {type}</p>
       </CardContent>
