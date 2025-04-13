@@ -79,6 +79,7 @@ export async function GET(request: Request) {
       where: {
         name: {
           contains: companyName,
+          mode: "insensitive",
         },
       },
       take: 10,
