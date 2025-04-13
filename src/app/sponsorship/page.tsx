@@ -1,14 +1,6 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -19,11 +11,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/lib/components/ui/button";
-import { useSponsorshipSearch } from "@/lib/hooks/use-sponsorship-search";
+import { useSponsorshipSearch } from "@/hooks/use-sponsorship-search";
+import SponsorCard from "@/lib/features/sponsorship/sponsor-card";
+import SponsorListError from "@/lib/features/sponsorship/sponsor-list-error";
+import SponsorListNotFound from "@/lib/features/sponsorship/sponsor-list-not-found";
+import SponsorListPlaceholder from "@/lib/features/sponsorship/sponsor-list-placeholder";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -97,58 +91,25 @@ export default function SponsorPage() {
 
         <Separator className="my-8" />
 
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error instanceof Error
-                ? error.message
-                : "Failed to fetch results. Please try again."}
-            </AlertDescription>
-          </Alert>
-        )}
+        {error && <SponsorListError error={error} />}
 
         {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <SponsorListPlaceholder />
         ) : results && results.length > 0 ? (
           <div className="space-y-4">
             {results.map((result, index) => (
-              <Card key={index} className="transition-shadow hover:shadow-md">
-                <CardHeader>
-                  <CardTitle className="text-xl">{result.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{result.city}</Badge>
-                    <Badge variant="outline">{result.county}</Badge>
-                  </div>
-                  <p className="text-muted-foreground text-sm">
-                    Type: {result.type}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Badge variant="secondary">Rate: {result.rate}</Badge>
-                </CardFooter>
-              </Card>
+              <SponsorCard
+                key={index}
+                name={result.name}
+                city={result.city}
+                county={result.county}
+                type={result.type}
+                rate={result.rate}
+              />
             ))}
           </div>
         ) : companyName && !isLoading ? (
-          <div className="py-8 text-center">
-            <p className="text-muted-foreground">
-              No results found for {companyName}
-            </p>
-          </div>
+          <SponsorListNotFound companyName={companyName} />
         ) : null}
       </div>
     </div>

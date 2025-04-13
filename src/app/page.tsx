@@ -1,9 +1,9 @@
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { apps } from "@/lib/constants/toys";
-import { GITHUB_URL } from "@/lib/constants/urls";
+import { apps } from "@/constants/toys";
+import { GITHUB_URL } from "@/constants/urls";
 
 export default function Home() {
   return (

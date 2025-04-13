@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { searchSponsorship } from "@/lib/clients/sponsorship-client";
+import { searchSponsorship } from "@/clients/sponsorship-client";
 
 export const useSponsorshipSearch = (companyName?: string) => {
   return useQuery({

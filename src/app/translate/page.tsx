@@ -1,14 +1,11 @@
 "use client";
 
-import { Button } from "@/lib/components/ui/button";
-import { Textarea } from "@/lib/components/ui/textarea";
-import CopyButton from "@/lib/components/button/copy-button";
-import LanguageSelect from "@/lib/components/select/language-select";
-import { useTranslate } from "@/lib/hooks/use-translate";
-import {
-  translateFormSchema,
-  TranslateFormValues,
-} from "@/lib/schemas/translate";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import CopyButton from "@/components/button/copy-button";
+import LanguageSelect from "@/components/select/language-select";
+import { useTranslate } from "@/hooks/use-translate";
+import { translateFormSchema, TranslateFormValues } from "@/schemas/translate";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftRight, Languages } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";

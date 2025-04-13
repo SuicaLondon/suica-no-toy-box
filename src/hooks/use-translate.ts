@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { translateText } from "@/lib/clients/translate-client";
-import { TranslateRequest } from "@/lib/schemas/translate";
+import { translateText } from "@/clients/translate-client";
+import { TranslateRequest } from "@/schemas/translate";
 
 type TranslateError = {
   error: string;

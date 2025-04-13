@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { openai } from "@ai-sdk/openai";
-import { translateRequestSchema } from "@/lib/schemas/translate";
+import { translateRequestSchema } from "@/schemas/translate";
 import { streamText } from "ai";
 import {
   createTranslationPrompt,
