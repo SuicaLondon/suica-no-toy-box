@@ -33,7 +33,7 @@ export default function SponsorDetail() {
   }
 
   return (
-    <Card className="mx-auto w-full max-w-2xl">
+    <Card>
       <CardHeader>
         <CardTitle>Company Details</CardTitle>
         <CardDescription>
