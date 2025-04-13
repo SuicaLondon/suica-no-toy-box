@@ -20,6 +20,10 @@ export default function SponsorDetail() {
     error,
   } = useSponsorshipDetail(companyId);
 
+  if (!companyId) {
+    return null;
+  }
+
   if (isLoading) {
     return <SponsorDetailLoading />;
   }
