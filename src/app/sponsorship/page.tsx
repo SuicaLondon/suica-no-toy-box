@@ -20,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/lib/components/ui/button";
-import { useSponsorshipSearch } from "@/lib/hooks/use-sponsorship-search";
+import { Button } from "@/components/ui/button";
+import { useSponsorshipSearch } from "@/hooks/use-sponsorship-search";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -110,16 +110,18 @@ export default function SponsorPage() {
 
         {isLoading ? (
           <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
+            {Array(3)
+              .fill(null)
+              .map((_, i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-1/2" />
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         ) : results && results.length > 0 ? (
           <div className="space-y-4">

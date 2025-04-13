@@ -2,7 +2,7 @@ import { load } from "cheerio";
 
 import { NextResponse } from "next/server";
 import { Company } from "@prisma/client";
-import { parseCompanies } from "@/app/utils/parser";
+import { parseCompanies } from "@/utils/parser";
 import { prisma } from "@/prisma/prisma";
 
 async function fetchCSVLink(): Promise<string | void> {

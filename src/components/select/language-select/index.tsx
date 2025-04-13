@@ -4,8 +4,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/lib/components/ui/select";
-import { languages } from "@/lib/constants/languages";
+} from "@/components/ui/select";
+import { languages } from "@/constants/languages";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
 type LanguageSelectProps<T extends FieldValues> = {
