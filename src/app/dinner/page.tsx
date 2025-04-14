@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import DinnerResult from "@/lib/features/dinner/dinner-result";
+import { DinnerRoulette } from "@/lib/features/dinner/dinner-roulette";
 import { CuisineFormValues, cuisineSchema } from "@/schemas/dinner-decider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -19,6 +21,7 @@ import { useForm } from "react-hook-form";
 export default function DinnerDecider() {
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
+  const [isSpinning, setIsSpinning] = useState(false);
 
   const {
     register,
@@ -34,10 +37,17 @@ export default function DinnerDecider() {
     reset();
   };
 
-  const decideDinner = () => {
+  const startRoulette = () => {
     if (cuisines.length === 0) return;
+
+    // Select the result first
     const randomIndex = Math.floor(Math.random() * cuisines.length);
     setSelectedCuisine(cuisines[randomIndex]);
+    setIsSpinning(true);
+  };
+
+  const handleSpinComplete = () => {
+    setIsSpinning(false);
   };
 
   const removeCuisine = (index: number) => {
@@ -97,19 +107,26 @@ export default function DinnerDecider() {
                 </div>
               </div>
 
-              <Button onClick={decideDinner} className="w-full">
-                Decide Dinner!
+              <Button
+                onClick={startRoulette}
+                className="w-full"
+                disabled={isSpinning}
+              >
+                {isSpinning ? "Spinning..." : "Decide Dinner!"}
               </Button>
 
-              {selectedCuisine && (
-                <div className="bg-primary/10 rounded-lg p-4 text-center">
-                  <p className="text-lg font-medium">
-                    Tonight&apos;s dinner will be:
-                  </p>
-                  <p className="text-primary mt-2 text-2xl font-bold">
-                    {selectedCuisine}
-                  </p>
+              {cuisines.length > 2 && (
+                <div className="relative flex h-[300px] w-full items-center justify-center">
+                  <DinnerRoulette
+                    options={cuisines}
+                    result={selectedCuisine || ""}
+                    onSpinComplete={handleSpinComplete}
+                  />
                 </div>
+              )}
+
+              {selectedCuisine && !isSpinning && (
+                <DinnerResult result={selectedCuisine} />
               )}
             </div>
           )}
