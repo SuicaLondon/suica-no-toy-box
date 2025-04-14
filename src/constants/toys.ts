@@ -1,4 +1,4 @@
-import { Languages, Book } from "lucide-react";
+import { Languages, Book, ForkKnife } from "lucide-react";
 
 export const apps = [
   {
@@ -13,5 +13,11 @@ export const apps = [
       "Search for sponsorships for the company you want to apply to in the UK",
     icon: Book,
     href: "/sponsorship",
+  },
+  {
+    title: "What for dinner?",
+    description: "Decide what to eat for dinner",
+    icon: ForkKnife,
+    href: "/dinner",
   },
 ] as const;
