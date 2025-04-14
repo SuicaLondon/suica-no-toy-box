@@ -1,4 +1,7 @@
-import { createSponsorshipPrompt } from "@/lib/prompts/sponsorship-promt";
+import {
+  createSponsorshipPrompt,
+  SYSTEM_PROMPT,
+} from "@/lib/prompts/sponsorship-promt";
 import { prisma } from "@/prisma/prisma";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
@@ -22,8 +25,13 @@ export async function GET(
       return NextResponse.json({ error: "Company not found" }, { status: 404 });
     }
 
+    if (company.url) {
+      return NextResponse.json({ data: company });
+    }
+
     const { object } = await generateObject({
       model: openai("gpt-4o"),
+      system: SYSTEM_PROMPT,
       prompt: createSponsorshipPrompt(company.name),
       schema: z.object({
         url: z.string(),
@@ -31,6 +39,16 @@ export async function GET(
         values: z.string(),
         businessModel: z.string(),
       }),
+    });
+
+    await prisma.company.update({
+      where: { id: companyId },
+      data: {
+        url: object.url,
+        description: object.description,
+        values: object.values,
+        businessModel: object.businessModel,
+      },
     });
 
     return NextResponse.json({ data: { ...company, ...object } });

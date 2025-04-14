@@ -13,8 +13,9 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useDebounceCallback } from "usehooks-ts";
 import * as z from "zod";
 
 const searchSchema = z.object({
@@ -32,14 +33,27 @@ export default function SponsorPage() {
     },
   });
   const companyName = form.watch("companyName");
+
+  const updateCompanyName = useCallback(
+    (name: string) => {
+      router.replace(`/sponsorship?companyName=${name}`);
+    },
+    [router],
+  );
+
+  const debouncedUpdateCompanyName = useDebounceCallback(
+    updateCompanyName,
+    200,
+  );
+
   useEffect(() => {
     if (companyName) {
-      router.replace(`/sponsorship?companyName=${companyName}`);
+      debouncedUpdateCompanyName(companyName);
     }
-  }, [companyName, router]);
+  }, [companyName, debouncedUpdateCompanyName]);
 
   const onSubmit = (data: SearchFormData) => {
-    router.replace(`/sponsorship?companyName=${data.companyName}`);
+    updateCompanyName(data.companyName);
   };
 
   return (
