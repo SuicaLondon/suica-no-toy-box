@@ -1,10 +1,19 @@
 import { Company } from "@prisma/client";
 
-export function parseCompanies(
-  data: string,
-): Omit<Company, "id" | "createdAt" | "updatedAt">[] {
+export type CompanyItem = Omit<
+  Company,
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "url"
+  | "description"
+  | "values"
+  | "businessModel"
+>;
+
+export function parseCompanies(data: string): CompanyItem[] {
   const rows: string[] = data.split("\n").slice(1);
-  const companies: Omit<Company, "id" | "createdAt" | "updatedAt">[] = [];
+  const companies: CompanyItem[] = [];
   for (let i = 0; i < rows.length; i++) {
     let row = rows[i];
     row = row.replaceAll("\r", "");

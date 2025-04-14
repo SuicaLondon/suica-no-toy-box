@@ -1,9 +1,8 @@
 import { load } from "cheerio";
 
-import { NextResponse } from "next/server";
-import { Company } from "@prisma/client";
-import { parseCompanies } from "@/utils/parser";
 import { prisma } from "@/prisma/prisma";
+import { CompanyItem, parseCompanies } from "@/utils/parser";
+import { NextResponse } from "next/server";
 
 async function fetchCSVLink(): Promise<string | void> {
   try {
@@ -34,9 +33,7 @@ async function downloadData(url: string): Promise<string | void> {
   }
 }
 
-async function fetchCompanies(): Promise<
-  Omit<Company, "id" | "createdAt" | "updatedAt">[] | undefined
-> {
+async function fetchCompanies(): Promise<CompanyItem[] | undefined> {
   try {
     const link = await fetchCSVLink();
     if (!link) throw new Error("No link found");
@@ -71,11 +68,27 @@ export async function GET(request: Request) {
 
     if (!companyName) {
       const companies = await prisma.company.findMany({
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          county: true,
+          type: true,
+          rate: true,
+        },
         take: 100,
       });
       return NextResponse.json({ data: companies });
     }
     const company = await prisma.company.findMany({
+      select: {
+        id: true,
+        name: true,
+        city: true,
+        county: true,
+        type: true,
+        rate: true,
+      },
       where: {
         name: {
           contains: companyName,
