@@ -115,7 +115,7 @@ export default function DinnerDecider() {
                 {isSpinning ? "Spinning..." : "Decide Dinner!"}
               </Button>
 
-              {cuisines.length > 2 && (
+              {cuisines.length > 1 && (
                 <div className="relative flex h-[300px] w-full items-center justify-center">
                   <DinnerRoulette
                     options={cuisines}
