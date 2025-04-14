@@ -7,7 +7,11 @@ export default async function SponsorListPage({
   searchParams: Promise<{ companyName?: string }>;
 }) {
   const { companyName } = await searchParams;
-  await prefetchSponsorshipSearch(companyName);
+  try {
+    await prefetchSponsorshipSearch(companyName);
+  } catch (error) {
+    console.error(error);
+  }
 
   return <SponsorList companyName={companyName} />;
 }
