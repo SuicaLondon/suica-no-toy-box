@@ -1,14 +1,30 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import CopyButton from "@/components/button/copy-button";
 import LanguageSelect from "@/components/select/language-select";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { LanguageCode, languages } from "@/constants/languages";
 import { useTranslate } from "@/hooks/use-translate";
 import { translateFormSchema, TranslateFormValues } from "@/schemas/translate";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftRight, Languages } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
+
+const getSavedLanguage = (
+  key: string,
+  defaultValue: LanguageCode,
+): LanguageCode => {
+  if (typeof window === "undefined") return defaultValue;
+  try {
+    const saved = localStorage.getItem(key);
+    return saved && languages.some((lang) => lang.code === saved)
+      ? (saved as LanguageCode)
+      : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
 
 export default function TranslatePage() {
   const form = useForm<TranslateFormValues>({
@@ -16,11 +32,10 @@ export default function TranslatePage() {
     defaultValues: {
       sourceText: "",
       targetText: "",
-      sourceLang: "en",
-      targetLang: "es",
+      sourceLang: getSavedLanguage("sourceLang", "en"),
+      targetLang: getSavedLanguage("targetLang", "es"),
     },
   });
-
   const { mutate: translateMutation, isPending: isTranslating } =
     useTranslate();
 
@@ -30,10 +45,14 @@ export default function TranslatePage() {
     form.setValue("targetLang", currentValues.sourceLang);
     form.setValue("sourceText", currentValues.targetText);
     form.setValue("targetText", currentValues.sourceText);
+    localStorage.setItem("sourceLang", currentValues.targetLang);
+    localStorage.setItem("targetLang", currentValues.sourceLang);
   };
 
   const onSubmit = async (data: TranslateFormValues) => {
     form.setValue("targetText", "");
+    localStorage.setItem("sourceLang", data.sourceLang);
+    localStorage.setItem("targetLang", data.targetLang);
 
     translateMutation(
       {
