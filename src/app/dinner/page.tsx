@@ -11,11 +11,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import DinnerResult from "@/lib/features/dinner/dinner-result";
+import { DinnerResult } from "@/lib/features/dinner/dinner-result";
 import { DinnerRoulette } from "@/lib/features/dinner/dinner-roulette";
+import { DinnerSelections } from "@/lib/features/dinner/dinner-selections";
 import { CuisineFormValues, cuisineSchema } from "@/schemas/dinner-decider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function DinnerDecider() {
@@ -32,28 +33,34 @@ export default function DinnerDecider() {
     resolver: zodResolver(cuisineSchema),
   });
 
-  const onSubmit = (data: CuisineFormValues) => {
-    setCuisines([...cuisines, data.cuisine]);
-    reset();
-  };
+  const onSubmit = useCallback(
+    (data: CuisineFormValues) => {
+      setCuisines([...cuisines, data.cuisine]);
+      reset();
+    },
+    [cuisines, reset],
+  );
 
-  const startRoulette = () => {
-    if (cuisines.length === 0) return;
+  const startRoulette = useCallback(() => {
+    if (cuisines.length <= 1) return;
 
     // Select the result first
     const randomIndex = Math.floor(Math.random() * cuisines.length);
     setSelectedCuisine(cuisines[randomIndex]);
     setIsSpinning(true);
-  };
+  }, [cuisines]);
 
-  const handleSpinComplete = () => {
+  const handleSpinComplete = useCallback(() => {
     setIsSpinning(false);
-  };
+  }, []);
 
-  const removeCuisine = (index: number) => {
-    setCuisines(cuisines.filter((_, i) => i !== index));
-    setSelectedCuisine(null);
-  };
+  const removeCuisine = useCallback(
+    (index: number) => {
+      setCuisines(cuisines.filter((_, i) => i !== index));
+      setSelectedCuisine(null);
+    },
+    [cuisines],
+  );
 
   return (
     <div className="container mx-auto max-w-2xl p-4">
@@ -87,30 +94,15 @@ export default function DinnerDecider() {
 
           {cuisines.length > 0 && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="font-medium">Your Options:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {cuisines.map((cuisine, index) => (
-                    <div
-                      key={index}
-                      className="bg-secondary flex items-center gap-2 rounded-full px-3 py-1"
-                    >
-                      <span>{cuisine}</span>
-                      <button
-                        onClick={() => removeCuisine(index)}
-                        className="text-muted-foreground hover:text-foreground text-sm"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <DinnerSelections
+                cuisines={cuisines}
+                removeCuisine={removeCuisine}
+              />
 
               <Button
                 onClick={startRoulette}
                 className="w-full"
-                disabled={isSpinning}
+                disabled={isSpinning || cuisines.length <= 1}
               >
                 {isSpinning ? "Spinning..." : "Decide Dinner!"}
               </Button>
@@ -118,6 +110,7 @@ export default function DinnerDecider() {
               {cuisines.length > 1 && (
                 <div className="relative flex h-[300px] w-full items-center justify-center">
                   <DinnerRoulette
+                    isSpinning={isSpinning}
                     options={cuisines}
                     result={selectedCuisine || ""}
                     onSpinComplete={handleSpinComplete}
