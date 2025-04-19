@@ -1,8 +1,12 @@
+import { memo } from "react";
+
 type DinnerResultProps = {
   result: string;
 };
 
-export default function DinnerResult({ result }: DinnerResultProps) {
+export const DinnerResult = memo(function DinnerResult({
+  result,
+}: DinnerResultProps) {
   return (
     <div className="inset-0 flex items-center justify-center">
       <div className="bg-primary/10 rounded-lg p-4 text-center">
@@ -11,4 +15,4 @@ export default function DinnerResult({ result }: DinnerResultProps) {
       </div>
     </div>
   );
-}
+});

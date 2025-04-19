@@ -1,4 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+
+const radius = 150;
+const center = radius;
 
 const generateRandomColor = () => {
   const hue = Math.floor(Math.random() * 360);
@@ -7,25 +10,37 @@ const generateRandomColor = () => {
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
+const getCoordinates = (deg: number) => {
+  const rad = (deg * Math.PI) / 180;
+  return {
+    x: center + radius * Math.cos(rad),
+    y: center + radius * Math.sin(rad),
+  };
+};
+
 type DinnerRouletteProps = {
+  isSpinning: boolean;
   options: string[];
   result: string;
   duration?: number;
   onSpinComplete?: () => void;
 };
 
-export const DinnerRoulette = ({
+export const DinnerRoulette = memo(function DinnerRoulette({
+  isSpinning,
   options,
   result,
-  duration = 5000,
+  duration = 3000,
   onSpinComplete,
-}: DinnerRouletteProps) => {
-  const radius = 150;
-  const center = radius;
+}: DinnerRouletteProps) {
   const angle = 360 / options.length;
+
   const [rotation, setRotation] = useState(0);
   const svgRef = useRef<HTMLDivElement>(null);
-
+  const resultIndex = useMemo(
+    () => options.findIndex((s) => s === result),
+    [options, result],
+  );
   const colors = useMemo(
     () => options.map(() => generateRandomColor()),
     [options],
@@ -33,30 +48,23 @@ export const DinnerRoulette = ({
 
   useEffect(() => {
     if (!result) return;
+    if (resultIndex === -1) return;
+    if (!isSpinning) return;
 
-    const finalIndex = options.findIndex((s) => s === result);
-    if (finalIndex === -1) return;
+    const targetAngle = (360 - (angle * resultIndex + angle / 2) + 270) % 360;
 
-    const spins = 5;
-    const targetAngle = (360 - (angle * finalIndex + angle / 2) + 270) % 360;
-
-    const totalRotation = spins * 360 + targetAngle;
-    setRotation(totalRotation);
+    setRotation((rotation) => {
+      const spins = rotation < 360 ? 5 : 0;
+      const totalRotation = spins * 360 + targetAngle;
+      return totalRotation;
+    });
 
     const timer = setTimeout(() => {
       onSpinComplete?.();
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [result, options, angle, duration, onSpinComplete]);
-
-  const getCoordinates = (deg: number) => {
-    const rad = (deg * Math.PI) / 180;
-    return {
-      x: center + radius * Math.cos(rad),
-      y: center + radius * Math.sin(rad),
-    };
-  };
+  }, [result, duration, onSpinComplete, isSpinning, resultIndex, angle]);
 
   return (
     <div className="relative flex items-center justify-center p-8">
@@ -116,4 +124,4 @@ export const DinnerRoulette = ({
       <div className="absolute top-1/2 h-0 w-0 -translate-y-[150px] border-r-8 border-b-[20px] border-l-8 border-r-transparent border-b-black border-l-transparent" />
     </div>
   );
-};
+});
