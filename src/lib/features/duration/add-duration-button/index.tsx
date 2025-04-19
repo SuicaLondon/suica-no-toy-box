@@ -17,20 +17,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { durationFormSchema } from "@/schemas/duration";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DateCalendar } from "../date-calendar";
+import { NotRepeatSelect } from "./not-repeat-select";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
@@ -47,6 +41,7 @@ type AddDurationButtonProps = {
 
 export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
   const [open, setOpen] = useState(false);
+  const portalContainerRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(durationFormSchema),
@@ -79,7 +74,7 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
           Add date
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" ref={portalContainerRef}>
         <DialogHeader>
           <DialogTitle>Add New Duration</DialogTitle>
         </DialogHeader>
@@ -98,33 +93,11 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="repeat"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Repeat</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select repeat option" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">No Repeat</SelectItem>
-                      <SelectItem value="week">Every Week</SelectItem>
-                      <SelectItem value="month">Every Month</SelectItem>
-                      <SelectItem value="year">Every Year</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <NotRepeatSelect
+              portalContainerRef={portalContainerRef}
+              form={form}
             />
-            <DateCalendar form={form} />
+            <DateCalendar portalContainerRef={portalContainerRef} form={form} />
             <Button type="submit" className="w-full">
               Add Duration
             </Button>

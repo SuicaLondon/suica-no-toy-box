@@ -5,10 +5,22 @@ import {
   DurationWidget,
   DurationWidgetItem,
 } from "@/lib/features/duration/duration-widget";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DurationPage() {
   const [widgets, setWidgets] = useState<DurationWidget[]>([]);
+
+  useEffect(() => {
+    const storedWidgets = localStorage.getItem("duration-widgets");
+    if (storedWidgets) {
+      const parsedWidgets = JSON.parse(storedWidgets) ?? [];
+      setWidgets(parsedWidgets);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("duration-widgets", JSON.stringify(widgets));
+  }, [widgets]);
 
   const addWidget = (widget: DurationWidget) => {
     setWidgets([...widgets, widget]);

@@ -3,16 +3,18 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { YearSelect } from "./year-select";
-import { memo } from "react";
+import { memo, RefObject } from "react";
 import { format } from "date-fns";
 
 type CalendarNavigatorProps = {
+  portalContainerRef: RefObject<HTMLDivElement | null>;
   currentDate: Date;
   handleMonthChange: (months: number) => void;
   handleYearChange: (year: number) => void;
 };
 
 export const CalendarNavigator = memo(function CalendarNavigator({
+  portalContainerRef,
   currentDate,
   handleMonthChange,
   handleYearChange,
@@ -29,6 +31,7 @@ export const CalendarNavigator = memo(function CalendarNavigator({
       </Button>
       <span className="text-sm">{format(currentDate, "MMMM")}</span>
       <YearSelect
+        portalContainerRef={portalContainerRef}
         currentDate={currentDate}
         handleYearChange={handleYearChange}
       />

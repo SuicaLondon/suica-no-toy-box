@@ -5,17 +5,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { memo, useMemo } from "react";
+import { memo, RefObject, useMemo, useState } from "react";
 
 type YearSelectProps = {
+  portalContainerRef: RefObject<HTMLDivElement | null>;
   currentDate: Date;
   handleYearChange: (year: number) => void;
 };
 
 export const YearSelect = memo(function YearSelect({
+  portalContainerRef,
   currentDate,
   handleYearChange,
 }: YearSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
     const years = [];
@@ -27,13 +30,15 @@ export const YearSelect = memo(function YearSelect({
 
   return (
     <Select
+      open={isOpen}
+      onOpenChange={setIsOpen}
       value={currentDate.getFullYear().toString()}
       onValueChange={(value) => handleYearChange(parseInt(value))}
     >
       <SelectTrigger className="border-none shadow-none">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent container={portalContainerRef.current}>
         {yearOptions.map((year) => (
           <SelectItem key={year} value={year.toString()}>
             {year}
