@@ -1,4 +1,4 @@
-import { Languages, Book, ForkKnife } from "lucide-react";
+import { Languages, Book, ForkKnife, Calendar } from "lucide-react";
 
 export const apps = [
   {
