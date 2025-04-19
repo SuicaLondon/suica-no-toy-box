@@ -20,4 +20,11 @@ export const apps = [
     icon: ForkKnife,
     href: "/dinner",
   },
+  {
+    title: "Duration Board",
+    description:
+      "A board for tracking important dates to make your life have hope.",
+    icon: Calendar,
+    href: "/duration",
+  },
 ] as const;
