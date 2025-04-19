@@ -1,4 +1,4 @@
-import { Languages, Book, ForkKnife } from "lucide-react";
+import { Languages, Book, ForkKnife, Calendar } from "lucide-react";
 
 export const apps = [
   {
@@ -19,5 +19,12 @@ export const apps = [
     description: "Decide what to eat for dinner",
     icon: ForkKnife,
     href: "/dinner",
+  },
+  {
+    title: "Duration Board",
+    description:
+      "A board for tracking important dates to make your life have hope.",
+    icon: Calendar,
+    href: "/duration",
   },
 ] as const;
