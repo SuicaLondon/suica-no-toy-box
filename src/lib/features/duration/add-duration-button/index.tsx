@@ -24,7 +24,6 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DateCalendar } from "../date-calendar";
-import { NotRepeatSelect } from "./not-repeat-select";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
@@ -93,10 +92,10 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
                 </FormItem>
               )}
             />
-            <NotRepeatSelect
+            {/* <NotRepeatSelect
               portalContainerRef={portalContainerRef}
               form={form}
-            />
+            /> */}
             <DateCalendar portalContainerRef={portalContainerRef} form={form} />
             <Button type="submit" className="w-full">
               Add Duration
