@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 
 import { prisma } from "@/prisma/prisma";
-import { CompanyItem, parseCompanies } from "@/utils/parser";
+import { parseCompanies } from "@/utils/parser";
 import { NextResponse } from "next/server";
 
 async function fetchCSVLink(): Promise<string | void> {
@@ -33,35 +33,45 @@ async function downloadData(url: string): Promise<string | void> {
   }
 }
 
-async function fetchCompanies(): Promise<CompanyItem[] | undefined> {
-  try {
-    const link = await fetchCSVLink();
-    if (!link) throw new Error("No link found");
-    const data = await downloadData(link!);
-    if (!data) throw new Error("No data found");
-    return parseCompanies(data);
-  } catch (error) {
-    console.error(`download error: ${error}`);
-    throw error;
-  }
-}
-
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     if (searchParams.get("refresh")) {
-      const companies = await fetchCompanies();
+      console.time("fetch companies");
+
+      const link = await fetchCSVLink();
+      console.log("fetch CSV link success");
+      console.timeLog("fetch companies");
+
+      if (!link) throw new Error("No link found");
+
+      const data = await downloadData(link!);
+      console.log("download data success");
+      console.timeLog("fetch companies");
+
+      if (!data) throw new Error("No data found");
+      console.log("parse companies success");
+      console.timeLog("fetch companies");
+
+      const companies = parseCompanies(data);
       if (!companies) {
         throw new Error("No companies data available");
       }
       await prisma.company.deleteMany();
-      for (let i = 0; i < companies.length; i += 100) {
-        const slicedCompanies = companies.slice(i, i + 100);
-        await prisma.company.createMany({
-          data: slicedCompanies,
-        });
+      const tasks = [];
+      for (let i = 0; i < companies.length; i += 1000) {
+        const slicedCompanies = companies.slice(i, i + 1000);
+        tasks.push(
+          prisma.company.createMany({
+            data: slicedCompanies,
+          }),
+        );
       }
-
+      console.log(tasks.length);
+      for (let i = 0; i < tasks.length; i += 10) {
+        await Promise.all(tasks.slice(i, i + 10));
+      }
+      console.timeEnd("fetch companies");
       return NextResponse.json({ data: companies });
     }
     const companyName = searchParams.get("name");
