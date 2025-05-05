@@ -83,12 +83,13 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
             />
             <div className="flex items-center gap-2">
               <TypeSelect portalContainerRef={portalContainerRef} form={form} />
-              {selectedType === "none" && (
-                <RepeatSelect
-                  portalContainerRef={portalContainerRef}
-                  form={form}
-                />
-              )}
+              {selectedType === "none" ||
+                (selectedType === "bills" && (
+                  <RepeatSelect
+                    portalContainerRef={portalContainerRef}
+                    form={form}
+                  />
+                ))}
             </div>
 
             <DateCalendar portalContainerRef={portalContainerRef} form={form} />
@@ -111,7 +112,7 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
       case "birthday":
         return "year";
       case "bills":
-        return "month";
+        return repeat;
       default:
         return repeat;
     }
