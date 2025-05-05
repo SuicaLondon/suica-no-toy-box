@@ -14,11 +14,13 @@ import { WidgetMenu } from "./widget-menu";
 type DurationWidgetItemProps = {
   widget: DurationWidget;
   onDelete: (widget: DurationWidget) => void;
+  onEdit: (widget: DurationWidget) => void;
 };
 
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
   onDelete,
+  onEdit,
 }: DurationWidgetItemProps) {
   const timeDiffienceLabel = useMemo(() => {
     return format(widget.date, "PPP") > format(new Date(), "PPP")
@@ -89,7 +91,11 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
         <CardTitle className="flex w-full items-center justify-between">
           <div className="flex w-full items-center justify-between">
             <h1 className="text-lg font-bold">{widget.name}</h1>
-            <WidgetMenu onDelete={() => onDelete(widget)} />
+            <WidgetMenu
+              widget={widget}
+              onDelete={() => onDelete(widget)}
+              onEdit={onEdit}
+            />
           </div>
         </CardTitle>
         <CardDescription>

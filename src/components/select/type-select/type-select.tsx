@@ -10,43 +10,25 @@ import { Select, SelectItem } from "@/components/ui/select";
 import { memo, RefObject, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { DurationFormValues } from "@/schemas/duration";
+import { typeOptions } from "@/constants/duration";
 
-const repeatOptions = [
-  {
-    label: "No Repeat",
-    value: "none",
-  },
-  {
-    label: "Every Week",
-    value: "week",
-  },
-  {
-    label: "Every Month",
-    value: "month",
-  },
-  {
-    label: "Every Year",
-    value: "year",
-  },
-];
-
-type RepeatSelectProps = {
-  portalContainerRef: RefObject<HTMLDivElement | null>;
+type TypeSelectProps = {
+  portalContainerRef?: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues>;
 };
 
-export const RepeatSelect = memo(function RepeatSelect({
+export const TypeSelect = memo(function TypeSelect({
   portalContainerRef,
   form,
-}: RepeatSelectProps) {
+}: TypeSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <FormField
       control={form.control}
-      name="repeat"
+      name="type"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Repeat</FormLabel>
+          <FormLabel>Type</FormLabel>
           <Select
             open={isOpen}
             onOpenChange={setIsOpen}
@@ -55,11 +37,11 @@ export const RepeatSelect = memo(function RepeatSelect({
           >
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select repeat option" />
+                <SelectValue placeholder="Select type" />
               </SelectTrigger>
             </FormControl>
-            <SelectContent container={portalContainerRef.current}>
-              {repeatOptions.map((option) => (
+            <SelectContent container={portalContainerRef?.current}>
+              {typeOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>

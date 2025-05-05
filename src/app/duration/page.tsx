@@ -29,6 +29,13 @@ export default function DurationPage() {
     localStorage.setItem("duration-widgets", JSON.stringify(widgets));
   };
 
+  const editWidget = (widget: DurationWidget) => {
+    console.log(widget);
+    setWidgets(widgets.map((w) => (w.id === widget.id ? widget : w)));
+    console.log(widgets);
+    localStorage.setItem("duration-widgets", JSON.stringify(widgets));
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 py-16">
@@ -44,6 +51,9 @@ export default function DurationPage() {
               widget={widget}
               onDelete={(widget) => {
                 deleteWidget(widget.id);
+              }}
+              onEdit={(widget) => {
+                editWidget(widget);
               }}
             />
           ))}
