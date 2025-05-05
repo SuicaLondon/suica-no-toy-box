@@ -26,7 +26,7 @@ export function getAnniversaryLabel(nextDate: Date, now: Date) {
     now,
   );
 
-  return `Next anniversary is in ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
+  return `Next anniversary is in ${days} days ${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 export function getBirthdayLabel(nextDate: Date, now: Date) {
@@ -35,7 +35,7 @@ export function getBirthdayLabel(nextDate: Date, now: Date) {
     now,
   );
 
-  return `Next birthday is in ${days} days ${hours}:${minutes}:${seconds}`;
+  return `Next birthday is in ${days} days ${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 export function getBillsLabel(nextDate: Date, now: Date) {
