@@ -35,13 +35,13 @@ export function getBirthdayLabel(nextDate: Date, now: Date) {
     now,
   );
 
-  return `Next birthday is in ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
+  return `Next birthday is in ${days} days ${hours}:${minutes}:${seconds}`;
 }
 
 export function getBillsLabel(nextDate: Date, now: Date) {
   const { days } = getTimeDifferenceObject(nextDate, now);
 
-  return `Next bill day is in ${days}`;
+  return `Next bill day is in ${days} days`;
 }
 
 export function getDefaultLabel(nextDate: Date, now: Date) {

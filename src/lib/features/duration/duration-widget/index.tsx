@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { format, formatDistanceToNow } from "date-fns";
+import { differenceInYears, format, formatDistanceToNow } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { DurationWidget } from "../duration.type";
@@ -42,10 +42,21 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
   }, [widget.type]);
 
   const timeDiffienceLabel = useMemo(() => {
-    return new Date(widget.date) > new Date()
-      ? `in ${formatDistanceToNow(widget.date)}`
-      : `${formatDistanceToNow(widget.date)} ago`;
-  }, [widget.date]);
+    switch (widget.type) {
+      case "anniversary":
+        const nthAnniversary = differenceInYears(now, widget.date);
+        return `${nthAnniversary}${nthAnniversary === 1 ? "st" : nthAnniversary === 2 ? "nd" : nthAnniversary === 3 ? "rd" : "th"} anniversary`;
+      case "birthday":
+        const age = differenceInYears(now, widget.date);
+        return `${age} years old`;
+      case "bills":
+        return null;
+      default:
+        return new Date(widget.date) > new Date()
+          ? `in ${formatDistanceToNow(widget.date)}`
+          : `${formatDistanceToNow(widget.date)} ago`;
+    }
+  }, [now, widget.date, widget.type]);
 
   const nextDateLabel = useMemo(() => {
     if (widget.repeat) {
