@@ -1,10 +1,8 @@
 "use client";
 
 import { AddDurationButton } from "@/lib/features/duration/add-duration-button";
-import {
-  DurationWidget,
-  DurationWidgetItem,
-} from "@/lib/features/duration/duration-widget";
+import { DurationWidgetItem } from "@/lib/features/duration/duration-widget";
+import { DurationWidget } from "@/lib/features/duration/duration.type";
 import { useEffect, useState } from "react";
 
 export default function DurationPage() {
