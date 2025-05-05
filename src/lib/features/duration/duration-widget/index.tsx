@@ -1,36 +1,54 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { format, formatDistanceToNow } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { memo, useMemo } from "react";
+import { DurationWidget } from "../duration.type";
+import { WidgetMenu } from "./widget-menu";
 
-export type DurationWidget = {
-  id: string;
-  name: string;
-  date: Date;
-  repeat?: "week" | "month" | "year";
+type DurationWidgetItemProps = {
+  widget: DurationWidget;
+  onDelete: (widget: DurationWidget) => void;
 };
 
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
-}: {
-  widget: DurationWidget;
-}) {
+  onDelete,
+}: DurationWidgetItemProps) {
   const timeDiffience = useMemo(() => {
     return format(widget.date, "PPP") > format(new Date(), "PPP")
       ? `in ${formatDistanceToNow(widget.date)}`
       : `${formatDistanceToNow(widget.date)} ago`;
   }, [widget.date]);
+
+  const typeLabel = useMemo(() => {
+    switch (widget.type) {
+      case "anniversary":
+        return "Anniversary";
+      case "birthday":
+        return "Birthday";
+      case "bills":
+        return "Bills" + (widget.repeat ? ` every ${widget.repeat}` : "");
+      default:
+        return widget.repeat ? `Repeats every ${widget.repeat}` : "";
+    }
+  }, [widget.type, widget.repeat]);
+
   return (
     <Card key={widget.id}>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>{widget.name}</span>
-          {widget.repeat && (
-            <span className="text-sm text-gray-500">
-              Repeats every {widget.repeat}
-            </span>
-          )}
+        <CardTitle className="flex w-full items-center justify-between">
+          <div className="flex w-full items-center justify-between">
+            <h1 className="text-lg font-bold">{widget.name}</h1>
+            <WidgetMenu onDelete={() => onDelete(widget)} />
+          </div>
         </CardTitle>
+        <CardDescription>{typeLabel}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-2">

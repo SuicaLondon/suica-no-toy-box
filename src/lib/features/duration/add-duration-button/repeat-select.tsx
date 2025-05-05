@@ -11,15 +11,34 @@ import { memo, RefObject, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { DurationFormValues } from "@/schemas/duration";
 
-type NotRepeatSelectProps = {
+const repeatOptions = [
+  {
+    label: "No Repeat",
+    value: "none",
+  },
+  {
+    label: "Every Week",
+    value: "week",
+  },
+  {
+    label: "Every Month",
+    value: "month",
+  },
+  {
+    label: "Every Year",
+    value: "year",
+  },
+];
+
+type RepeatSelectProps = {
   portalContainerRef: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues>;
 };
 
-export const NotRepeatSelect = memo(function NotRepeatSelect({
+export const RepeatSelect = memo(function RepeatSelect({
   portalContainerRef,
   form,
-}: NotRepeatSelectProps) {
+}: RepeatSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <FormField
@@ -40,10 +59,11 @@ export const NotRepeatSelect = memo(function NotRepeatSelect({
               </SelectTrigger>
             </FormControl>
             <SelectContent container={portalContainerRef.current}>
-              <SelectItem value="none">No Repeat</SelectItem>
-              <SelectItem value="week">Every Week</SelectItem>
-              <SelectItem value="month">Every Month</SelectItem>
-              <SelectItem value="year">Every Year</SelectItem>
+              {repeatOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <FormMessage />

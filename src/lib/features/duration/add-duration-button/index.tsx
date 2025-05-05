@@ -17,22 +17,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { durationFormSchema } from "@/schemas/duration";
+import {
+  durationFormSchema,
+  RepeatOptionType,
+  TypeOptionType,
+} from "@/schemas/duration";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DateCalendar } from "../date-calendar";
+import { RepeatSelect } from "./repeat-select";
+import { TypeSelect } from "./type-select";
+import { DurationWidget } from "../duration.type";
 
 type FormValues = z.infer<typeof durationFormSchema>;
-
-type DurationWidget = {
-  id: string;
-  name: string;
-  date: Date;
-  repeat?: "week" | "month" | "year";
-};
 
 type AddDurationButtonProps = {
   addWidget: (widget: DurationWidget) => void;
@@ -47,23 +47,12 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
     defaultValues: {
       name: "",
       date: new Date(),
+      type: "none",
       repeat: "none",
     },
   });
 
-  const onSubmit = (values: FormValues) => {
-    console.log(values);
-    const newWidget: DurationWidget = {
-      id: crypto.randomUUID(),
-      name: values.name,
-      date: values.date,
-      repeat: values.repeat === "none" ? undefined : values.repeat,
-    };
-
-    addWidget(newWidget);
-    form.reset();
-    setOpen(false);
-  };
+  const selectedType = form.watch("type");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -92,10 +81,16 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
                 </FormItem>
               )}
             />
-            {/* <NotRepeatSelect
-              portalContainerRef={portalContainerRef}
-              form={form}
-            /> */}
+            <div className="flex items-center gap-2">
+              <TypeSelect portalContainerRef={portalContainerRef} form={form} />
+              {selectedType === "none" && (
+                <RepeatSelect
+                  portalContainerRef={portalContainerRef}
+                  form={form}
+                />
+              )}
+            </div>
+
             <DateCalendar portalContainerRef={portalContainerRef} form={form} />
             <Button type="submit" className="w-full">
               Add Duration
@@ -105,4 +100,35 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
       </DialogContent>
     </Dialog>
   );
+
+  function calculateRepeat(
+    type: TypeOptionType,
+    repeat: RepeatOptionType,
+  ): RepeatOptionType {
+    switch (type) {
+      case "anniversary":
+        return "year";
+      case "birthday":
+        return "year";
+      case "bills":
+        return "month";
+      default:
+        return repeat;
+    }
+  }
+
+  function onSubmit(values: FormValues) {
+    console.log(values);
+    const newWidget: DurationWidget = {
+      id: crypto.randomUUID(),
+      name: values.name,
+      date: values.date,
+      repeat: calculateRepeat(values.type, values.repeat),
+      type: values.type,
+    };
+
+    addWidget(newWidget);
+    form.reset();
+    setOpen(false);
+  }
 }
