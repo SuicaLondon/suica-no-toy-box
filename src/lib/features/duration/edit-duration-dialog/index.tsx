@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -23,48 +22,47 @@ import {
   TypeOptionType,
 } from "@/schemas/duration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
-import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { DateCalendar } from "../date-calendar";
 import { RepeatSelect } from "../../../../components/select/repeat-select";
 import { TypeSelect } from "../../../../components/select/type-select/type-select";
+import { DateCalendar } from "../date-calendar";
 import { DurationWidget } from "../duration.type";
+import { useRef } from "react";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
-type AddDurationButtonProps = {
-  addWidget: (widget: DurationWidget) => void;
+type EditDurationDialogProps = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  widget: DurationWidget;
+  onEdit: (widget: DurationWidget) => void;
 };
 
-export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
-  const [open, setOpen] = useState(false);
+export function EditDurationDialog({
+  open,
+  setOpen,
+  widget,
+  onEdit,
+}: EditDurationDialogProps) {
   const portalContainerRef = useRef<HTMLDivElement>(null);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(durationFormSchema),
     defaultValues: {
-      name: "",
-      date: new Date(),
-      type: "none",
-      repeat: "none",
+      name: widget.name,
+      date: widget.date,
+      type: widget.type,
+      repeat: widget.repeat,
     },
   });
 
   const selectedType = form.watch("type");
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add date
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]" ref={portalContainerRef}>
         <DialogHeader>
-          <DialogTitle>Add New Duration</DialogTitle>
+          <DialogTitle>Edit Duration</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -82,16 +80,16 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
               )}
             />
             <div className="flex items-center gap-2">
-              <TypeSelect portalContainerRef={portalContainerRef} form={form} />
+              <TypeSelect form={form} portalContainerRef={portalContainerRef} />
               {(selectedType === "none" || selectedType === "bills") && (
                 <RepeatSelect
-                  portalContainerRef={portalContainerRef}
                   form={form}
+                  portalContainerRef={portalContainerRef}
                 />
               )}
             </div>
 
-            <DateCalendar portalContainerRef={portalContainerRef} form={form} />
+            <DateCalendar form={form} portalContainerRef={portalContainerRef} />
             <Button type="submit" className="w-full">
               Add Duration
             </Button>
@@ -100,6 +98,10 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
       </DialogContent>
     </Dialog>
   );
+  function onOpenChange(open: boolean) {
+    setOpen(open);
+    form.reset();
+  }
 
   function calculateRepeat(
     type: TypeOptionType,
@@ -118,16 +120,15 @@ export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
   }
 
   function onSubmit(values: FormValues) {
-    console.log(values);
     const newWidget: DurationWidget = {
-      id: crypto.randomUUID(),
+      id: widget.id,
       name: values.name,
       date: values.date,
       repeat: calculateRepeat(values.type, values.repeat),
       type: values.type,
     };
 
-    addWidget(newWidget);
+    onEdit(newWidget);
     form.reset();
     setOpen(false);
   }

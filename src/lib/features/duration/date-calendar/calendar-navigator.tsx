@@ -7,7 +7,7 @@ import { memo, RefObject } from "react";
 import { format } from "date-fns";
 
 type CalendarNavigatorProps = {
-  portalContainerRef: RefObject<HTMLDivElement | null>;
+  portalContainerRef?: RefObject<HTMLDivElement | null>;
   currentDate: Date;
   handleMonthChange: (months: number) => void;
   handleYearChange: (year: number) => void;

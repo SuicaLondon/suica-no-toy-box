@@ -8,7 +8,7 @@ import {
 import { memo, RefObject, useMemo, useState } from "react";
 
 type YearSelectProps = {
-  portalContainerRef: RefObject<HTMLDivElement | null>;
+  portalContainerRef?: RefObject<HTMLDivElement | null>;
   currentDate: Date;
   handleYearChange: (year: number) => void;
 };
@@ -38,7 +38,7 @@ export const YearSelect = memo(function YearSelect({
       <SelectTrigger className="border-none shadow-none">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent container={portalContainerRef.current}>
+      <SelectContent container={portalContainerRef?.current}>
         {yearOptions.map((year) => (
           <SelectItem key={year} value={year.toString()}>
             {year}

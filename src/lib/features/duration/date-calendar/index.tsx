@@ -12,7 +12,7 @@ import { UseFormReturn } from "react-hook-form";
 import { CalendarNavigator } from "./calendar-navigator";
 
 type DateCalendarProps = {
-  portalContainerRef: RefObject<HTMLDivElement | null>;
+  portalContainerRef?: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues>;
 };
 

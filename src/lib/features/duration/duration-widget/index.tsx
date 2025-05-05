@@ -5,32 +5,63 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { differenceInDays, format, formatDistanceToNow } from "date-fns";
+import { differenceInYears, format, formatDistanceToNow } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { DurationWidget } from "../duration.type";
+import {
+  getAnniversaryLabel,
+  getBillsLabel,
+  getBirthdayLabel,
+  getDefaultLabel,
+} from "./get-time-difference-label";
 import { WidgetMenu } from "./widget-menu";
 
 type DurationWidgetItemProps = {
   widget: DurationWidget;
   onDelete: (widget: DurationWidget) => void;
+  onEdit: (widget: DurationWidget) => void;
 };
+
+const countDownType = ["anniversary", "birthday"] as const;
 
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
   onDelete,
+  onEdit,
 }: DurationWidgetItemProps) {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const hasCountDownType = countDownType.some((type) => type === widget.type);
+    if (!hasCountDownType) return;
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [widget.type]);
+
   const timeDiffienceLabel = useMemo(() => {
-    return format(widget.date, "PPP") > format(new Date(), "PPP")
-      ? `in ${formatDistanceToNow(widget.date)}`
-      : `${formatDistanceToNow(widget.date)} ago`;
-  }, [widget.date]);
+    switch (widget.type) {
+      case "anniversary":
+        const nthAnniversary = differenceInYears(now, widget.date);
+        return `${nthAnniversary}${nthAnniversary === 1 ? "st" : nthAnniversary === 2 ? "nd" : nthAnniversary === 3 ? "rd" : "th"} anniversary`;
+      case "birthday":
+        const age = differenceInYears(now, widget.date);
+        return `${age} years old`;
+      case "bills":
+        return null;
+      default:
+        return new Date(widget.date) > new Date()
+          ? `in ${formatDistanceToNow(widget.date)}`
+          : `${formatDistanceToNow(widget.date)} ago`;
+    }
+  }, [now, widget.date, widget.type]);
 
   const nextDateLabel = useMemo(() => {
     if (widget.repeat) {
-      const today = new Date();
       const nextDate = new Date(widget.date);
-      while (nextDate < today) {
+      while (nextDate < now) {
         switch (widget.repeat) {
           case "week":
             nextDate.setDate(nextDate.getDate() + 7);
@@ -43,32 +74,21 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
             break;
         }
       }
-      const diffInDays = differenceInDays(nextDate, today);
-      // const diffInHours = differenceInHours(nextDate, today) - diffInDays * 24;
-      // const diffInMinutes =
-      //   differenceInMinutes(nextDate, today) -
-      //   diffInDays * 24 * 60 -
-      //   diffInHours * 60;
-      // const diffInSeconds =
-      //   differenceInSeconds(nextDate, today) -
-      //   diffInDays * 24 * 60 * 60 -
-      //   diffInHours * 60 * 60 -
-      //   diffInMinutes * 60;
 
       switch (widget.type) {
         case "anniversary":
-          return `Next anniversary is in ${diffInDays} days`;
+          return getAnniversaryLabel(nextDate, now);
         case "birthday":
-          return `Next birthday is in ${diffInDays} days`;
+          return getBirthdayLabel(nextDate, now);
         case "bills":
-          return `Next bill day is in ${diffInDays} days`;
+          return getBillsLabel(nextDate, now);
         default:
-          return `Next ${widget.type} is in ${diffInDays} days`;
+          return getDefaultLabel(nextDate, now);
       }
     }
 
     return "Not repeat";
-  }, [widget.repeat, widget.type, widget.date]);
+  }, [widget.repeat, widget.type, widget.date, now]);
 
   const typeLabel = useMemo(() => {
     switch (widget.type) {
@@ -89,7 +109,11 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
         <CardTitle className="flex w-full items-center justify-between">
           <div className="flex w-full items-center justify-between">
             <h1 className="text-lg font-bold">{widget.name}</h1>
-            <WidgetMenu onDelete={() => onDelete(widget)} />
+            <WidgetMenu
+              widget={widget}
+              onDelete={() => onDelete(widget)}
+              onEdit={onEdit}
+            />
           </div>
         </CardTitle>
         <CardDescription>
