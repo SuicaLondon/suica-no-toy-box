@@ -5,7 +5,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { differenceInYears, format, formatDistanceToNow } from "date-fns";
+import {
+  addMonths,
+  addWeeks,
+  addYears,
+  differenceInYears,
+  format,
+  formatDistanceToNow,
+  subMonths,
+  subWeeks,
+  subYears,
+} from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { DurationWidget } from "../duration.type";
@@ -23,7 +33,7 @@ type DurationWidgetItemProps = {
   onEdit: (widget: DurationWidget) => void;
 };
 
-const countDownType = ["anniversary", "birthday"] as const;
+const countDownTypes = ["anniversary", "birthday"] as const;
 
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
@@ -33,7 +43,9 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const hasCountDownType = countDownType.some((type) => type === widget.type);
+    const hasCountDownType = countDownTypes.some(
+      (type) => type === widget.type,
+    );
     if (!hasCountDownType) return;
     const interval = setInterval(() => {
       setNow(new Date());
@@ -52,28 +64,46 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
       case "bills":
         return null;
       default:
-        return new Date(widget.date) > new Date()
-          ? `in ${formatDistanceToNow(widget.date)}`
-          : `${formatDistanceToNow(widget.date)} ago`;
+        const isFuture = new Date(widget.date) > now;
+        const distance = formatDistanceToNow(widget.date);
+        return isFuture ? `in ${distance}` : `${distance} ago`;
     }
   }, [now, widget.date, widget.type]);
 
   const nextDateLabel = useMemo(() => {
-    if (widget.repeat) {
-      const nextDate = new Date(widget.date);
-      while (nextDate < now) {
-        switch (widget.repeat) {
-          case "week":
-            nextDate.setDate(nextDate.getDate() + 7);
-            break;
-          case "month":
-            nextDate.setMonth(nextDate.getMonth() + 1);
-            break;
-          case "year":
-            nextDate.setFullYear(nextDate.getFullYear() + 1);
-            break;
+    if (widget.repeat !== "none") {
+      let nextDate = new Date(widget.date.getTime());
+      if (nextDate < now) {
+        while (nextDate < now) {
+          switch (widget.repeat) {
+            case "week":
+              nextDate = addWeeks(nextDate, 1);
+              break;
+            case "month":
+              nextDate = addMonths(nextDate, 1);
+              break;
+            case "year":
+              nextDate = addYears(nextDate, 1);
+              break;
+          }
+        }
+      } else {
+        while (nextDate > now) {
+          switch (widget.repeat) {
+            case "week":
+              nextDate = subWeeks(nextDate, 1);
+              break;
+            case "month":
+              nextDate = subMonths(nextDate, 1);
+              break;
+            case "year":
+              nextDate = subYears(nextDate, 1);
+              break;
+          }
         }
       }
+
+      console.log("nextDate", nextDate);
 
       switch (widget.type) {
         case "anniversary":
