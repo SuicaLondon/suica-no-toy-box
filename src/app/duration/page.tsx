@@ -3,7 +3,7 @@
 import { AddDurationButton } from "@/lib/features/duration/add-duration-button";
 import { DurationWidgetItem } from "@/lib/features/duration/duration-widget";
 import { DurationWidget } from "@/lib/features/duration/duration.type";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function DurationPage() {
   const [widgets, setWidgets] = useState<DurationWidget[]>([]);
@@ -21,20 +21,28 @@ export default function DurationPage() {
   }, [widgets]);
 
   const addWidget = (widget: DurationWidget) => {
+    console.log(widget);
     setWidgets([...widgets, widget]);
   };
+  console.log("updated widgets", widgets);
 
-  const deleteWidget = (widgetId: string) => {
-    setWidgets(widgets.filter((w) => w.id !== widgetId));
-    localStorage.setItem("duration-widgets", JSON.stringify(widgets));
-  };
+  const deleteWidget = useCallback(
+    (widget: DurationWidget) => {
+      setWidgets(widgets.filter((w) => w.id !== widget.id));
+      localStorage.setItem("duration-widgets", JSON.stringify(widgets));
+    },
+    [widgets],
+  );
 
-  const editWidget = (widget: DurationWidget) => {
-    console.log(widget);
-    setWidgets(widgets.map((w) => (w.id === widget.id ? widget : w)));
-    console.log(widgets);
-    localStorage.setItem("duration-widgets", JSON.stringify(widgets));
-  };
+  const editWidget = useCallback(
+    (widget: DurationWidget) => {
+      console.log(widget);
+      setWidgets(widgets.map((w) => (w.id === widget.id ? widget : w)));
+      console.log(widgets);
+      localStorage.setItem("duration-widgets", JSON.stringify(widgets));
+    },
+    [widgets],
+  );
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -49,12 +57,8 @@ export default function DurationPage() {
             <DurationWidgetItem
               key={widget.id}
               widget={widget}
-              onDelete={(widget) => {
-                deleteWidget(widget.id);
-              }}
-              onEdit={(widget) => {
-                editWidget(widget);
-              }}
+              onDelete={deleteWidget}
+              onEdit={editWidget}
             />
           ))}
         </div>
