@@ -36,7 +36,7 @@ import { useDurationStore } from "../../stores/duration.store";
 type FormValues = z.infer<typeof durationFormSchema>;
 
 export const AddDurationButton = memo(function AddDurationButton() {
-  const { addWidget } = useDurationStore();
+  const addWidget = useDurationStore((state) => state.addWidget);
   const [open, setOpen] = useState(false);
   const portalContainerRef = useRef<HTMLDivElement>(null);
 

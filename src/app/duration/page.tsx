@@ -6,11 +6,18 @@ import { useDurationStore } from "@/lib/features/duration/stores/duration.store"
 import { useEffect } from "react";
 
 export default function DurationPage() {
-  const { widgets, loadWidgets } = useDurationStore();
+  const widgets = useDurationStore((state) => state.widgets);
+  const loadWidgets = useDurationStore((state) => state.loadWidgets);
+  const startTimer = useDurationStore((state) => state.startTimer);
+  const stopTimer = useDurationStore((state) => state.stopTimer);
 
   useEffect(() => {
     loadWidgets();
-  }, [loadWidgets]);
+    startTimer();
+    return () => {
+      stopTimer();
+    };
+  }, [loadWidgets, startTimer, stopTimer]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

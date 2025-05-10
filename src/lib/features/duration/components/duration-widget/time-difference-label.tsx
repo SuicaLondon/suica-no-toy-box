@@ -1,18 +1,26 @@
-import { TypeOptionType } from "@/schemas/duration";
+import { intervalTypeOptions, TypeOptionType } from "@/schemas/duration";
 import { differenceInYears, formatDistanceToNow } from "date-fns";
 import { memo } from "react";
+import { useDurationStore } from "../../stores/duration.store";
 
 type TimeDifferenceLabelProps = {
-  now: Date;
   date: Date;
   type?: TypeOptionType;
 };
 
 export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
-  now,
   date,
   type,
 }: TimeDifferenceLabelProps) {
+  const now = useDurationStore((state) => {
+    const hasCountDownType = intervalTypeOptions.some(
+      (typeOption) => typeOption === type,
+    );
+    if (!hasCountDownType) return undefined;
+    return state.now;
+  });
+
+  if (!now) return null;
   const getTimeDiffienceLabel = () => {
     switch (type) {
       case "anniversary":

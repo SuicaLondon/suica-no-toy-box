@@ -1,4 +1,8 @@
-import { RepeatOptionType, TypeOptionType } from "@/schemas/duration";
+import {
+  intervalTypeOptions,
+  RepeatOptionType,
+  TypeOptionType,
+} from "@/schemas/duration";
 import {
   addMonths,
   addWeeks,
@@ -14,22 +18,29 @@ import {
   getBirthdayLabel,
   getDefaultLabel,
 } from "./get-time-difference-label";
+import { useDurationStore } from "../../stores/duration.store";
 
 type NextDayLabelProps = {
   repeat?: RepeatOptionType;
   type?: TypeOptionType;
   date: Date;
-  now: Date;
 };
 
 export const NextDayLabel = memo(function NextDayLabel({
   repeat,
   type,
   date,
-  now,
 }: NextDayLabelProps) {
+  const now = useDurationStore((state) => {
+    const hasCountDownType = intervalTypeOptions.some(
+      (typeOption) => typeOption === type,
+    );
+    if (!hasCountDownType) return undefined;
+    return state.now;
+  });
+
   const getNextDateLabel = () => {
-    if (repeat !== "none") {
+    if (repeat !== "none" && now) {
       let nextDate = new Date(date);
       if (nextDate < now) {
         while (nextDate < now) {
