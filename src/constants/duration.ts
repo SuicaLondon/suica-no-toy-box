@@ -35,3 +35,5 @@ export const typeOptions = [
     value: "bills",
   },
 ] as const;
+
+export const DURATION_WIDGET_LOCAL_STORAGE_KEY = "duration-widgets";

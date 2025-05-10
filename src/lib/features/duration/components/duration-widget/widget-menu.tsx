@@ -1,12 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,15 +8,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { DurationWidget } from "../duration.type";
+import { DurationWidget } from "../../type/duration.type";
+import { DeleteDurationDialog } from "../delete-duration-dialog";
 import { EditDurationDialog } from "../edit-duration-dialog";
 type WidgetMenuProps = {
   widget: DurationWidget;
-  onDelete: () => void;
-  onEdit: (widget: DurationWidget) => void;
 };
 
-export function WidgetMenu({ widget, onDelete, onEdit }: WidgetMenuProps) {
+export function WidgetMenu({ widget }: WidgetMenuProps) {
   const [activeDialog, setActiveDialog] = useState<"delete" | "edit" | null>(
     null,
   );
@@ -48,25 +40,15 @@ export function WidgetMenu({ widget, onDelete, onEdit }: WidgetMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Dialog
+      <DeleteDurationDialog
         open={activeDialog === "delete"}
-        onOpenChange={() => setActiveDialog(null)}
-      >
-        <DialogContent>
-          <DialogTitle>Delete Widget</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete this widget?
-          </DialogDescription>
-          <DialogFooter>
-            <Button onClick={onDelete}>Delete</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        setOpen={() => setActiveDialog(null)}
+        widget={widget}
+      />
       <EditDurationDialog
         open={activeDialog === "edit"}
         setOpen={() => setActiveDialog(null)}
         widget={widget}
-        onEdit={onEdit}
       />
     </>
   );

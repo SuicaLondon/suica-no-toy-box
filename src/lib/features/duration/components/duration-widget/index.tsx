@@ -18,7 +18,7 @@ import {
 } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
-import { DurationWidget } from "../duration.type";
+import { DurationWidget } from "../../type/duration.type";
 import {
   getAnniversaryLabel,
   getBillsLabel,
@@ -29,16 +29,12 @@ import { WidgetMenu } from "./widget-menu";
 
 type DurationWidgetItemProps = {
   widget: DurationWidget;
-  onDelete: (widget: DurationWidget) => void;
-  onEdit: (widget: DurationWidget) => void;
 };
 
 const countDownTypes = ["anniversary", "birthday"] as const;
 
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
-  onDelete,
-  onEdit,
 }: DurationWidgetItemProps) {
   const [now, setNow] = useState(new Date());
 
@@ -72,7 +68,7 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
 
   const nextDateLabel = useMemo(() => {
     if (widget.repeat !== "none") {
-      let nextDate = new Date(widget.date.getTime());
+      let nextDate = new Date(widget.date);
       if (nextDate < now) {
         while (nextDate < now) {
           switch (widget.repeat) {
@@ -139,11 +135,7 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
         <CardTitle className="flex w-full items-center justify-between">
           <div className="flex w-full items-center justify-between">
             <h1 className="text-lg font-bold">{widget.name}</h1>
-            <WidgetMenu
-              widget={widget}
-              onDelete={() => onDelete(widget)}
-              onEdit={onEdit}
-            />
+            <WidgetMenu widget={widget} />
           </div>
         </CardTitle>
         <CardDescription>

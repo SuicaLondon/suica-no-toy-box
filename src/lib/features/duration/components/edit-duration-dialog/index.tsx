@@ -24,11 +24,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { RepeatSelect } from "../../../../components/select/repeat-select";
-import { TypeSelect } from "../../../../components/select/type-select/type-select";
+import { RepeatSelect } from "../../../../../components/select/repeat-select";
+import { TypeSelect } from "../../../../../components/select/type-select/type-select";
 import { DateCalendar } from "../date-calendar";
-import { DurationWidget } from "../duration.type";
+import { DurationWidget } from "../../type/duration.type";
 import { useRef } from "react";
+import { useDurationStore } from "../../stores/duration.store";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
@@ -36,14 +37,12 @@ type EditDurationDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
   widget: DurationWidget;
-  onEdit: (widget: DurationWidget) => void;
 };
 
 export function EditDurationDialog({
   open,
   setOpen,
   widget,
-  onEdit,
 }: EditDurationDialogProps) {
   const portalContainerRef = useRef<HTMLDivElement>(null);
   const form = useForm<FormValues>({
@@ -55,6 +54,8 @@ export function EditDurationDialog({
       repeat: widget.repeat,
     },
   });
+
+  const { editWidget } = useDurationStore();
 
   const selectedType = form.watch("type");
 
@@ -128,7 +129,7 @@ export function EditDurationDialog({
       type: values.type,
     };
 
-    onEdit(newWidget);
+    editWidget(newWidget);
     form.reset();
     setOpen(false);
   }

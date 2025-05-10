@@ -28,17 +28,15 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DateCalendar } from "../date-calendar";
-import { RepeatSelect } from "../../../../components/select/repeat-select";
-import { TypeSelect } from "../../../../components/select/type-select/type-select";
-import { DurationWidget } from "../duration.type";
+import { RepeatSelect } from "@/components/select/repeat-select";
+import { TypeSelect } from "@/components/select/type-select/type-select";
+import { DurationWidget } from "../../type/duration.type";
+import { useDurationStore } from "../../stores/duration.store";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
-type AddDurationButtonProps = {
-  addWidget: (widget: DurationWidget) => void;
-};
-
-export function AddDurationButton({ addWidget }: AddDurationButtonProps) {
+export function AddDurationButton() {
+  const { addWidget } = useDurationStore();
   const [open, setOpen] = useState(false);
   const portalContainerRef = useRef<HTMLDivElement>(null);
 

@@ -1,65 +1,41 @@
 "use client";
 
-import { AddDurationButton } from "@/lib/features/duration/add-duration-button";
-import { DurationWidgetItem } from "@/lib/features/duration/duration-widget";
-import { DurationWidget } from "@/lib/features/duration/duration.type";
-import { useCallback, useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AddDurationButton } from "@/lib/features/duration/components/add-duration-button";
+import { DurationWidgetItem } from "@/lib/features/duration/components/duration-widget";
+import { useDurationStore } from "@/lib/features/duration/stores/duration.store";
+import { useEffect } from "react";
 
 export default function DurationPage() {
-  const [widgets, setWidgets] = useState<DurationWidget[]>([]);
+  const { widgets, loadWidgets } = useDurationStore();
 
   useEffect(() => {
-    const storedWidgets = localStorage.getItem("duration-widgets");
-    if (storedWidgets) {
-      const parsedWidgets = JSON.parse(storedWidgets) ?? [];
-      setWidgets(parsedWidgets);
-    }
-  }, []);
+    loadWidgets();
+  }, [loadWidgets]);
 
-  useEffect(() => {
-    localStorage.setItem("duration-widgets", JSON.stringify(widgets));
-  }, [widgets]);
+  console.log(widgets);
 
-  const addWidget = (widget: DurationWidget) => {
-    console.log(widget);
-    setWidgets([...widgets, widget]);
-  };
-  console.log("updated widgets", widgets);
-
-  const deleteWidget = useCallback(
-    (widget: DurationWidget) => {
-      setWidgets(widgets.filter((w) => w.id !== widget.id));
-      localStorage.setItem("duration-widgets", JSON.stringify(widgets));
-    },
-    [widgets],
-  );
-
-  const editWidget = useCallback(
-    (widget: DurationWidget) => {
-      console.log(widget);
-      setWidgets(widgets.map((w) => (w.id === widget.id ? widget : w)));
-      console.log(widgets);
-      localStorage.setItem("duration-widgets", JSON.stringify(widgets));
-    },
-    [widgets],
-  );
+  if (widgets.length === 0) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Skeleton className="h-10 w-3xl max-w-md" />
+        <Skeleton className="h-10 w-3xl max-w-md" />
+        <Skeleton className="h-10 w-3xl max-w-md" />
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Duration Board</h1>
-          <AddDurationButton addWidget={addWidget} />
+          <AddDurationButton />
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {widgets.map((widget) => (
-            <DurationWidgetItem
-              key={widget.id}
-              widget={widget}
-              onDelete={deleteWidget}
-              onEdit={editWidget}
-            />
+            <DurationWidgetItem key={widget.id} widget={widget} />
           ))}
         </div>
       </div>
