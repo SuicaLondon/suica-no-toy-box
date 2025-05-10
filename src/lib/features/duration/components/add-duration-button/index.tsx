@@ -24,7 +24,7 @@ import {
 } from "@/schemas/duration";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { DateCalendar } from "../date-calendar";
@@ -35,7 +35,7 @@ import { useDurationStore } from "../../stores/duration.store";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
-export function AddDurationButton() {
+export const AddDurationButton = memo(function AddDurationButton() {
   const { addWidget } = useDurationStore();
   const [open, setOpen] = useState(false);
   const portalContainerRef = useRef<HTMLDivElement>(null);
@@ -129,4 +129,4 @@ export function AddDurationButton() {
     form.reset();
     setOpen(false);
   }
-}
+});

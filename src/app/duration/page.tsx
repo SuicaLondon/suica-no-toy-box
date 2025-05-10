@@ -1,6 +1,5 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import { AddDurationButton } from "@/lib/features/duration/components/add-duration-button";
 import { DurationWidgetItem } from "@/lib/features/duration/components/duration-widget";
 import { useDurationStore } from "@/lib/features/duration/stores/duration.store";
@@ -12,18 +11,6 @@ export default function DurationPage() {
   useEffect(() => {
     loadWidgets();
   }, [loadWidgets]);
-
-  console.log(widgets);
-
-  if (widgets.length === 0) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Skeleton className="h-10 w-3xl max-w-md" />
-        <Skeleton className="h-10 w-3xl max-w-md" />
-        <Skeleton className="h-10 w-3xl max-w-md" />
-      </div>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

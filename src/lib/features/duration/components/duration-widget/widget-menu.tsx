@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { DurationWidget } from "../../type/duration.type";
 import { DeleteDurationDialog } from "../delete-duration-dialog";
 import { EditDurationDialog } from "../edit-duration-dialog";
@@ -15,7 +15,9 @@ type WidgetMenuProps = {
   widget: DurationWidget;
 };
 
-export function WidgetMenu({ widget }: WidgetMenuProps) {
+export const WidgetMenu = memo(function WidgetMenu({
+  widget,
+}: WidgetMenuProps) {
   const [activeDialog, setActiveDialog] = useState<"delete" | "edit" | null>(
     null,
   );
@@ -48,8 +50,12 @@ export function WidgetMenu({ widget }: WidgetMenuProps) {
       <EditDurationDialog
         open={activeDialog === "edit"}
         setOpen={() => setActiveDialog(null)}
-        widget={widget}
+        id={widget.id}
+        name={widget.name}
+        date={widget.date}
+        type={widget.type}
+        repeat={widget.repeat}
       />
     </>
   );
-}
+});

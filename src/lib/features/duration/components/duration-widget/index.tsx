@@ -5,26 +5,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  addMonths,
-  addWeeks,
-  addYears,
-  differenceInYears,
-  format,
-  formatDistanceToNow,
-  subMonths,
-  subWeeks,
-  subYears,
-} from "date-fns";
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { DurationWidget } from "../../type/duration.type";
-import {
-  getAnniversaryLabel,
-  getBillsLabel,
-  getBirthdayLabel,
-  getDefaultLabel,
-} from "./get-time-difference-label";
+import { NextDayLabel } from "./next-day-label";
+import { TimeDifferenceLabel } from "./time-difference-label";
+import { TypeLabel } from "./type-label";
 import { WidgetMenu } from "./widget-menu";
 
 type DurationWidgetItemProps = {
@@ -36,6 +23,7 @@ const countDownTypes = ["anniversary", "birthday"] as const;
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
 }: DurationWidgetItemProps) {
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -43,91 +31,15 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
       (type) => type === widget.type,
     );
     if (!hasCountDownType) return;
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setNow(new Date());
     }, 1000);
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [widget.type]);
-
-  const timeDiffienceLabel = useMemo(() => {
-    switch (widget.type) {
-      case "anniversary":
-        const nthAnniversary = differenceInYears(now, widget.date);
-        return `${nthAnniversary}${nthAnniversary === 1 ? "st" : nthAnniversary === 2 ? "nd" : nthAnniversary === 3 ? "rd" : "th"} anniversary`;
-      case "birthday":
-        const age = differenceInYears(now, widget.date);
-        return `${age} years old`;
-      case "bills":
-        return null;
-      default:
-        const isFuture = new Date(widget.date) > now;
-        const distance = formatDistanceToNow(widget.date);
-        return isFuture ? `in ${distance}` : `${distance} ago`;
-    }
-  }, [now, widget.date, widget.type]);
-
-  const nextDateLabel = useMemo(() => {
-    if (widget.repeat !== "none") {
-      let nextDate = new Date(widget.date);
-      if (nextDate < now) {
-        while (nextDate < now) {
-          switch (widget.repeat) {
-            case "week":
-              nextDate = addWeeks(nextDate, 1);
-              break;
-            case "month":
-              nextDate = addMonths(nextDate, 1);
-              break;
-            case "year":
-              nextDate = addYears(nextDate, 1);
-              break;
-          }
-        }
-      } else {
-        while (nextDate > now) {
-          switch (widget.repeat) {
-            case "week":
-              nextDate = subWeeks(nextDate, 1);
-              break;
-            case "month":
-              nextDate = subMonths(nextDate, 1);
-              break;
-            case "year":
-              nextDate = subYears(nextDate, 1);
-              break;
-          }
-        }
-      }
-
-      console.log("nextDate", nextDate);
-
-      switch (widget.type) {
-        case "anniversary":
-          return getAnniversaryLabel(nextDate, now);
-        case "birthday":
-          return getBirthdayLabel(nextDate, now);
-        case "bills":
-          return getBillsLabel(nextDate, now);
-        default:
-          return getDefaultLabel(nextDate, now);
-      }
-    }
-
-    return "Not repeat";
-  }, [widget.repeat, widget.type, widget.date, now]);
-
-  const typeLabel = useMemo(() => {
-    switch (widget.type) {
-      case "anniversary":
-        return "Anniversary";
-      case "birthday":
-        return "Birthday";
-      case "bills":
-        return "Bills" + (widget.repeat ? ` every ${widget.repeat}` : "");
-      default:
-        return widget.repeat ? `Repeats every ${widget.repeat}` : "";
-    }
-  }, [widget.type, widget.repeat]);
 
   return (
     <Card key={widget.id}>
@@ -140,8 +52,13 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
         </CardTitle>
         <CardDescription>
           <div className="flex flex-col gap-2">
-            <span>{typeLabel}</span>
-            <span>{nextDateLabel}</span>
+            <TypeLabel type={widget.type} repeat={widget.repeat} />
+            <NextDayLabel
+              repeat={widget.repeat}
+              type={widget.type}
+              date={widget.date}
+              now={now}
+            />
           </div>
         </CardDescription>
       </CardHeader>
@@ -151,9 +68,11 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
           <span className="text-sm text-gray-500">
             {format(widget.date, "EEEE, MMMM d, yyyy")}
           </span>
-          <span className="ml-auto text-sm text-gray-500">
-            {timeDiffienceLabel}
-          </span>
+          <TimeDifferenceLabel
+            now={now}
+            date={widget.date}
+            type={widget.type}
+          />
         </div>
       </CardContent>
     </Card>
