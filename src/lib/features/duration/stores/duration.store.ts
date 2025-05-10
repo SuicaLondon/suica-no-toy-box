@@ -6,10 +6,14 @@ interface DurationStore {
   now: Date;
   timer: NodeJS.Timeout | null;
   widgets: DurationWidget[];
+  sortBy: "date" | "name";
+  sortDirection: "asc" | "desc";
   addWidget: (widget: DurationWidget) => void;
   deleteWidget: (widget: DurationWidget) => void;
   editWidget: (widget: DurationWidget) => void;
   loadWidgets: () => void;
+  setSortBy: (sortBy: "date" | "name") => void;
+  setSortDirection: (sortDirection: "asc" | "desc") => void;
   startTimer: () => void;
   stopTimer: () => void;
 }
@@ -18,6 +22,8 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
   now: new Date(),
   timer: null,
   widgets: [],
+  sortBy: "date",
+  sortDirection: "asc",
   addWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
     set({ widgets: [...currentWidgets, widget] });
@@ -55,6 +61,36 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
       set({ widgets: parsedWidgets });
     }
   },
+  setSortBy: (sortBy: "date" | "name") => {
+    const sortedWidgets = get().widgets.toSorted((a, b) => {
+      if (sortBy === "date") {
+        const aDate = new Date(a.date);
+        const bDate = new Date(b.date);
+        return get().sortDirection === "asc"
+          ? aDate.getTime() - bDate.getTime()
+          : bDate.getTime() - aDate.getTime();
+      }
+      return get().sortDirection === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    });
+    set({ sortBy, widgets: sortedWidgets });
+  },
+  setSortDirection: (sortDirection: "asc" | "desc") => {
+    const sortedWidgets = get().widgets.toSorted((a, b) => {
+      if (get().sortBy === "date") {
+        const aDate = new Date(a.date);
+        const bDate = new Date(b.date);
+        return sortDirection === "asc"
+          ? aDate.getTime() - bDate.getTime()
+          : bDate.getTime() - aDate.getTime();
+      }
+      return sortDirection === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    });
+    set({ sortDirection, widgets: sortedWidgets });
+  },
   startTimer: () => {
     const timer = setInterval(() => {
       set({ now: new Date() });
@@ -62,7 +98,7 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
     set({ timer });
   },
   stopTimer: () => {
-    const timer = get().timer;
+    const { timer } = get();
     if (timer) {
       clearInterval(timer);
       set({ timer: null });

@@ -2,6 +2,7 @@
 
 import { AddDurationButton } from "@/lib/features/duration/components/add-duration-button";
 import { DurationWidgetItem } from "@/lib/features/duration/components/duration-widget";
+import { SortControls } from "@/lib/features/duration/components/sort-controls";
 import { useDurationStore } from "@/lib/features/duration/stores/duration.store";
 import { useEffect } from "react";
 
@@ -24,7 +25,10 @@ export default function DurationPage() {
       <div className="container mx-auto px-4 py-16">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Duration Board</h1>
-          <AddDurationButton />
+          <div className="flex items-center gap-4">
+            <SortControls />
+            <AddDurationButton />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
