@@ -24,37 +24,46 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { RepeatSelect } from "../../../../components/select/repeat-select";
-import { TypeSelect } from "../../../../components/select/type-select/type-select";
+import { RepeatSelect } from "../../../../../components/select/repeat-select";
+import { TypeSelect } from "../../../../../components/select/type-select/type-select";
 import { DateCalendar } from "../date-calendar";
-import { DurationWidget } from "../duration.type";
-import { useRef } from "react";
+import { DurationWidget } from "../../type/duration.type";
+import { memo, useRef } from "react";
+import { useDurationStore } from "../../stores/duration.store";
 
 type FormValues = z.infer<typeof durationFormSchema>;
 
 type EditDurationDialogProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  widget: DurationWidget;
-  onEdit: (widget: DurationWidget) => void;
+  id: string;
+  name: string;
+  date: Date;
+  type?: TypeOptionType;
+  repeat?: RepeatOptionType;
 };
 
-export function EditDurationDialog({
+export const EditDurationDialog = memo(function EditDurationDialog({
   open,
   setOpen,
-  widget,
-  onEdit,
+  id,
+  name,
+  date,
+  type,
+  repeat,
 }: EditDurationDialogProps) {
   const portalContainerRef = useRef<HTMLDivElement>(null);
   const form = useForm<FormValues>({
     resolver: zodResolver(durationFormSchema),
     defaultValues: {
-      name: widget.name,
-      date: widget.date,
-      type: widget.type,
-      repeat: widget.repeat,
+      name,
+      date,
+      type,
+      repeat,
     },
   });
+
+  const { editWidget } = useDurationStore();
 
   const selectedType = form.watch("type");
 
@@ -121,15 +130,15 @@ export function EditDurationDialog({
 
   function onSubmit(values: FormValues) {
     const newWidget: DurationWidget = {
-      id: widget.id,
+      id,
       name: values.name,
       date: values.date,
       repeat: calculateRepeat(values.type, values.repeat),
       type: values.type,
     };
 
-    onEdit(newWidget);
+    editWidget(newWidget);
     form.reset();
     setOpen(false);
   }
-}
+});

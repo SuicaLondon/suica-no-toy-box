@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/form";
 import { DurationFormValues } from "@/schemas/duration";
 import { addMonths, setYear, subMonths } from "date-fns";
-import { RefObject, useCallback, useState } from "react";
+import { memo, RefObject, useCallback, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CalendarNavigator } from "./calendar-navigator";
 
@@ -16,7 +16,10 @@ type DateCalendarProps = {
   form: UseFormReturn<DurationFormValues>;
 };
 
-export function DateCalendar({ portalContainerRef, form }: DateCalendarProps) {
+export const DateCalendar = memo(function DateCalendar({
+  portalContainerRef,
+  form,
+}: DateCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const handleMonthChange = useCallback(
@@ -83,4 +86,4 @@ export function DateCalendar({ portalContainerRef, form }: DateCalendarProps) {
       )}
     />
   );
-}
+});
