@@ -3,14 +3,20 @@ import { DurationWidget } from "../type/duration.type";
 import { DURATION_WIDGET_LOCAL_STORAGE_KEY } from "@/constants/duration";
 
 interface DurationStore {
+  now: Date;
+  timer: NodeJS.Timeout | null;
   widgets: DurationWidget[];
   addWidget: (widget: DurationWidget) => void;
   deleteWidget: (widget: DurationWidget) => void;
   editWidget: (widget: DurationWidget) => void;
   loadWidgets: () => void;
+  startTimer: () => void;
+  stopTimer: () => void;
 }
 
 export const useDurationStore = create<DurationStore>((set, get) => ({
+  now: new Date(),
+  timer: null,
   widgets: [],
   addWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
@@ -47,6 +53,19 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
     if (storedWidgets) {
       const parsedWidgets = JSON.parse(storedWidgets) ?? [];
       set({ widgets: parsedWidgets });
+    }
+  },
+  startTimer: () => {
+    const timer = setInterval(() => {
+      set({ now: new Date() });
+    }, 1000);
+    set({ timer });
+  },
+  stopTimer: () => {
+    const timer = get().timer;
+    if (timer) {
+      clearInterval(timer);
+      set({ timer: null });
     }
   },
 }));

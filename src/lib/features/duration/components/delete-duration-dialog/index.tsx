@@ -20,7 +20,7 @@ export function DeleteDurationDialog({
   setOpen,
   widget,
 }: DeleteDurationDialogProps) {
-  const { deleteWidget } = useDurationStore();
+  const deleteWidget = useDurationStore((state) => state.deleteWidget);
 
   return (
     <Dialog open={open} onOpenChange={() => setOpen(false)}>

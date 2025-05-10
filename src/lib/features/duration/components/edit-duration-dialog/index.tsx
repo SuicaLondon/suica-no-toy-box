@@ -63,7 +63,7 @@ export const EditDurationDialog = memo(function EditDurationDialog({
     },
   });
 
-  const { editWidget } = useDurationStore();
+  const editWidget = useDurationStore((state) => state.editWidget);
 
   const selectedType = form.watch("type");
 

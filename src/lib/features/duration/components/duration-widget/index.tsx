@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo } from "react";
 import { DurationWidget } from "../../type/duration.type";
 import { NextDayLabel } from "./next-day-label";
 import { TimeDifferenceLabel } from "./time-difference-label";
@@ -18,29 +18,9 @@ type DurationWidgetItemProps = {
   widget: DurationWidget;
 };
 
-const countDownTypes = ["anniversary", "birthday"] as const;
-
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
 }: DurationWidgetItemProps) {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [now, setNow] = useState(new Date());
-
-  useEffect(() => {
-    const hasCountDownType = countDownTypes.some(
-      (type) => type === widget.type,
-    );
-    if (!hasCountDownType) return;
-    intervalRef.current = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [widget.type]);
-
   return (
     <Card key={widget.id}>
       <CardHeader>
@@ -57,7 +37,6 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
               repeat={widget.repeat}
               type={widget.type}
               date={widget.date}
-              now={now}
             />
           </div>
         </CardDescription>
@@ -68,11 +47,7 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
           <span className="text-sm text-gray-500">
             {format(widget.date, "EEEE, MMMM d, yyyy")}
           </span>
-          <TimeDifferenceLabel
-            now={now}
-            date={widget.date}
-            type={widget.type}
-          />
+          <TimeDifferenceLabel date={widget.date} type={widget.type} />
         </div>
       </CardContent>
     </Card>
