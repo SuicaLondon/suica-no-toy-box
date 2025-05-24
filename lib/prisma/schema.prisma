@@ -15,6 +15,7 @@ model Company {
     county        String
     type          String
     rate          String
+    hasUrl        Boolean?
     url           String?
     description   String?
     values        String?
