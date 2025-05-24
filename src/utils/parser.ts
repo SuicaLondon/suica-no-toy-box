@@ -28,6 +28,7 @@ export function parseCompanies(data: string): CompanyItem[] {
         county: orgInfo[2].trim(),
         type: orgInfo[3].trim(),
         rate: orgInfo[4].trim(),
+        hasUrl: null,
       };
       companies.push(company);
     }
