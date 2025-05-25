@@ -1,12 +1,6 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type SponsorCardProps = {
@@ -33,7 +27,7 @@ export default function SponsorCard({
   params.set("selectedCompanyId", id);
   return (
     <Card
-      className="transition-shadow hover:shadow-md"
+      className="gap-2 transition-shadow hover:shadow-md"
       onClick={() => {
         router.replace(`${pathname}?${params.toString()}`);
       }}
@@ -47,10 +41,8 @@ export default function SponsorCard({
           {county && <Badge variant="outline">{county}</Badge>}
         </div>
         <p className="text-muted-foreground text-sm">Type: {type}</p>
-      </CardContent>
-      <CardFooter>
         <Badge variant="secondary">Rate: {rate}</Badge>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 }

@@ -45,17 +45,19 @@ export default function SponsorDetail() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <h3 className="font-semibold">Website</h3>
-          <a
-            href={companyDetail.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            {companyDetail.url}
-          </a>
-        </div>
+        {companyDetail.hasUrl && (
+          <div className="space-y-2">
+            <h3 className="font-semibold">Website</h3>
+            <a
+              href={companyDetail.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              {companyDetail.url}
+            </a>
+          </div>
+        )}
 
         <div className="space-y-2">
           <h3 className="font-semibold">Description</h3>
