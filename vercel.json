@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/sponsorship?refresh=1",
-      "schedule": "0 9 * * 1-5"
+      "schedule": "0 9 * * 1"
     }
   ]
 }
