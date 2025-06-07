@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState } from "react";
+import { toast } from "sonner";
 import { DurationWidget } from "../../type/duration.type";
 import { DeleteDurationDialog } from "../delete-duration-dialog";
 import { EditDurationDialog } from "../edit-duration-dialog";
@@ -21,6 +22,13 @@ export const WidgetMenu = memo(function WidgetMenu({
   const [activeDialog, setActiveDialog] = useState<"delete" | "edit" | null>(
     null,
   );
+
+  const handleCopy = () => {
+    const widgetString = JSON.stringify(widget);
+    navigator.clipboard.writeText(widgetString);
+    toast.success("Widget copied to clipboard");
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -40,6 +48,7 @@ export const WidgetMenu = memo(function WidgetMenu({
           <DropdownMenuItem onClick={() => setActiveDialog("edit")}>
             Edit Widget
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCopy}>Copy Widget</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteDurationDialog
