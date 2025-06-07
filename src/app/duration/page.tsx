@@ -3,6 +3,7 @@
 import { AddDurationButton } from "@/lib/features/duration/components/add-duration-button";
 import { CopyAllDurationsButton } from "@/lib/features/duration/components/copy-all-durations-button";
 import { DurationWidgetItem } from "@/lib/features/duration/components/duration-widget";
+import { ImportDurationsButton } from "@/lib/features/duration/components/import-durations-button";
 import { SortControls } from "@/lib/features/duration/components/sort-controls";
 import { useDurationStore } from "@/lib/features/duration/stores/duration.store";
 import { useEffect } from "react";
@@ -28,6 +29,7 @@ export default function DurationPage() {
           <h1 className="text-3xl font-bold">Duration Board</h1>
           <div className="flex items-center gap-4">
             <CopyAllDurationsButton />
+            <ImportDurationsButton />
             <SortControls />
             <AddDurationButton />
           </div>

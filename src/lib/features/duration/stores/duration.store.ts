@@ -1,6 +1,9 @@
+import { DURATION_WIDGET_LOCAL_STORAGE_KEY } from "@/constants/duration";
+import { durationFormSchema } from "@/schemas/duration";
+import { toast } from "sonner";
+import { z } from "zod";
 import { create } from "zustand";
 import { DurationWidget } from "../type/duration.type";
-import { DURATION_WIDGET_LOCAL_STORAGE_KEY } from "@/constants/duration";
 
 interface DurationStore {
   now: Date;
@@ -12,6 +15,10 @@ interface DurationStore {
   deleteWidget: (widget: DurationWidget) => void;
   editWidget: (widget: DurationWidget) => void;
   loadWidgets: () => void;
+  copyWidget: (widget: DurationWidget) => void;
+  copyAllWidgets: () => void;
+  importWidgetFromClipboard: () => Promise<void>;
+  importWidgetsFromClipboard: () => Promise<void>;
   setSortBy: (sortBy: "date" | "name") => void;
   setSortDirection: (sortDirection: "asc" | "desc") => void;
   startTimer: () => void;
@@ -75,6 +82,53 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
         : b.name.localeCompare(a.name);
     });
     set({ sortBy, widgets: sortedWidgets });
+  },
+  copyWidget: (widget: DurationWidget) => {
+    const widgetString = JSON.stringify(widget);
+    navigator.clipboard.writeText(widgetString);
+    toast.success("Widget copied to clipboard");
+  },
+  copyAllWidgets: () => {
+    const widgets = get().widgets;
+    const widgetsString = JSON.stringify(widgets);
+    navigator.clipboard.writeText(widgetsString);
+    toast.success(`${widgets.length} widgets copied to clipboard`);
+  },
+  importWidgetFromClipboard: async () => {
+    const widgetsString = await navigator.clipboard.readText();
+    const widget = durationFormSchema.parse(JSON.parse(widgetsString));
+    const currentWidgets = get().widgets;
+    const isExist = currentWidgets.some((w) => w.id === widget.id);
+    if (isExist) {
+      toast.error("Widget already exists");
+      return;
+    }
+    const newWidgets = [...currentWidgets, widget];
+    set({ widgets: newWidgets });
+    localStorage.setItem(
+      DURATION_WIDGET_LOCAL_STORAGE_KEY,
+      JSON.stringify(newWidgets),
+    );
+  },
+  importWidgetsFromClipboard: async () => {
+    const widgetsString = await navigator.clipboard.readText();
+    const widgets = z
+      .array(durationFormSchema)
+      .parse(JSON.parse(widgetsString));
+    const currentWidgets = get().widgets;
+    const isExist = currentWidgets.some((w) =>
+      widgets.some((w2) => w2.id === w.id),
+    );
+    if (isExist) {
+      toast.error("Some of the widgets already exist");
+      return;
+    }
+    const newWidgets = [...currentWidgets, ...widgets];
+    set({ widgets: newWidgets });
+    localStorage.setItem(
+      DURATION_WIDGET_LOCAL_STORAGE_KEY,
+      JSON.stringify(newWidgets),
+    );
   },
   setSortDirection: (sortDirection: "asc" | "desc") => {
     const sortedWidgets = get().widgets.toSorted((a, b) => {

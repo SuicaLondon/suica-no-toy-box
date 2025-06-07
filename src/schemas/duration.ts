@@ -1,6 +1,8 @@
+import { isValid, parseISO } from "date-fns";
 import { z } from "zod";
 
 export const durationFormSchema = z.object({
+  id: z.string().uuid(),
   name: z
     .string({
       required_error: "Please enter a name",
@@ -8,9 +10,18 @@ export const durationFormSchema = z.object({
     .min(1, {
       message: "Name is required",
     }),
-  date: z.date({
-    required_error: "Please select a date",
-  }),
+  date: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        const parsed = parseISO(val);
+        return isValid(parsed) ? parsed : undefined;
+      }
+      return val;
+    },
+    z.date({
+      required_error: "Please select a date",
+    }),
+  ),
   repeat: z.enum(["none", "week", "month", "year"], {
     required_error: "Please select a repeat option",
   }),
@@ -19,7 +30,11 @@ export const durationFormSchema = z.object({
   }),
 });
 
+export const addDurationFormSchema = durationFormSchema.omit({ id: true });
+
+export type AddDurationFormValues = z.infer<typeof addDurationFormSchema>;
 export type DurationFormValues = z.infer<typeof durationFormSchema>;
+
 export type TypeOptionType = "none" | "anniversary" | "birthday" | "bills";
 export type RepeatOptionType = "week" | "month" | "year" | "none";
 export type IntervalType = "anniversary" | "birthday";
