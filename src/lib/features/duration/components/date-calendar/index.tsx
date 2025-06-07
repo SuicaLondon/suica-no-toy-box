@@ -5,7 +5,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { DurationFormValues } from "@/schemas/duration";
+import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { addMonths, setYear, subMonths } from "date-fns";
 import { memo, RefObject, useCallback, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -13,7 +13,7 @@ import { CalendarNavigator } from "./calendar-navigator";
 
 type DateCalendarProps = {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
-  form: UseFormReturn<DurationFormValues>;
+  form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
 };
 
 export const DateCalendar = memo(function DateCalendar({

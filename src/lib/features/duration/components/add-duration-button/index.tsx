@@ -1,5 +1,7 @@
 "use client";
 
+import { RepeatSelect } from "@/components/select/repeat-select";
+import { TypeSelect } from "@/components/select/type-select/type-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  durationFormSchema,
+  addDurationFormSchema,
   RepeatOptionType,
   TypeOptionType,
 } from "@/schemas/duration";
@@ -27,13 +29,11 @@ import { Plus } from "lucide-react";
 import { memo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { DateCalendar } from "../date-calendar";
-import { RepeatSelect } from "@/components/select/repeat-select";
-import { TypeSelect } from "@/components/select/type-select/type-select";
-import { DurationWidget } from "../../type/duration.type";
 import { useDurationStore } from "../../stores/duration.store";
+import { DurationWidget } from "../../type/duration.type";
+import { DateCalendar } from "../date-calendar";
 
-type FormValues = z.infer<typeof durationFormSchema>;
+type FormValues = z.infer<typeof addDurationFormSchema>;
 
 export const AddDurationButton = memo(function AddDurationButton() {
   const addWidget = useDurationStore((state) => state.addWidget);
@@ -41,7 +41,7 @@ export const AddDurationButton = memo(function AddDurationButton() {
   const portalContainerRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(durationFormSchema),
+    resolver: zodResolver(addDurationFormSchema),
     defaultValues: {
       name: "",
       date: new Date(),

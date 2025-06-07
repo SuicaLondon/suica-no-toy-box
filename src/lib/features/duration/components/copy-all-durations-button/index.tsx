@@ -1,16 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const CopyAllDurationsButton = () => {
-  const durations = useDurationStore((state) => state.widgets);
-  const handleCopy = () => {
-    const durationsString = JSON.stringify(durations);
-    navigator.clipboard.writeText(durationsString);
-    toast.success("Durations copied to clipboard");
-  };
+  const copyAllWidgets = useDurationStore((state) => state.copyAllWidgets);
   return (
-    <Button variant="outline" onClick={handleCopy}>
+    <Button variant="outline" onClick={copyAllWidgets}>
       Copy Durations
     </Button>
   );

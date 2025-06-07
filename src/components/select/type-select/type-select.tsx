@@ -1,20 +1,25 @@
 import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
   SelectContent,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormControl, FormItem, FormMessage } from "@/components/ui/form";
-import { FormLabel } from "@/components/ui/form";
-import { FormField } from "@/components/ui/form";
-import { Select, SelectItem } from "@/components/ui/select";
+import { typeOptions } from "@/constants/duration";
+import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { memo, RefObject, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { DurationFormValues } from "@/schemas/duration";
-import { typeOptions } from "@/constants/duration";
 
 type TypeSelectProps = {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
-  form: UseFormReturn<DurationFormValues>;
+  form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
 };
 
 export const TypeSelect = memo(function TypeSelect({
