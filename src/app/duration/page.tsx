@@ -1,6 +1,7 @@
 "use client";
 
 import { AddDurationButton } from "@/lib/features/duration/components/add-duration-button";
+import { CopyAllDurationsButton } from "@/lib/features/duration/components/copy-all-durations-button";
 import { DurationWidgetItem } from "@/lib/features/duration/components/duration-widget";
 import { SortControls } from "@/lib/features/duration/components/sort-controls";
 import { useDurationStore } from "@/lib/features/duration/stores/duration.store";
@@ -26,6 +27,7 @@ export default function DurationPage() {
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Duration Board</h1>
           <div className="flex items-center gap-4">
+            <CopyAllDurationsButton />
             <SortControls />
             <AddDurationButton />
           </div>
