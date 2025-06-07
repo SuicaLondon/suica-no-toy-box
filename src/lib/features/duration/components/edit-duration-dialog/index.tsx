@@ -17,21 +17,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  AddDurationFormValues,
   durationFormSchema,
+  DurationFormValues,
   RepeatOptionType,
   TypeOptionType,
 } from "@/schemas/duration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { memo, useRef } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { RepeatSelect } from "../../../../../components/select/repeat-select";
 import { TypeSelect } from "../../../../../components/select/type-select/type-select";
-import { DateCalendar } from "../date-calendar";
-import { DurationWidget } from "../../type/duration.type";
-import { memo, useRef } from "react";
 import { useDurationStore } from "../../stores/duration.store";
-
-type FormValues = z.infer<typeof durationFormSchema>;
+import { DurationWidget } from "../../type/duration.type";
+import { DateCalendar } from "../date-calendar";
 
 type EditDurationDialogProps = {
   open: boolean;
@@ -53,9 +52,10 @@ export const EditDurationDialog = memo(function EditDurationDialog({
   repeat,
 }: EditDurationDialogProps) {
   const portalContainerRef = useRef<HTMLDivElement>(null);
-  const form = useForm<FormValues>({
+  const form = useForm<DurationFormValues>({
     resolver: zodResolver(durationFormSchema),
     defaultValues: {
+      id,
       name,
       date,
       type,
@@ -89,16 +89,34 @@ export const EditDurationDialog = memo(function EditDurationDialog({
               )}
             />
             <div className="flex items-center gap-2">
-              <TypeSelect form={form} portalContainerRef={portalContainerRef} />
+              <TypeSelect
+                form={
+                  form as UseFormReturn<
+                    DurationFormValues | AddDurationFormValues
+                  >
+                }
+                portalContainerRef={portalContainerRef}
+              />
               {(selectedType === "none" || selectedType === "bills") && (
                 <RepeatSelect
-                  form={form}
+                  form={
+                    form as UseFormReturn<
+                      DurationFormValues | AddDurationFormValues
+                    >
+                  }
                   portalContainerRef={portalContainerRef}
                 />
               )}
             </div>
 
-            <DateCalendar form={form} portalContainerRef={portalContainerRef} />
+            <DateCalendar
+              form={
+                form as UseFormReturn<
+                  DurationFormValues | AddDurationFormValues
+                >
+              }
+              portalContainerRef={portalContainerRef}
+            />
             <Button type="submit" className="w-full">
               Add Duration
             </Button>
@@ -128,7 +146,7 @@ export const EditDurationDialog = memo(function EditDurationDialog({
     }
   }
 
-  function onSubmit(values: FormValues) {
+  function onSubmit(values: DurationFormValues) {
     const newWidget: DurationWidget = {
       id,
       name: values.name,
