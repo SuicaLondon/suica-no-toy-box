@@ -65,8 +65,6 @@ export const EditDurationDialog = memo(function EditDurationDialog({
 
   const editWidget = useDurationStore((state) => state.editWidget);
 
-  const selectedType = form.watch("type");
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]" ref={portalContainerRef}>
@@ -97,16 +95,14 @@ export const EditDurationDialog = memo(function EditDurationDialog({
                 }
                 portalContainerRef={portalContainerRef}
               />
-              {(selectedType === "none" || selectedType === "bills") && (
-                <RepeatSelect
-                  form={
-                    form as UseFormReturn<
-                      DurationFormValues | AddDurationFormValues
-                    >
-                  }
-                  portalContainerRef={portalContainerRef}
-                />
-              )}
+              <RepeatSelect
+                form={
+                  form as UseFormReturn<
+                    DurationFormValues | AddDurationFormValues
+                  >
+                }
+                portalContainerRef={portalContainerRef}
+              />
             </div>
 
             <DateCalendar

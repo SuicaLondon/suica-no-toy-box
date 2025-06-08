@@ -15,7 +15,7 @@ import {
 import { repeatOptions } from "@/constants/duration";
 import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { memo, RefObject, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
 
 type RepeatSelectProps = {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
@@ -26,6 +26,15 @@ export const RepeatSelect = memo(function RepeatSelect({
   portalContainerRef,
   form,
 }: RepeatSelectProps) {
+  const selectedType = useWatch({
+    control: form.control,
+    name: "type",
+  });
+  const selectedRepeat = useWatch({
+    control: form.control,
+    name: "repeat",
+  });
+  console.log(selectedType, selectedRepeat);
   const [isOpen, setIsOpen] = useState(false);
   return (
     <FormField
@@ -36,6 +45,8 @@ export const RepeatSelect = memo(function RepeatSelect({
           <FormLabel>Repeat</FormLabel>
           <Select
             open={isOpen}
+            disabled={selectedType !== "bills" && selectedType !== "none"}
+            value={selectedRepeat}
             onOpenChange={setIsOpen}
             onValueChange={field.onChange}
             defaultValue={field.value}
