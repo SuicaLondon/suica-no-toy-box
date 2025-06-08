@@ -34,7 +34,7 @@ export const RepeatSelect = memo(function RepeatSelect({
     control: form.control,
     name: "repeat",
   });
-  console.log(selectedType, selectedRepeat);
+
   const [isOpen, setIsOpen] = useState(false);
   return (
     <FormField
