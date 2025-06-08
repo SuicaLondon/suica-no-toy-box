@@ -50,8 +50,6 @@ export const AddDurationButton = memo(function AddDurationButton() {
     },
   });
 
-  const selectedType = form.watch("type");
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -81,12 +79,10 @@ export const AddDurationButton = memo(function AddDurationButton() {
             />
             <div className="flex items-center gap-2">
               <TypeSelect portalContainerRef={portalContainerRef} form={form} />
-              {(selectedType === "none" || selectedType === "bills") && (
-                <RepeatSelect
-                  portalContainerRef={portalContainerRef}
-                  form={form}
-                />
-              )}
+              <RepeatSelect
+                portalContainerRef={portalContainerRef}
+                form={form}
+              />
             </div>
 
             <DateCalendar portalContainerRef={portalContainerRef} form={form} />

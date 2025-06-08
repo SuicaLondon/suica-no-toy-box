@@ -17,6 +17,12 @@ import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { memo, RefObject, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 
+const formOptions = {
+  shouldDirty: true,
+  shouldValidate: true,
+  shouldTouch: true,
+} as const;
+
 type TypeSelectProps = {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
@@ -37,7 +43,22 @@ export const TypeSelect = memo(function TypeSelect({
           <Select
             open={isOpen}
             onOpenChange={setIsOpen}
-            onValueChange={field.onChange}
+            onValueChange={(value) => {
+              field.onChange(value);
+              switch (value) {
+                case "anniversary":
+                  form.setValue("repeat", "year", formOptions);
+                  break;
+                case "birthday":
+                  form.setValue("repeat", "year", formOptions);
+                  break;
+                case "bills":
+                  form.setValue("repeat", "month", formOptions);
+                  break;
+                case "none":
+                  form.setValue("repeat", "none", formOptions);
+              }
+            }}
             defaultValue={field.value}
           >
             <FormControl>
