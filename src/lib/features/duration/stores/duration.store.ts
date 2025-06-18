@@ -64,7 +64,9 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
       DURATION_WIDGET_LOCAL_STORAGE_KEY,
     );
     if (storedWidgets) {
-      const parsedWidgets = JSON.parse(storedWidgets) ?? [];
+      const parsedWidgets = z
+        .array(durationFormSchema)
+        .parse(JSON.parse(storedWidgets));
       set({ widgets: parsedWidgets });
     }
   },
