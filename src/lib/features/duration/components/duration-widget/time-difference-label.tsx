@@ -1,4 +1,4 @@
-import { intervalTypeOptions, TypeOptionType } from "@/schemas/duration";
+import { TypeOptionType } from "@/schemas/duration";
 import {
   differenceInYears,
   format,
@@ -40,10 +40,6 @@ export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
   type,
 }: TimeDifferenceLabelProps) {
   const todayString = useDurationStore((state) => {
-    const hasCountDownType = intervalTypeOptions.some(
-      (typeOption) => typeOption === type,
-    );
-    if (!hasCountDownType) return undefined;
     return format(state.now, "yyyy-MM-dd");
   });
 
