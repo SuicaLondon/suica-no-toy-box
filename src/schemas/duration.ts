@@ -37,9 +37,3 @@ export type DurationFormValues = z.infer<typeof durationFormSchema>;
 
 export type TypeOptionType = "none" | "anniversary" | "birthday" | "bills";
 export type RepeatOptionType = "week" | "month" | "year" | "none";
-export type IntervalType = "anniversary" | "birthday" | "bills";
-export const intervalTypeOptions: IntervalType[] = [
-  "anniversary",
-  "birthday",
-  "bills",
-] as const;
