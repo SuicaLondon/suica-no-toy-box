@@ -1,8 +1,4 @@
-import {
-  intervalTypeOptions,
-  RepeatOptionType,
-  TypeOptionType,
-} from "@/schemas/duration";
+import { RepeatOptionType, TypeOptionType } from "@/schemas/duration";
 import {
   addMonths,
   addWeeks,
@@ -85,10 +81,6 @@ export const NextDayLabel = memo(function NextDayLabel({
   date,
 }: NextDayLabelProps) {
   const label = useDurationStore((state) => {
-    const hasCountDownType = intervalTypeOptions.some(
-      (typeOption) => typeOption === type,
-    );
-    if (!hasCountDownType) return getNextDateLabel(date, repeat, type);
     return getNextDateLabel(date, repeat, type, state.now);
   });
 
