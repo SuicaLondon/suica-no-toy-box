@@ -107,10 +107,8 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
     }
     const newWidgets = [...currentWidgets, widget];
     set({ widgets: newWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(newWidgets),
-    );
+    const newWidgetJson = JSON.stringify(newWidgets);
+    localStorage.setItem(DURATION_WIDGET_LOCAL_STORAGE_KEY, newWidgetJson);
   },
   importWidgetsFromClipboard: async () => {
     const widgetsString = await navigator.clipboard.readText();
@@ -127,10 +125,8 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
     }
     const newWidgets = [...currentWidgets, ...widgets];
     set({ widgets: newWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(newWidgets),
-    );
+    const newWidgetJson = JSON.stringify(newWidgets);
+    localStorage.setItem(DURATION_WIDGET_LOCAL_STORAGE_KEY, newWidgetJson);
   },
   setSortDirection: (sortDirection: "asc" | "desc") => {
     const sortedWidgets = get().widgets.toSorted((a, b) => {
