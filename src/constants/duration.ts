@@ -1,7 +1,7 @@
 export const repeatOptions = [
   {
     label: "No Repeat",
-    value: "none",
+    value: "never",
   },
   {
     label: "Every Week",

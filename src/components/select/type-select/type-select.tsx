@@ -56,7 +56,7 @@ export const TypeSelect = memo(function TypeSelect({
                   form.setValue("repeat", "month", formOptions);
                   break;
                 case "none":
-                  form.setValue("repeat", "none", formOptions);
+                  form.setValue("repeat", "never", formOptions);
               }
             }}
             defaultValue={field.value}

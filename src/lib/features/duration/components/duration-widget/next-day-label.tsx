@@ -22,7 +22,7 @@ const getNextDateLabel = (
   type?: TypeOptionType,
   now?: Date,
 ) => {
-  if (repeat !== "none" && now) {
+  if (repeat !== "never" && now) {
     let nextDate = new Date(date);
     if (nextDate < now) {
       while (nextDate < now) {

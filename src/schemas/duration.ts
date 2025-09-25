@@ -22,9 +22,17 @@ export const durationFormSchema = z.object({
       required_error: "Please select a date",
     }),
   ),
-  repeat: z.enum(["none", "week", "month", "year"], {
-    required_error: "Please select a repeat option",
-  }),
+  repeat: z.preprocess(
+    (val) => {
+      if (val === "none" || val === undefined || val === null) {
+        return "never";
+      }
+      return val;
+    },
+    z.enum(["never", "week", "month", "year"], {
+      required_error: "Please select a repeat option",
+    }),
+  ),
   type: z.enum(["none", "anniversary", "birthday", "bills"], {
     required_error: "Please select a type",
   }),
@@ -36,4 +44,4 @@ export type AddDurationFormValues = z.infer<typeof addDurationFormSchema>;
 export type DurationFormValues = z.infer<typeof durationFormSchema>;
 
 export type TypeOptionType = "none" | "anniversary" | "birthday" | "bills";
-export type RepeatOptionType = "week" | "month" | "year" | "none";
+export type RepeatOptionType = "week" | "month" | "year" | "never";
