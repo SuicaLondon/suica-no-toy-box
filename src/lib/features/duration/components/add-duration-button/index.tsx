@@ -46,7 +46,7 @@ export const AddDurationButton = memo(function AddDurationButton() {
       name: "",
       date: new Date(),
       type: "none",
-      repeat: "none",
+      repeat: "never",
     },
   });
 
