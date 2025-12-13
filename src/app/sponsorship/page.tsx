@@ -12,8 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDebounceCallback } from "usehooks-ts";
 import * as z from "zod";
@@ -24,12 +24,14 @@ const searchSchema = z.object({
 
 type SearchFormData = z.infer<typeof searchSchema>;
 
-export default function SponsorPage() {
+function SponsorForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const form = useForm<SearchFormData>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
-      companyName: "",
+      companyName: searchParams.get("companyName") || "",
     },
   });
   const companyName = form.watch("companyName");
@@ -88,5 +90,13 @@ export default function SponsorPage() {
         />
       </form>
     </Form>
+  );
+}
+
+export default function SponsorPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SponsorForm />
+    </Suspense>
   );
 }
