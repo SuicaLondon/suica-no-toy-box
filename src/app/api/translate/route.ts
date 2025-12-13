@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { z } from "zod";
-import { openai } from "@ai-sdk/openai";
-import { translateRequestSchema } from "@/schemas/translate";
-import { streamText } from "ai";
 import {
   createTranslationPrompt,
   SYSTEM_PROMPT,
 } from "@/lib/prompts/translate-prompt";
+import { translateRequestSchema } from "@/schemas/translate";
+import { openai } from "@ai-sdk/openai";
+import { streamText } from "ai";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function POST(request: Request) {
   try {
