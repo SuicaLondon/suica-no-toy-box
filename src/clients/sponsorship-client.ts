@@ -1,4 +1,4 @@
-import { Company } from "@prisma/client";
+import { type Company } from "@/db/schema";
 
 type SponsorshipDetail = Company & {
   url: string;

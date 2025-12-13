@@ -43,7 +43,6 @@ export default defineConfig({
         "**/test/**",
         "**/*.d.ts",
         "**/*.config.{js,ts,mjs,mts}",
-        "**/prisma/**",
         "**/public/**",
         "src/app/**/page.tsx",
         "src/app/**/layout.tsx",
@@ -66,7 +65,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@/prisma": path.resolve(__dirname, "./lib/prisma/schema"),
     },
   },
 

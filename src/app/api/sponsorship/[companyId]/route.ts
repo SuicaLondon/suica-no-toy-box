@@ -3,7 +3,10 @@ import {
   createSponsorshipPrompt,
   SYSTEM_PROMPT,
 } from "@/lib/prompts/sponsorship-promt";
-import { prisma } from "@/prisma/prisma";
+import { eq } from "drizzle-orm";
+
+import { db } from "@/db/client";
+import { companies } from "@/db/schema";
 import { tryCatch } from "@/utils/try-catch";
 import { openai } from "@ai-sdk/openai";
 import { generateObject, generateText } from "ai";
@@ -31,10 +34,8 @@ export async function GET(
   try {
     const { companyId } = await params;
 
-    const company = await prisma.company.findUnique({
-      where: {
-        id: companyId,
-      },
+    const company = await db.query.companies.findFirst({
+      where: (company, { eq }) => eq(company.id, companyId),
     });
 
     if (!company) {
@@ -57,31 +58,33 @@ export async function GET(
     const { object } = await getCompanyDetail(company.name, url?.toString());
     if (error) {
       console.error("Error: ", text, company.name);
-      await prisma.company.update({
-        where: { id: companyId },
-        data: {
+      await db
+        .update(companies)
+        .set({
           hasUrl: false,
           url: null,
           description: object.description,
           values: object.values,
           businessModel: object.businessModel,
-        },
-      });
+          updatedAt: new Date(),
+        })
+        .where(eq(companies.id, companyId));
       return NextResponse.json({ error: "Company not found" }, { status: 404 });
     }
 
     console.log(object);
 
-    await prisma.company.update({
-      where: { id: companyId },
-      data: {
+    await db
+      .update(companies)
+      .set({
         hasUrl: true,
         url: url.toString(),
         description: object.description,
         values: object.values,
         businessModel: object.businessModel,
-      },
-    });
+        updatedAt: new Date(),
+      })
+      .where(eq(companies.id, companyId));
 
     console.info("Company updated successfully", company.name);
     return NextResponse.json({ data: { ...company, ...object } });

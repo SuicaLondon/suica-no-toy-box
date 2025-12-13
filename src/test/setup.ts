@@ -22,9 +22,17 @@ beforeAll(() => {
     },
   }));
 
-  vi.mock("@/lib/prisma", () => ({
-    prisma: {
-      // Add your Prisma mocks here as needed
+  vi.mock("@/db/client", () => ({
+    db: {
+      query: {
+        companies: {
+          findMany: vi.fn(),
+          findFirst: vi.fn(),
+        },
+      },
+      insert: vi.fn(),
+      delete: vi.fn(),
+      update: vi.fn(),
     },
   }));
 });
