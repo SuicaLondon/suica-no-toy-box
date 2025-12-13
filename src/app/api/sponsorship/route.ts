@@ -1,6 +1,9 @@
 import { load } from "cheerio";
 
-import { prisma } from "@/prisma/prisma";
+import { ilike } from "drizzle-orm";
+
+import { db } from "@/db/client";
+import { companies as companiesTable } from "@/db/schema";
 import { parseCompanies } from "@/utils/parser";
 import { NextResponse } from "next/server";
 
@@ -57,15 +60,11 @@ export async function GET(request: Request) {
       if (!companies) {
         throw new Error("No companies data available");
       }
-      await prisma.company.deleteMany();
+      await db.delete(companiesTable);
       const tasks = [];
       for (let i = 0; i < companies.length; i += 1000) {
         const slicedCompanies = companies.slice(i, i + 1000);
-        tasks.push(
-          prisma.company.createMany({
-            data: slicedCompanies,
-          }),
-        );
+        tasks.push(db.insert(companiesTable).values(slicedCompanies));
       }
       console.log(tasks.length);
       for (let i = 0; i < tasks.length; i += 10) {
@@ -77,8 +76,8 @@ export async function GET(request: Request) {
     const companyName = searchParams.get("name");
 
     if (!companyName) {
-      const companies = await prisma.company.findMany({
-        select: {
+      const companies = await db.query.companies.findMany({
+        columns: {
           id: true,
           name: true,
           city: true,
@@ -86,12 +85,12 @@ export async function GET(request: Request) {
           type: true,
           rate: true,
         },
-        take: 100,
+        limit: 100,
       });
       return NextResponse.json({ data: companies });
     }
-    const company = await prisma.company.findMany({
-      select: {
+    const company = await db.query.companies.findMany({
+      columns: {
         id: true,
         name: true,
         city: true,
@@ -99,13 +98,8 @@ export async function GET(request: Request) {
         type: true,
         rate: true,
       },
-      where: {
-        name: {
-          contains: companyName,
-          mode: "insensitive",
-        },
-      },
-      take: 10,
+      where: (company) => ilike(company.name, `%${companyName}%`),
+      limit: 10,
     });
     return NextResponse.json({ data: company });
   } catch (error) {

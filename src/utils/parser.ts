@@ -1,14 +1,10 @@
-import { Company } from "@prisma/client";
+import { randomUUID } from "crypto";
+
+import { type NewCompany } from "@/db/schema";
 
 export type CompanyItem = Omit<
-  Company,
-  | "id"
-  | "createdAt"
-  | "updatedAt"
-  | "url"
-  | "description"
-  | "values"
-  | "businessModel"
+  NewCompany,
+  "createdAt" | "updatedAt" | "url" | "description" | "values" | "businessModel"
 >;
 
 export function parseCompanies(data: string): CompanyItem[] {
@@ -22,7 +18,8 @@ export function parseCompanies(data: string): CompanyItem[] {
     if (orgInfo.length == 5) {
       orgInfo[0] = orgInfo[0].replaceAll('"', "");
       orgInfo[4] = orgInfo[4].replaceAll('"', "");
-      const company = {
+      const company: CompanyItem = {
+        id: randomUUID(),
         name: orgInfo[0].trim(),
         city: orgInfo[1].trim(),
         county: orgInfo[2].trim(),
