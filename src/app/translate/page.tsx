@@ -8,7 +8,7 @@ import { LanguageCode, languages } from "@/constants/languages";
 import { useTranslate } from "@/hooks/use-translate";
 import { translateFormSchema, TranslateFormValues } from "@/schemas/translate";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftRight, Languages } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, Languages } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
 const getSavedLanguage = (
@@ -74,26 +74,31 @@ export default function TranslatePage() {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl p-4">
+    <div className="container mx-auto flex min-h-svh max-w-6xl flex-col p-3 pb-4 sm:p-4">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
+        className="flex flex-1 flex-col gap-3 sm:gap-4"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="flex items-center gap-2 text-2xl font-bold">
             <Languages className="h-6 w-6" />
             Translator
           </h1>
-          <Button type="button" variant="outline" onClick={handleSwapLanguages}>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 w-full sm:w-auto"
+            onClick={handleSwapLanguages}
+          >
             <ArrowLeftRight className="mr-2 h-4 w-4" />
             Swap Languages
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-1 gap-3 lg:flex-1 lg:grid-cols-2 lg:gap-4">
+          <div className="flex min-h-0 flex-col gap-2">
             <LanguageSelect name="sourceLang" control={form.control} />
-            <div className="relative">
+            <div className="relative flex-1">
               <Controller
                 name="sourceText"
                 control={form.control}
@@ -107,7 +112,7 @@ export default function TranslatePage() {
                       {...field}
                       disabled={isSubmitting}
                       placeholder="Enter text to translate"
-                      className="min-h-[200px] pr-10"
+                      className="min-h-[180px] resize-none pr-10 sm:min-h-[240px] lg:h-full lg:min-h-[420px]"
                     />
                     {error && (
                       <p className="mt-1 text-sm text-red-500">
@@ -124,9 +129,9 @@ export default function TranslatePage() {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-2">
+          <div className="flex min-h-0 flex-col gap-2">
             <LanguageSelect name="targetLang" control={form.control} />
-            <div className="relative">
+            <div className="relative flex-1">
               <Controller
                 name="targetText"
                 control={form.control}
@@ -134,7 +139,7 @@ export default function TranslatePage() {
                   <Textarea
                     {...field}
                     placeholder="Translation"
-                    className="min-h-[200px] pr-10"
+                    className="min-h-[180px] resize-none pr-10 sm:min-h-[240px] lg:h-full lg:min-h-[420px]"
                     readOnly
                   />
                 )}
@@ -144,14 +149,18 @@ export default function TranslatePage() {
                 className="absolute top-2 right-2"
               />
             </div>
-            <Button
-              type="submit"
-              className="sticky top-4 bottom-4 w-32 self-end"
-              disabled={isTranslating}
-            >
-              {isTranslating ? "Translating..." : "Translate"}
-            </Button>
           </div>
+        </div>
+
+        <div className="sticky bottom-0 z-10 mt-auto flex justify-end py-3 sm:static sm:py-0">
+          <Button
+            type="submit"
+            className="h-12 min-w-36 rounded-full bg-[#0b57d0] px-5 text-white shadow-lg shadow-blue-950/15 hover:bg-[#0842a0] sm:h-10 sm:min-w-32"
+            disabled={isTranslating}
+          >
+            <span>{isTranslating ? "Translating..." : "Translate"}</span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       </form>
     </div>
