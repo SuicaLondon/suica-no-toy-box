@@ -1,30 +1,57 @@
-import { Languages, Book, ForkKnife, Calendar } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  CalendarDays,
+  Languages,
+  Utensils,
+} from "lucide-react";
 
 export const apps = [
   {
-    title: "Suica Translate",
-    description: "A Google Translate-like interface for quick translations",
+    title: {
+      en: "Suica Translate",
+      zh: "Suica 翻譯",
+    },
+    description: {
+      en: "Focused translation without the clutter.",
+      zh: "專注、俐落的翻譯工具。",
+    },
     icon: Languages,
     href: "/translate",
   },
   {
-    title: "Sponsor Me",
-    description:
-      "Search for sponsorships for the company you want to apply to in the UK",
-    icon: Book,
+    title: {
+      en: "Sponsor Me",
+      zh: "Sponsor Me",
+    },
+    description: {
+      en: "Find UK companies that can sponsor a role.",
+      zh: "搜尋可提供英國工作簽證擔保的公司。",
+    },
+    icon: BriefcaseBusiness,
     href: "/sponsorship",
   },
   {
-    title: "What for dinner?",
-    description: "Decide what to eat for dinner",
-    icon: ForkKnife,
+    title: {
+      en: "What for dinner?",
+      zh: "今晚吃什麼？",
+    },
+    description: {
+      en: "Let chance choose tonight's menu.",
+      zh: "讓隨機選擇替你決定今晚吃什麼。",
+    },
+    icon: Utensils,
     href: "/dinner",
   },
   {
-    title: "Duration Board",
-    description:
-      "A board for tracking important dates to make your life have hope.",
-    icon: Calendar,
+    title: {
+      en: "Duration Board",
+      zh: "日期看板",
+    },
+    description: {
+      en: "Keep the dates worth looking forward to.",
+      zh: "記下那些值得期待的重要日子。",
+    },
+    icon: CalendarDays,
     href: "/duration",
   },
 ] as const;
