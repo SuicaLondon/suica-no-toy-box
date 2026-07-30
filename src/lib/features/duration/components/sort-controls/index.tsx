@@ -1,3 +1,4 @@
+import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -6,38 +7,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { memo } from "react";
+import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const SortControls = memo(function SortControls() {
+  const { copy } = useToolI18n();
+  const durationCopy = copy.duration;
   const sortBy = useDurationStore((state) => state.sortBy);
   const sortDirection = useDurationStore((state) => state.sortDirection);
   const setSortBy = useDurationStore((state) => state.setSortBy);
   const setSortDirection = useDurationStore((state) => state.setSortDirection);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={styles.sortControls}>
       <Select value={sortBy} onValueChange={setSortBy}>
-        <SelectTrigger className="w-[120px]">
-          <SelectValue placeholder="Sort by" />
+        <SelectTrigger
+          className={toolStyles.selectTrigger}
+          aria-label={durationCopy.sortBy}
+        >
+          <SelectValue placeholder={durationCopy.sortBy} />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="date">Date</SelectItem>
-          <SelectItem value="name">Name</SelectItem>
+        <SelectContent className={styles.menuContent}>
+          <SelectItem className={styles.menuItem} value="date">
+            {durationCopy.sortDate}
+          </SelectItem>
+          <SelectItem className={styles.menuItem} value="name">
+            {durationCopy.sortName}
+          </SelectItem>
         </SelectContent>
       </Select>
       <Button
-        variant="outline"
+        type="button"
         size="icon"
+        className={toolStyles.iconButton}
         onClick={() =>
           setSortDirection(sortDirection === "asc" ? "desc" : "asc")
         }
+        aria-label={
+          sortDirection === "asc"
+            ? durationCopy.ascending
+            : durationCopy.descending
+        }
+        title={
+          sortDirection === "asc"
+            ? durationCopy.ascending
+            : durationCopy.descending
+        }
       >
         {sortDirection === "asc" ? (
-          <ArrowUp className="h-4 w-4" />
+          <ArrowUp aria-hidden="true" />
         ) : (
-          <ArrowDown className="h-4 w-4" />
+          <ArrowDown aria-hidden="true" />
         )}
       </Button>
     </div>

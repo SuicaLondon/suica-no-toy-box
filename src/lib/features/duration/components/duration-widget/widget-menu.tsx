@@ -1,13 +1,16 @@
+import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState } from "react";
+import { toast } from "sonner";
+import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 import { DurationWidget } from "../../type/duration.type";
 import { DeleteDurationDialog } from "../delete-duration-dialog";
@@ -19,6 +22,8 @@ type WidgetMenuProps = {
 export const WidgetMenu = memo(function WidgetMenu({
   widget,
 }: WidgetMenuProps) {
+  const { copy } = useToolI18n();
+  const durationCopy = copy.duration;
   const [activeDialog, setActiveDialog] = useState<"delete" | "edit" | null>(
     null,
   );
@@ -28,23 +33,35 @@ export const WidgetMenu = memo(function WidgetMenu({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal />
+          <Button
+            type="button"
+            size="icon"
+            className={`${toolStyles.iconButton} ${styles.menuTrigger}`}
+            aria-label={durationCopy.menuLabel(widget.name)}
+            title={durationCopy.menuLabel(widget.name)}
+          >
+            <MoreHorizontal aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className={styles.menuContent} align="end">
           <DropdownMenuItem
+            className={styles.menuItem}
             variant="destructive"
-            onClick={() => setActiveDialog("delete")}
+            onSelect={() => setActiveDialog("delete")}
           >
-            Delete Widget
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+            {durationCopy.deleteMenu}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setActiveDialog("edit")}>
-            Edit Widget
+          <DropdownMenuItem
+            className={styles.menuItem}
+            onSelect={() => setActiveDialog("edit")}
+          >
+            {durationCopy.editMenu}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => copyWidget(widget)}>
-            Copy Widget
+          <DropdownMenuItem
+            className={styles.menuItem}
+            onSelect={() => void handleCopy()}
+          >
+            {durationCopy.copyMenu}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -64,4 +81,13 @@ export const WidgetMenu = memo(function WidgetMenu({
       />
     </>
   );
+
+  async function handleCopy() {
+    try {
+      await copyWidget(widget);
+      toast.success(durationCopy.copiedOne);
+    } catch {
+      toast.error(durationCopy.copyFailed);
+    }
+  }
 });

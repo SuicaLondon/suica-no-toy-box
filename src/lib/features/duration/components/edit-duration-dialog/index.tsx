@@ -1,9 +1,12 @@
 "use client";
 
+import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -16,18 +19,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import {
   AddDurationFormValues,
-  durationFormSchema,
+  createDurationFormSchema,
   DurationFormValues,
   RepeatOptionType,
   TypeOptionType,
 } from "@/schemas/duration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { memo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { RepeatSelect } from "../../../../../components/select/repeat-select";
 import { TypeSelect } from "../../../../../components/select/type-select/type-select";
+import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 import { DurationWidget } from "../../type/duration.type";
 import { DateCalendar } from "../date-calendar";
@@ -51,42 +56,81 @@ export const EditDurationDialog = memo(function EditDurationDialog({
   type,
   repeat,
 }: EditDurationDialogProps) {
+  const { copy } = useToolI18n();
+  const durationCopy = copy.duration;
   const portalContainerRef = useRef<HTMLDivElement>(null);
+  const schema = useMemo(
+    () =>
+      createDurationFormSchema({
+        nameRequired: durationCopy.nameRequired,
+        dateRequired: durationCopy.dateRequired,
+      }),
+    [durationCopy.dateRequired, durationCopy.nameRequired],
+  );
   const form = useForm<DurationFormValues>({
-    resolver: zodResolver(durationFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       id,
       name,
       date,
-      type,
-      repeat,
+      type: type ?? "none",
+      repeat: repeat ?? "never",
     },
   });
 
   const editWidget = useDurationStore((state) => state.editWidget);
 
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        id,
+        name,
+        date,
+        type: type ?? "none",
+        repeat: repeat ?? "never",
+      });
+    }
+  }, [date, form, id, name, open, repeat, type]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]" ref={portalContainerRef}>
+      <DialogContent
+        className={styles.dialogContent}
+        ref={portalContainerRef}
+        closeLabel={copy.common.close}
+      >
         <DialogHeader>
-          <DialogTitle>Edit Duration</DialogTitle>
+          <DialogTitle className={styles.dialogTitle}>
+            {durationCopy.editTitle}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {durationCopy.editTitle}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className={styles.dialogForm}
+          >
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{durationCopy.nameLabel}</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      className={toolStyles.input}
+                      placeholder={durationCopy.namePlaceholder}
+                      autoComplete="off"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex items-center gap-2">
+            <div className={toolStyles.formPair}>
               <TypeSelect
                 form={
                   form as UseFormReturn<
@@ -113,9 +157,16 @@ export const EditDurationDialog = memo(function EditDurationDialog({
               }
               portalContainerRef={portalContainerRef}
             />
-            <Button type="submit" className="w-full">
-              Add Duration
-            </Button>
+            <div className={styles.dialogActions}>
+              <DialogClose asChild>
+                <Button type="button" className={toolStyles.secondaryButton}>
+                  {durationCopy.cancelAction}
+                </Button>
+              </DialogClose>
+              <Button type="submit" className={toolStyles.primaryButton}>
+                {durationCopy.saveAction}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
@@ -123,7 +174,6 @@ export const EditDurationDialog = memo(function EditDurationDialog({
   );
   function onOpenChange(open: boolean) {
     setOpen(open);
-    form.reset();
   }
 
   function calculateRepeat(
@@ -145,7 +195,7 @@ export const EditDurationDialog = memo(function EditDurationDialog({
   function onSubmit(values: DurationFormValues) {
     const newWidget: DurationWidget = {
       id,
-      name: values.name,
+      name: values.name.trim(),
       date: values.date,
       repeat: calculateRepeat(values.type, values.repeat),
       type: values.type,

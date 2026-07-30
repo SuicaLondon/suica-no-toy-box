@@ -1,10 +1,11 @@
-import { ChevronLeft } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-import { YearSelect } from "./year-select";
-import { memo, RefObject } from "react";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { format } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { memo, RefObject } from "react";
+import { getDurationDateLocale } from "../../date-locale";
+import styles from "../../duration.module.css";
+import { YearSelect } from "./year-select";
 
 type CalendarNavigatorProps = {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
@@ -19,17 +20,25 @@ export const CalendarNavigator = memo(function CalendarNavigator({
   handleMonthChange,
   handleYearChange,
 }: CalendarNavigatorProps) {
+  const { copy, locale } = useToolI18n();
+  const durationCopy = copy.duration;
+  const dateLocale = getDurationDateLocale(locale);
+
   return (
-    <div className="flex min-w-[250px] items-center justify-between gap-2">
+    <div className={styles.calendarNavigator}>
       <Button
         type="button"
         variant="ghost"
         size="icon"
+        className={styles.menuTrigger}
         onClick={() => handleMonthChange(-1)}
+        aria-label={durationCopy.previousMonth}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft aria-hidden="true" />
       </Button>
-      <span className="text-sm">{format(currentDate, "MMMM")}</span>
+      <span className={styles.calendarMonthLabel}>
+        {format(currentDate, "LLLL", { locale: dateLocale })}
+      </span>
       <YearSelect
         portalContainerRef={portalContainerRef}
         currentDate={currentDate}
@@ -39,9 +48,11 @@ export const CalendarNavigator = memo(function CalendarNavigator({
         type="button"
         variant="ghost"
         size="icon"
+        className={styles.menuTrigger}
         onClick={() => handleMonthChange(1)}
+        aria-label={durationCopy.nextMonth}
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight aria-hidden="true" />
       </Button>
     </div>
   );

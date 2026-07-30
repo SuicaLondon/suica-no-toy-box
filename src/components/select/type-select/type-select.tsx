@@ -12,7 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import toolStyles from "@/app/tool-shell.module.css";
 import { typeOptions } from "@/constants/duration";
+import { useToolI18n } from "@/i18n/tool-i18n";
+import durationStyles from "@/lib/features/duration/duration.module.css";
 import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { memo, RefObject, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -32,14 +35,16 @@ export const TypeSelect = memo(function TypeSelect({
   portalContainerRef,
   form,
 }: TypeSelectProps) {
+  const { copy } = useToolI18n();
+  const durationCopy = copy.duration;
   const [isOpen, setIsOpen] = useState(false);
   return (
     <FormField
       control={form.control}
       name="type"
       render={({ field }) => (
-        <FormItem>
-          <FormLabel>Type</FormLabel>
+        <FormItem className="min-w-0">
+          <FormLabel>{durationCopy.typeLabel}</FormLabel>
           <Select
             open={isOpen}
             onOpenChange={setIsOpen}
@@ -59,17 +64,27 @@ export const TypeSelect = memo(function TypeSelect({
                   form.setValue("repeat", "never", formOptions);
               }
             }}
-            defaultValue={field.value}
+            value={field.value}
           >
             <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
+              <SelectTrigger
+                className={toolStyles.selectTrigger}
+                aria-label={durationCopy.typeLabel}
+              >
+                <SelectValue placeholder={durationCopy.typePlaceholder} />
               </SelectTrigger>
             </FormControl>
-            <SelectContent container={portalContainerRef?.current}>
+            <SelectContent
+              className={durationStyles.menuContent}
+              container={portalContainerRef?.current}
+            >
               {typeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                <SelectItem
+                  className={durationStyles.menuItem}
+                  key={option.value}
+                  value={option.value}
+                >
+                  {durationCopy.typeOptions[option.value]}
                 </SelectItem>
               ))}
             </SelectContent>

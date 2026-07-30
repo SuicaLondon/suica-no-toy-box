@@ -1,35 +1,35 @@
+import styles from "@/app/tool-shell.module.css";
 import { memo } from "react";
 
 type DinnerSelectionsProps = {
-  cuisines: string[];
-  removeCuisine: (index: number) => void;
+  options: string[];
+  removeOption: (index: number) => void;
+  removeLabel: (option: string) => string;
+  disabled?: boolean;
 };
 
 export const DinnerSelections = memo(function DinnerSelections({
-  cuisines,
-  removeCuisine,
+  options,
+  removeOption,
+  removeLabel,
+  disabled,
 }: DinnerSelectionsProps) {
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <h3 className="font-medium">Your Options:</h3>
-        <div className="flex flex-wrap gap-2">
-          {cuisines.map((cuisine, index) => (
-            <div
-              key={index}
-              className="bg-secondary flex items-center gap-2 rounded-full px-3 py-1"
-            >
-              <span>{cuisine}</span>
-              <button
-                onClick={() => removeCuisine(index)}
-                className="text-muted-foreground hover:text-foreground text-sm"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className={styles.chipList}>
+      {options.map((option, index) => (
+        <span key={`${option}-${index}`} className={styles.chip}>
+          <span>{option}</span>
+          <button
+            type="button"
+            onClick={() => removeOption(index)}
+            aria-label={removeLabel(option)}
+            title={removeLabel(option)}
+            disabled={disabled}
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </span>
+      ))}
     </div>
   );
 });

@@ -1,13 +1,17 @@
+import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DurationWidget } from "../../type/duration.type";
+import { useToolI18n } from "@/i18n/tool-i18n";
+import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
+import { DurationWidget } from "../../type/duration.type";
 
 type DeleteDurationDialogProps = {
   open: boolean;
@@ -20,17 +24,38 @@ export function DeleteDurationDialog({
   setOpen,
   widget,
 }: DeleteDurationDialogProps) {
+  const { copy } = useToolI18n();
+  const durationCopy = copy.duration;
   const deleteWidget = useDurationStore((state) => state.deleteWidget);
 
   return (
-    <Dialog open={open} onOpenChange={() => setOpen(false)}>
-      <DialogContent>
-        <DialogTitle>Delete Widget</DialogTitle>
-        <DialogDescription>
-          Are you sure you want to delete this widget?
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent
+        className={styles.dialogContent}
+        closeLabel={copy.common.close}
+      >
+        <DialogTitle className={styles.dialogTitle}>
+          {durationCopy.deleteTitle}
+        </DialogTitle>
+        <DialogDescription className={styles.dialogDescription}>
+          {durationCopy.deleteDescription}
         </DialogDescription>
         <DialogFooter>
-          <Button onClick={() => deleteWidget(widget)}>Delete</Button>
+          <DialogClose asChild>
+            <Button type="button" className={toolStyles.secondaryButton}>
+              {durationCopy.cancelAction}
+            </Button>
+          </DialogClose>
+          <Button
+            type="button"
+            className={toolStyles.dangerButton}
+            onClick={() => {
+              deleteWidget(widget);
+              setOpen(false);
+            }}
+          >
+            {durationCopy.deleteAction}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

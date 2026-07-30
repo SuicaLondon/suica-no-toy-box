@@ -5,7 +5,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { memo, RefObject, useMemo, useState } from "react";
+import styles from "../../duration.module.css";
 
 type YearSelectProps = {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
@@ -18,6 +20,7 @@ export const YearSelect = memo(function YearSelect({
   currentDate,
   handleYearChange,
 }: YearSelectProps) {
+  const { copy } = useToolI18n();
   const [isOpen, setIsOpen] = useState(false);
   const yearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
@@ -35,12 +38,22 @@ export const YearSelect = memo(function YearSelect({
       value={currentDate.getFullYear().toString()}
       onValueChange={(value) => handleYearChange(parseInt(value))}
     >
-      <SelectTrigger className="border-none shadow-none">
+      <SelectTrigger
+        className={styles.yearTrigger}
+        aria-label={copy.duration.selectYear}
+      >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent container={portalContainerRef?.current}>
+      <SelectContent
+        className={styles.menuContent}
+        container={portalContainerRef?.current}
+      >
         {yearOptions.map((year) => (
-          <SelectItem key={year} value={year.toString()}>
+          <SelectItem
+            className={styles.menuItem}
+            key={year}
+            value={year.toString()}
+          >
             {year}
           </SelectItem>
         ))}

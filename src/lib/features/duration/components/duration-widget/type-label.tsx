@@ -1,3 +1,4 @@
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { RepeatOptionType, TypeOptionType } from "@/schemas/duration";
 import { memo } from "react";
 
@@ -10,17 +11,14 @@ export const TypeLabel = memo(function TypeLabel({
   type,
   repeat,
 }: TypeLabelProps) {
-  function getLabel() {
-    switch (type) {
-      case "anniversary":
-        return "Anniversary";
-      case "birthday":
-        return "Birthday";
-      case "bills":
-        return "Bills" + (repeat ? ` every ${repeat}` : "");
-      default:
-        return repeat ? `Repeats every ${repeat}` : "";
-    }
-  }
-  return <span>{getLabel()}</span>;
+  const { copy } = useToolI18n();
+  const typeLabel = copy.duration.typeOptions[type ?? "none"];
+  const repeatLabel = copy.duration.repeatOptions[repeat ?? "never"];
+
+  return (
+    <span>
+      {typeLabel}
+      {repeat && repeat !== "never" ? ` · ${repeatLabel}` : ""}
+    </span>
+  );
 });

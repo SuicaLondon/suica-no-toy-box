@@ -3,12 +3,16 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { addMonths, setYear, subMonths } from "date-fns";
 import { memo, RefObject, useCallback, useEffect, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
+import { getDurationDateLocale } from "../../date-locale";
+import styles from "../../duration.module.css";
 import { CalendarNavigator } from "./calendar-navigator";
 
 type DateCalendarProps = {
@@ -20,14 +24,20 @@ export const DateCalendar = memo(function DateCalendar({
   portalContainerRef,
   form,
 }: DateCalendarProps) {
+  const { copy, locale } = useToolI18n();
+  const durationCopy = copy.duration;
+  const dateLocale = getDurationDateLocale(locale);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const selectedDate = useWatch({
+    control: form.control,
+    name: "date",
+  });
 
   useEffect(() => {
-    const date = form.getValues("date");
-    if (date) {
-      setCurrentDate(new Date(date.toString()));
+    if (selectedDate) {
+      setCurrentDate(new Date(selectedDate.toString()));
     }
-  }, [form]);
+  }, [selectedDate]);
 
   const handleMonthChange = useCallback(
     (months: number) => {
@@ -53,29 +63,32 @@ export const DateCalendar = memo(function DateCalendar({
       name="date"
       render={({ field }) => {
         return (
-          <FormItem className="flex min-h-[300px] flex-col items-center">
+          <FormItem>
+            <FormLabel>{durationCopy.dateLabel}</FormLabel>
             <FormControl>
               <Calendar
                 mode="single"
-                className="flex h-full w-full"
+                locale={dateLocale}
+                className={styles.calendarFrame}
                 classNames={{
-                  months:
-                    "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1",
-                  month: "space-y-4 w-full flex flex-col",
-                  table: "w-full h-full border-collapse space-y-1",
-                  head_row: "",
-                  row: "w-full mt-2",
-                  cell: "h-8 w-8 text-center text-sm p-0",
-                  day: "cursor-pointer w-8 h-8 rounded-full overflow-hidden",
-                  day_disabled: "hover:bg-none select-none cursor-not-allowed",
-                  day_selected:
-                    "cursor-pointer w-8 h-8 rounded-full bg-black text-white overflow-hidden",
+                  months: styles.calendarMonths,
+                  month: styles.calendarMonth,
+                  table: styles.calendarTable,
+                  head_row: styles.calendarHeadRow,
+                  head_cell: styles.calendarHeadCell,
+                  row: styles.calendarRow,
+                  cell: styles.calendarCell,
+                  day: styles.calendarDay,
+                  day_disabled: styles.calendarDisabled,
+                  day_selected: styles.calendarSelected,
+                  day_today: styles.calendarToday,
+                  day_outside: styles.calendarOutside,
                 }}
                 selected={field.value}
                 onSelect={field.onChange}
                 month={currentDate}
                 disableNavigation
-                showOutsideDays
+                showOutsideDays={false}
                 components={{
                   Caption: () => (
                     <CalendarNavigator
