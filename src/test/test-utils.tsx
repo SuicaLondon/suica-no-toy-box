@@ -14,7 +14,11 @@ import { expect } from "vitest";
 /**
  * Wrapper component that includes all necessary providers
  */
-const AllProviders = ({ children }: { children: ReactNode }) => {
+interface AllProvidersProps {
+  children: ReactNode;
+}
+
+const AllProviders = ({ children }: AllProvidersProps) => {
   // TODO: Add providers herer
 
   return <>{children}</>;

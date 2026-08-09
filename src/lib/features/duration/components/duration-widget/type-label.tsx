@@ -2,10 +2,10 @@ import { useToolI18n } from "@/i18n/tool-i18n";
 import { RepeatOptionType, TypeOptionType } from "@/schemas/duration";
 import { memo } from "react";
 
-type TypeLabelProps = {
+interface TypeLabelProps {
   type?: TypeOptionType;
   repeat?: RepeatOptionType;
-};
+}
 
 export const TypeLabel = memo(function TypeLabel({
   type,

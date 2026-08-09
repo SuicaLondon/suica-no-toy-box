@@ -1,55 +1,16 @@
-import styles from "@/app/tool-shell.module.css";
-import {
-  memo,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { memo, useEffect, useMemo, useState } from "react";
+import { getRouletteSegmentAngle } from "../roulette-geometry";
+import { RouletteWheelSvg } from "./roulette-wheel-svg";
 
-const radius = 150;
-const center = radius;
-
-const colors = [
-  "var(--roulette-1)",
-  "var(--roulette-2)",
-  "var(--roulette-3)",
-  "var(--roulette-4)",
-] as const;
-
-const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
-
-function subscribeToReducedMotion(onChange: () => void) {
-  const mediaQuery = window.matchMedia(reducedMotionQuery);
-  mediaQuery.addEventListener("change", onChange);
-
-  return () => mediaQuery.removeEventListener("change", onChange);
-}
-
-function getReducedMotionSnapshot() {
-  return window.matchMedia(reducedMotionQuery).matches;
-}
-
-function getServerReducedMotionSnapshot() {
-  return false;
-}
-
-const getCoordinates = (deg: number) => {
-  const rad = (deg * Math.PI) / 180;
-  return {
-    x: center + radius * Math.cos(rad),
-    y: center + radius * Math.sin(rad),
-  };
-};
-
-type DinnerRouletteProps = {
+interface DinnerRouletteProps {
   isSpinning: boolean;
   options: string[];
   result: string;
   duration?: number;
   onSpinComplete?: () => void;
   ariaLabel: string;
-};
+}
 
 export const DinnerRoulette = memo(function DinnerRoulette({
   isSpinning,
@@ -59,12 +20,8 @@ export const DinnerRoulette = memo(function DinnerRoulette({
   onSpinComplete,
   ariaLabel,
 }: DinnerRouletteProps) {
-  const angle = 360 / options.length;
-  const prefersReducedMotion = useSyncExternalStore(
-    subscribeToReducedMotion,
-    getReducedMotionSnapshot,
-    getServerReducedMotionSnapshot,
-  );
+  const angle = getRouletteSegmentAngle(options.length);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const effectiveDuration = prefersReducedMotion ? 1 : duration;
 
   const [rotation, setRotation] = useState(0);
@@ -100,67 +57,22 @@ export const DinnerRoulette = memo(function DinnerRoulette({
   ]);
 
   return (
-    <div className={`${styles.rouletteStage} ${styles.rouletteWheel}`}>
-      <div className={styles.rouletteAssembly}>
+    <div className="border-toy-line bg-toy-hover relative flex min-h-[356px] items-center justify-center overflow-hidden border [--roulette-1:color-mix(in_srgb,var(--toy-accent)_85%,var(--toy-bg))] [--roulette-2:color-mix(in_srgb,var(--toy-accent)_58%,var(--toy-bg))] [--roulette-3:color-mix(in_srgb,var(--toy-accent)_36%,var(--toy-bg))] [--roulette-4:color-mix(in_srgb,var(--toy-accent)_70%,var(--toy-text))] max-[767px]:min-h-[310px]">
+      <div className="relative w-[min(300px,calc(100vw-96px))]">
         <div
-          className={styles.rouletteRotation}
+          className="w-full transition-transform [transition-timing-function:cubic-bezier(0.16,0.76,0.2,1)] motion-reduce:!duration-[1ms]"
           style={{
             transform: `rotate(${rotation}deg)`,
             transitionDuration: `${effectiveDuration}ms`,
           }}
         >
-          <svg
-            viewBox={`0 0 ${radius * 2} ${radius * 2}`}
-            className={styles.rouletteSvg}
-            role="img"
-            aria-label={ariaLabel}
-          >
-            {options.map((option, index) => {
-              const startAngle = angle * index;
-              const endAngle = angle * (index + 1);
-              const largeArc = endAngle - startAngle > 180 ? 1 : 0;
-
-              const start = getCoordinates(startAngle);
-              const end = getCoordinates(endAngle);
-
-              const pathData = `
-                M ${center},${center}
-                L ${start.x},${start.y}
-                A ${radius},${radius} 0 ${largeArc} 1 ${end.x},${end.y}
-                Z
-              `;
-
-              const midAngle = startAngle + angle / 2;
-              const labelX =
-                center + radius * 0.6 * Math.cos((midAngle * Math.PI) / 180);
-              const labelY =
-                center + radius * 0.6 * Math.sin((midAngle * Math.PI) / 180);
-
-              return (
-                <g key={option}>
-                  <path
-                    d={pathData}
-                    fill={colors[index % colors.length]}
-                    stroke="var(--home-bg)"
-                    strokeWidth="1"
-                  />
-                  <text
-                    x={labelX}
-                    y={labelY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className={styles.rouletteText}
-                  >
-                    {option.length > 18 ? `${option.slice(0, 17)}…` : option}
-                  </text>
-                </g>
-              );
-            })}
-            <circle cx={center} cy={center} r="6" fill="var(--home-accent)" />
-          </svg>
+          <RouletteWheelSvg options={options} ariaLabel={ariaLabel} />
         </div>
 
-        <div className={styles.roulettePointer} aria-hidden="true" />
+        <div
+          className="border-t-toy-accent absolute top-0.5 left-1/2 size-0 -translate-x-1/2 border-t-[16px] border-r-[10px] border-l-[10px] border-r-transparent border-l-transparent drop-shadow-[0_2px_3px_rgb(0_0_0_/_18%)]"
+          aria-hidden="true"
+        />
       </div>
     </div>
   );

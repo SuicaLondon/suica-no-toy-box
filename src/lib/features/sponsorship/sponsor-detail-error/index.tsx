@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type SponsorDetailErrorProps = {
+interface SponsorDetailErrorProps {
   error: Error;
-};
+}
 
 export default function SponsorDetailError({ error }: SponsorDetailErrorProps) {
   return (

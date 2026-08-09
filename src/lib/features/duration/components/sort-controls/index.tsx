@@ -1,4 +1,3 @@
-import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,7 +9,6 @@ import {
 import { useToolI18n } from "@/i18n/tool-i18n";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { memo } from "react";
-import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const SortControls = memo(function SortControls() {
@@ -22,19 +20,25 @@ export const SortControls = memo(function SortControls() {
   const setSortDirection = useDurationStore((state) => state.setSortDirection);
 
   return (
-    <div className={styles.sortControls}>
+    <div className="flex items-center gap-2.5 max-[640px]:w-full max-[640px]:[&>*:first-child]:flex-auto">
       <Select value={sortBy} onValueChange={setSortBy}>
         <SelectTrigger
-          className={toolStyles.selectTrigger}
+          className="border-toy-line-strong text-toy-text focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-11 w-full justify-between rounded-[2px] bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-offset-2"
           aria-label={durationCopy.sortBy}
         >
           <SelectValue placeholder={durationCopy.sortBy} />
         </SelectTrigger>
-        <SelectContent className={styles.menuContent}>
-          <SelectItem className={styles.menuItem} value="date">
+        <SelectContent className="border-toy-line-strong bg-toy-bg text-toy-text min-w-[190px] rounded-[2px] p-[5px] font-sans shadow-[0_18px_44px_rgb(0_0_0_/_14%)]">
+          <SelectItem
+            className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
+            value="date"
+          >
             {durationCopy.sortDate}
           </SelectItem>
-          <SelectItem className={styles.menuItem} value="name">
+          <SelectItem
+            className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
+            value="name"
+          >
             {durationCopy.sortName}
           </SelectItem>
         </SelectContent>
@@ -42,7 +46,7 @@ export const SortControls = memo(function SortControls() {
       <Button
         type="button"
         size="icon"
-        className={toolStyles.iconButton}
+        className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent size-10 min-h-10 shrink-0 rounded-[2px] bg-transparent p-0 font-mono text-xs tracking-[0.08em] uppercase shadow-none"
         onClick={() =>
           setSortDirection(sortDirection === "asc" ? "desc" : "asc")
         }

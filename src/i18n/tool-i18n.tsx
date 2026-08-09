@@ -13,13 +13,12 @@ type ToolI18nContextValue = (typeof contextValues)[Locale];
 
 const ToolI18nContext = createContext<ToolI18nContextValue | null>(null);
 
-export function ToolI18nProvider({
-  locale,
-  children,
-}: {
+interface ToolI18nProviderProps {
   locale: Locale;
   children: ReactNode;
-}) {
+}
+
+export function ToolI18nProvider({ locale, children }: ToolI18nProviderProps) {
   return (
     <ToolI18nContext.Provider value={contextValues[locale]}>
       {children}

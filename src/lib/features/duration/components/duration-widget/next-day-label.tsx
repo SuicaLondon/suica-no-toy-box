@@ -36,11 +36,11 @@ export function getNextOccurrence(
   return nextDate;
 }
 
-type NextDayLabelProps = {
+interface NextDayLabelProps {
   repeat?: RepeatOptionType;
   type?: TypeOptionType;
   date: Date;
-};
+}
 
 export const NextDayLabel = memo(function NextDayLabel({
   repeat,

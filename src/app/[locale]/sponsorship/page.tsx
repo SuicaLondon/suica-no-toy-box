@@ -1,17 +1,17 @@
-import { ToolShell } from "@/app/_components/tool-shell";
+import { ToolShell } from "@/components/site/tool-shell";
 import { getAlternateLocale, isLocale } from "@/i18n/locales";
 import { getToolMetadata } from "@/i18n/tool-metadata";
 import { SponsorshipTool } from "@/lib/features/sponsorship/sponsorship-tool";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type SponsorshipPageProps = {
+interface SponsorshipPageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{
     companyName?: string | string[];
     selectedCompanyId?: string | string[];
   }>;
-};
+}
 
 function getFirstValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");

@@ -1,4 +1,3 @@
-import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,14 +9,13 @@ import { useToolI18n } from "@/i18n/tool-i18n";
 import { MoreHorizontal } from "lucide-react";
 import { memo, useState } from "react";
 import { toast } from "sonner";
-import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 import { DurationWidget } from "../../type/duration.type";
 import { DeleteDurationDialog } from "../delete-duration-dialog";
 import { EditDurationDialog } from "../edit-duration-dialog";
-type WidgetMenuProps = {
+interface WidgetMenuProps {
   widget: DurationWidget;
-};
+}
 
 export const WidgetMenu = memo(function WidgetMenu({
   widget,
@@ -36,29 +34,32 @@ export const WidgetMenu = memo(function WidgetMenu({
           <Button
             type="button"
             size="icon"
-            className={`${toolStyles.iconButton} ${styles.menuTrigger}`}
+            className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent size-10 min-h-10 shrink-0 rounded-[2px] bg-transparent p-0 font-mono text-xs tracking-[0.08em] uppercase shadow-none"
             aria-label={durationCopy.menuLabel(widget.name)}
             title={durationCopy.menuLabel(widget.name)}
           >
             <MoreHorizontal aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className={styles.menuContent} align="end">
+        <DropdownMenuContent
+          className="border-toy-line-strong bg-toy-bg text-toy-text min-w-[190px] rounded-[2px] p-[5px] font-sans shadow-[0_18px_44px_rgb(0_0_0_/_14%)]"
+          align="end"
+        >
           <DropdownMenuItem
-            className={styles.menuItem}
+            className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
             variant="destructive"
             onSelect={() => setActiveDialog("delete")}
           >
             {durationCopy.deleteMenu}
           </DropdownMenuItem>
           <DropdownMenuItem
-            className={styles.menuItem}
+            className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
             onSelect={() => setActiveDialog("edit")}
           >
             {durationCopy.editMenu}
           </DropdownMenuItem>
           <DropdownMenuItem
-            className={styles.menuItem}
+            className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
             onSelect={() => void handleCopy()}
           >
             {durationCopy.copyMenu}

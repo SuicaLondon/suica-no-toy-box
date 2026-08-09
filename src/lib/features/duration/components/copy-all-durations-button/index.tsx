@@ -1,4 +1,3 @@
-import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import { useToolI18n } from "@/i18n/tool-i18n";
 import { Copy } from "lucide-react";
@@ -14,7 +13,7 @@ export const CopyAllDurationsButton = memo(function CopyAllDurationsButton() {
   return (
     <Button
       type="button"
-      className={toolStyles.secondaryButton}
+      className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
       onClick={handleCopy}
       disabled={widgetCount === 0}
     >

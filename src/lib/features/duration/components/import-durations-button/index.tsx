@@ -1,6 +1,5 @@
 "use client";
 
-import toolStyles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,7 +15,6 @@ import { useToolI18n } from "@/i18n/tool-i18n";
 import { Download } from "lucide-react";
 import { type FormEvent, memo, useState } from "react";
 import { toast } from "sonner";
-import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const ImportDurationsButton = memo(function ImportDurationsButton() {
@@ -31,26 +29,32 @@ export const ImportDurationsButton = memo(function ImportDurationsButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" className={toolStyles.secondaryButton}>
+        <Button
+          type="button"
+          className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
+        >
           <Download aria-hidden="true" />
           {durationCopy.importDates}
         </Button>
       </DialogTrigger>
       <DialogContent
-        className={styles.dialogContent}
+        className="border-toy-line-strong bg-toy-bg text-toy-text max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto rounded-[2px] p-6 font-sans max-[640px]:p-5"
         closeLabel={copy.common.close}
       >
         <DialogHeader>
-          <DialogTitle className={styles.dialogTitle}>
+          <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
             {durationCopy.importTitle}
           </DialogTitle>
-          <DialogDescription className={styles.dialogDescription}>
+          <DialogDescription className="text-toy-muted leading-[1.55]">
             {durationCopy.importDescription}
           </DialogDescription>
         </DialogHeader>
 
-        <form className={styles.dialogForm} onSubmit={handleImport}>
-          <label className={toolStyles.fieldLabel} htmlFor="duration-import">
+        <form className="grid gap-4" onSubmit={handleImport}>
+          <label
+            className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase"
+            htmlFor="duration-import"
+          >
             {durationCopy.importLabel}
           </label>
           <Textarea
@@ -58,19 +62,22 @@ export const ImportDurationsButton = memo(function ImportDurationsButton() {
             value={importText}
             onChange={(event) => setImportText(event.target.value)}
             placeholder={durationCopy.importPlaceholder}
-            className={`${toolStyles.textarea} ${styles.importTextarea}`}
+            className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent max-h-[42svh] min-h-[180px] w-full resize-y rounded-[2px] bg-transparent p-4 pr-12 font-mono text-[0.8125rem] leading-[1.55] shadow-none focus-visible:ring-1 focus-visible:ring-offset-2"
             autoFocus
           />
 
-          <div className={styles.dialogActions}>
+          <div className="flex items-center justify-end gap-2.5 pt-1 max-[420px]:flex-col-reverse max-[420px]:items-stretch max-[420px]:[&>*]:w-full">
             <DialogClose asChild>
-              <Button type="button" className={toolStyles.secondaryButton}>
+              <Button
+                type="button"
+                className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
+              >
                 {durationCopy.cancelAction}
               </Button>
             </DialogClose>
             <Button
               type="submit"
-              className={toolStyles.primaryButton}
+              className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full"
               disabled={!importText.trim()}
             >
               {durationCopy.importAction}

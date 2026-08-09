@@ -1,9 +1,9 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-type SponsorListErrorProps = {
+interface SponsorListErrorProps {
   error: Error;
-};
+}
 
 export default function SponsorListError({ error }: SponsorListErrorProps) {
   return (

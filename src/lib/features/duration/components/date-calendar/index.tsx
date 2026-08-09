@@ -12,13 +12,12 @@ import { addMonths, setYear, subMonths } from "date-fns";
 import { memo, RefObject, useCallback, useEffect, useState } from "react";
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { getDurationDateLocale } from "../../date-locale";
-import styles from "../../duration.module.css";
 import { CalendarNavigator } from "./calendar-navigator";
 
-type DateCalendarProps = {
+interface DateCalendarProps {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
-};
+}
 
 export const DateCalendar = memo(function DateCalendar({
   portalContainerRef,
@@ -69,20 +68,23 @@ export const DateCalendar = memo(function DateCalendar({
               <Calendar
                 mode="single"
                 locale={dateLocale}
-                className={styles.calendarFrame}
+                className="text-toy-text pt-1"
                 classNames={{
-                  months: styles.calendarMonths,
-                  month: styles.calendarMonth,
-                  table: styles.calendarTable,
-                  head_row: styles.calendarHeadRow,
-                  head_cell: styles.calendarHeadCell,
-                  row: styles.calendarRow,
-                  cell: styles.calendarCell,
-                  day: styles.calendarDay,
-                  day_disabled: styles.calendarDisabled,
-                  day_selected: styles.calendarSelected,
-                  day_today: styles.calendarToday,
-                  day_outside: styles.calendarOutside,
+                  months: "w-full",
+                  month: "grid w-full gap-3",
+                  table: "w-full border-collapse",
+                  head_row: "flex justify-between",
+                  head_cell:
+                    "w-9 text-center font-mono text-[0.6875rem] font-normal text-toy-muted max-[420px]:w-8",
+                  row: "mt-1.5 flex justify-between",
+                  cell: "w-9 text-center max-[420px]:w-8",
+                  day: "inline-flex size-9 items-center justify-center rounded-full bg-transparent text-[0.8125rem] text-toy-text transition-colors duration-150 hover:bg-toy-hover motion-reduce:transition-none max-[420px]:size-8",
+                  day_disabled: "cursor-not-allowed opacity-30",
+                  day_selected:
+                    "bg-toy-accent text-toy-bg hover:bg-toy-accent hover:text-toy-bg",
+                  day_today:
+                    "outline outline-1 -outline-offset-1 outline-toy-line-strong",
+                  day_outside: "text-toy-muted opacity-45",
                 }}
                 selected={field.value}
                 onSelect={field.onChange}

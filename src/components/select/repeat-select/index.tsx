@@ -12,18 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import toolStyles from "@/app/tool-shell.module.css";
 import { repeatOptions } from "@/constants/duration";
 import { useToolI18n } from "@/i18n/tool-i18n";
 import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
-import durationStyles from "@/lib/features/duration/duration.module.css";
 import { memo, RefObject, useState } from "react";
 import { UseFormReturn, useWatch } from "react-hook-form";
 
-type RepeatSelectProps = {
+interface RepeatSelectProps {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
-};
+}
 
 export const RepeatSelect = memo(function RepeatSelect({
   portalContainerRef,
@@ -57,19 +55,19 @@ export const RepeatSelect = memo(function RepeatSelect({
           >
             <FormControl>
               <SelectTrigger
-                className={toolStyles.selectTrigger}
+                className="border-toy-line-strong text-toy-text focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-11 w-full justify-between rounded-[2px] bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-offset-2"
                 aria-label={durationCopy.repeatLabel}
               >
                 <SelectValue placeholder={durationCopy.repeatPlaceholder} />
               </SelectTrigger>
             </FormControl>
             <SelectContent
-              className={durationStyles.menuContent}
+              className="border-toy-line-strong bg-toy-bg text-toy-text min-w-[190px] rounded-[2px] p-[5px] font-sans shadow-[0_18px_44px_rgb(0_0_0_/_14%)]"
               container={portalContainerRef?.current}
             >
               {repeatOptions.map((option) => (
                 <SelectItem
-                  className={durationStyles.menuItem}
+                  className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
                   key={option.value}
                   value={option.value}
                 >

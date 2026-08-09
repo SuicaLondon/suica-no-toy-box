@@ -1,11 +1,9 @@
 "use client";
 
-import styles from "@/app/tool-shell.module.css";
 import CopyButton from "@/components/button/copy-button";
 import LanguageSelect from "@/components/select/language-select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { type LanguageCode, languages } from "@/constants/languages";
 import { useTranslate } from "@/hooks/use-translate";
 import { useToolI18n } from "@/i18n/tool-i18n";
 import {
@@ -13,32 +11,14 @@ import {
   type TranslateFormValues,
 } from "@/schemas/translate";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftRight, ArrowRight } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, LoaderCircle } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-
-function getSavedLanguage(
-  key: string,
-  defaultValue: LanguageCode,
-): LanguageCode {
-  try {
-    const saved = window.localStorage.getItem(key);
-    return saved && languages.some((language) => language.code === saved)
-      ? (saved as LanguageCode)
-      : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-}
-
-function saveLanguage(key: string, language: LanguageCode) {
-  try {
-    window.localStorage.setItem(key, language);
-  } catch {
-    // Translation still works when storage is unavailable.
-  }
-}
+import {
+  getLanguagePreference,
+  saveLanguagePreference,
+} from "@/utils/language-preferences";
 
 export function TranslateTool() {
   const { locale, copy } = useToolI18n();
@@ -57,8 +37,8 @@ export function TranslateTool() {
   const targetText = useWatch({ control: form.control, name: "targetText" });
 
   useEffect(() => {
-    form.setValue("sourceLang", getSavedLanguage("sourceLang", "en"));
-    form.setValue("targetLang", getSavedLanguage("targetLang", "es"));
+    form.setValue("sourceLang", getLanguagePreference("sourceLang", "en"));
+    form.setValue("targetLang", getLanguagePreference("targetLang", "es"));
   }, [form]);
 
   function handleSwapLanguages() {
@@ -67,14 +47,14 @@ export function TranslateTool() {
     form.setValue("targetLang", currentValues.sourceLang);
     form.setValue("sourceText", currentValues.targetText);
     form.setValue("targetText", currentValues.sourceText);
-    saveLanguage("sourceLang", currentValues.targetLang);
-    saveLanguage("targetLang", currentValues.sourceLang);
+    saveLanguagePreference("sourceLang", currentValues.targetLang);
+    saveLanguagePreference("targetLang", currentValues.sourceLang);
   }
 
   function onSubmit(data: TranslateFormValues) {
     form.setValue("targetText", "");
-    saveLanguage("sourceLang", data.sourceLang);
-    saveLanguage("targetLang", data.targetLang);
+    saveLanguagePreference("sourceLang", data.sourceLang);
+    saveLanguagePreference("targetLang", data.targetLang);
 
     translate(
       {
@@ -97,14 +77,14 @@ export function TranslateTool() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className={`${styles.workspaceBody} ${styles.stack}`}
+      className="mt-5 grid gap-3.5 max-[767px]:mt-[18px]"
     >
-      <div className={styles.toolbar}>
+      <div className="flex flex-wrap items-center justify-between gap-3 max-[767px]:flex-col max-[767px]:items-stretch">
         <div />
         <Button
           type="button"
           variant="outline"
-          className={styles.secondaryButton}
+          className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
           onClick={handleSwapLanguages}
           disabled={isPending}
         >
@@ -113,10 +93,10 @@ export function TranslateTool() {
         </Button>
       </div>
 
-      <div className={styles.splitGrid}>
-        <section className={styles.panel}>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>
+      <div className="grid grid-cols-2 gap-3.5 max-[1100px]:grid-cols-1">
+        <section className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]">
+          <div className="grid gap-[9px]">
+            <label className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
               {content.sourceLanguage}
             </label>
             <LanguageSelect
@@ -126,11 +106,11 @@ export function TranslateTool() {
               placeholder={content.selectLanguage}
               ariaLabel={content.sourceLanguage}
               disabled={isPending}
-              triggerClassName={styles.selectTrigger}
+              triggerClassName="min-h-11 w-full justify-between rounded-[2px] border-toy-line-strong bg-transparent text-toy-text shadow-none focus-visible:border-toy-accent focus-visible:ring-1 focus-visible:ring-toy-accent focus-visible:ring-offset-2"
             />
           </div>
 
-          <div className={`${styles.relative} mt-4`}>
+          <div className="relative mt-4">
             <Controller
               name="sourceText"
               control={form.control}
@@ -141,17 +121,19 @@ export function TranslateTool() {
                     disabled={isPending}
                     placeholder={content.sourcePlaceholder}
                     aria-label={content.sourcePlaceholder}
-                    className={styles.textarea}
+                    className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-[360px] w-full resize-y rounded-[2px] bg-transparent p-4 pr-12 text-base leading-[1.65] shadow-none focus-visible:ring-1 focus-visible:ring-offset-2 max-[767px]:min-h-60"
                   />
                   {error ? (
-                    <p className={styles.errorText}>{content.required}</p>
+                    <p className="text-toy-error m-0 text-[0.8125rem] leading-[1.45]">
+                      {content.required}
+                    </p>
                   ) : null}
                 </>
               )}
             />
             <CopyButton
               text={sourceText}
-              className={`${styles.iconButton} ${styles.copyButton}`}
+              className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent absolute top-2.5 right-2.5 size-10 min-h-10 rounded-[2px] bg-transparent p-0 font-mono text-xs tracking-[0.08em] uppercase shadow-none"
               ariaLabel={content.copySource}
               successMessage={content.copied}
               errorMessage={content.copyFailed}
@@ -159,9 +141,12 @@ export function TranslateTool() {
           </div>
         </section>
 
-        <section className={styles.panel}>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>
+        <section
+          className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]"
+          aria-busy={isPending}
+        >
+          <div className="grid gap-[9px]">
+            <label className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
               {content.targetLanguage}
             </label>
             <LanguageSelect
@@ -171,11 +156,11 @@ export function TranslateTool() {
               placeholder={content.selectLanguage}
               ariaLabel={content.targetLanguage}
               disabled={isPending}
-              triggerClassName={styles.selectTrigger}
+              triggerClassName="min-h-11 w-full justify-between rounded-[2px] border-toy-line-strong bg-transparent text-toy-text shadow-none focus-visible:border-toy-accent focus-visible:ring-1 focus-visible:ring-toy-accent focus-visible:ring-offset-2"
             />
           </div>
 
-          <div className={`${styles.relative} mt-4`}>
+          <div className="relative mt-4">
             <Controller
               name="targetText"
               control={form.control}
@@ -184,14 +169,14 @@ export function TranslateTool() {
                   {...field}
                   placeholder={content.targetPlaceholder}
                   aria-label={content.targetPlaceholder}
-                  className={styles.textarea}
+                  className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-[360px] w-full resize-y rounded-[2px] bg-transparent p-4 pr-12 text-base leading-[1.65] shadow-none focus-visible:ring-1 focus-visible:ring-offset-2 max-[767px]:min-h-60"
                   readOnly
                 />
               )}
             />
             <CopyButton
               text={targetText}
-              className={`${styles.iconButton} ${styles.copyButton}`}
+              className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent absolute top-2.5 right-2.5 size-10 min-h-10 rounded-[2px] bg-transparent p-0 font-mono text-xs tracking-[0.08em] uppercase shadow-none"
               ariaLabel={content.copyTranslation}
               successMessage={content.copied}
               errorMessage={content.copyFailed}
@@ -200,15 +185,22 @@ export function TranslateTool() {
         </section>
       </div>
 
-      <div className={styles.toolbar}>
+      <div className="flex flex-wrap items-center justify-between gap-3 max-[767px]:flex-col max-[767px]:items-stretch">
         <div />
         <Button
           type="submit"
-          className={styles.primaryButton}
+          className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full"
           disabled={isPending}
         >
+          {isPending ? (
+            <LoaderCircle
+              className="animate-toy-spin size-[18px] shrink-0 motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+          ) : (
+            <ArrowRight aria-hidden="true" />
+          )}
           {isPending ? content.submitting : content.submit}
-          <ArrowRight aria-hidden="true" />
         </Button>
       </div>
     </form>

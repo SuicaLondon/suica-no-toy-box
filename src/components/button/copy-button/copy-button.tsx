@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 
-type CopyButtonProps = {
+interface CopyButtonProps {
   text: string;
   className?: string;
   ariaLabel?: string;
   successMessage?: string;
   errorMessage?: string;
-};
+}
 
 export default function CopyButton({
   text,

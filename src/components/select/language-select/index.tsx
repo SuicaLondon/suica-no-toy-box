@@ -9,7 +9,7 @@ import { languages } from "@/constants/languages";
 import type { Locale } from "@/i18n/locales";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
-type LanguageSelectProps<T extends FieldValues> = {
+interface LanguageSelectProps<T extends FieldValues> {
   name: FieldPath<T>;
   control: Control<T>;
   locale?: Locale;
@@ -17,7 +17,7 @@ type LanguageSelectProps<T extends FieldValues> = {
   ariaLabel?: string;
   disabled?: boolean;
   triggerClassName?: string;
-};
+}
 
 export default function LanguageSelect<T extends FieldValues>({
   name,

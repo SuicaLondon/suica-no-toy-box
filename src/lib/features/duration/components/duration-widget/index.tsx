@@ -1,19 +1,17 @@
-import toolStyles from "@/app/tool-shell.module.css";
 import { useToolI18n } from "@/i18n/tool-i18n";
 import { format, formatISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { memo } from "react";
 import { getDurationDateLocale } from "../../date-locale";
-import styles from "../../duration.module.css";
 import { DurationWidget } from "../../type/duration.type";
 import { NextDayLabel } from "./next-day-label";
 import { TimeDifferenceLabel } from "./time-difference-label";
 import { TypeLabel } from "./type-label";
 import { WidgetMenu } from "./widget-menu";
 
-type DurationWidgetItemProps = {
+interface DurationWidgetItemProps {
   widget: DurationWidget;
-};
+}
 
 export const DurationWidgetItem = memo(function DurationWidgetItem({
   widget,
@@ -22,19 +20,21 @@ export const DurationWidgetItem = memo(function DurationWidgetItem({
   const dateLocale = getDurationDateLocale(locale);
 
   return (
-    <article className={toolStyles.durationCard}>
-      <header className={toolStyles.durationCardHeader}>
-        <div className={styles.cardTitle}>
-          <h3>{widget.name}</h3>
-          <p className={styles.typeLine}>
+    <article className="border-toy-line text-toy-text min-w-0 rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-[18px]">
+      <header className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h3 className="m-0 overflow-hidden text-[1.0625rem] font-semibold [overflow-wrap:anywhere] text-ellipsis">
+            {widget.name}
+          </h3>
+          <p className="text-toy-accent mt-2 mb-0 font-mono text-[0.6875rem] leading-[1.5] tracking-[0.08em] uppercase">
             <TypeLabel type={widget.type} repeat={widget.repeat} />
           </p>
         </div>
         <WidgetMenu widget={widget} />
       </header>
 
-      <div className={toolStyles.durationMeta}>
-        <div className={styles.dateRow}>
+      <div className="border-toy-line text-toy-muted mt-3.5 grid gap-2 border-t pt-3.5 text-[0.8125rem] leading-[1.5]">
+        <div className="text-toy-text [&_svg]:text-toy-accent flex items-start gap-[9px] [&_svg]:mt-0.5 [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:[stroke-width:1.5] [&_time]:text-sm">
           <CalendarIcon aria-hidden="true" />
           <time dateTime={formatISO(widget.date)}>
             {format(widget.date, "PPPP", { locale: dateLocale })}

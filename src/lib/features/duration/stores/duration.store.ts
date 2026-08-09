@@ -1,8 +1,11 @@
-import { DURATION_WIDGET_LOCAL_STORAGE_KEY } from "@/constants/duration";
-import { durationFormSchema } from "@/schemas/duration";
-import { z } from "zod";
 import { create } from "zustand";
 import { parseDurationImportText } from "../duration-import";
+import {
+  type DurationSortBy,
+  type DurationSortDirection,
+  sortDurationWidgets,
+} from "../duration-sort";
+import { loadDurationWidgets, saveDurationWidgets } from "../duration-storage";
 import { DurationWidget } from "../type/duration.type";
 
 export type ImportDurationResult =
@@ -13,8 +16,8 @@ interface DurationStore {
   now: Date;
   timer: NodeJS.Timeout | null;
   widgets: DurationWidget[];
-  sortBy: "date" | "name";
-  sortDirection: "asc" | "desc";
+  sortBy: DurationSortBy;
+  sortDirection: DurationSortDirection;
   addWidget: (widget: DurationWidget) => void;
   deleteWidget: (widget: DurationWidget) => void;
   editWidget: (widget: DurationWidget) => void;
@@ -22,8 +25,8 @@ interface DurationStore {
   copyWidget: (widget: DurationWidget) => Promise<void>;
   copyAllWidgets: () => Promise<number>;
   importWidgetsFromText: (text: string) => ImportDurationResult;
-  setSortBy: (sortBy: "date" | "name") => void;
-  setSortDirection: (sortDirection: "asc" | "desc") => void;
+  setSortBy: (sortBy: DurationSortBy) => void;
+  setSortDirection: (sortDirection: DurationSortDirection) => void;
   startTimer: () => void;
   stopTimer: () => void;
 }
@@ -36,20 +39,15 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
   sortDirection: "asc",
   addWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
-    set({ widgets: [...currentWidgets, widget] });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify([...currentWidgets, widget]),
-    );
+    const widgets = [...currentWidgets, widget];
+    set({ widgets });
+    saveDurationWidgets(widgets);
   },
   deleteWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
     const updatedWidgets = currentWidgets.filter((w) => w.id !== widget.id);
     set({ widgets: updatedWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(updatedWidgets),
-    );
+    saveDurationWidgets(updatedWidgets);
   },
   editWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
@@ -57,38 +55,20 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
       w.id === widget.id ? widget : w,
     );
     set({ widgets: updatedWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(updatedWidgets),
-    );
+    saveDurationWidgets(updatedWidgets);
   },
   loadWidgets: () => {
-    const storedWidgets = localStorage.getItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-    );
-    if (storedWidgets) {
-      const parsedWidgets = z
-        .array(durationFormSchema)
-        .safeParse(JSON.parse(storedWidgets));
-
-      if (parsedWidgets.success) {
-        set({ widgets: parsedWidgets.data });
-      }
+    const widgets = loadDurationWidgets();
+    if (widgets) {
+      set({ widgets });
     }
   },
-  setSortBy: (sortBy: "date" | "name") => {
-    const sortedWidgets = get().widgets.toSorted((a, b) => {
-      if (sortBy === "date") {
-        const aDate = new Date(a.date);
-        const bDate = new Date(b.date);
-        return get().sortDirection === "asc"
-          ? aDate.getTime() - bDate.getTime()
-          : bDate.getTime() - aDate.getTime();
-      }
-      return get().sortDirection === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    });
+  setSortBy: (sortBy: DurationSortBy) => {
+    const sortedWidgets = sortDurationWidgets(
+      get().widgets,
+      sortBy,
+      get().sortDirection,
+    );
     set({ sortBy, widgets: sortedWidgets });
   },
   copyWidget: async (widget: DurationWidget) => {
@@ -115,10 +95,7 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
 
     const newWidgets = [...currentWidgets, ...newWidgetsToImport];
     set({ widgets: newWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(newWidgets),
-    );
+    saveDurationWidgets(newWidgets);
 
     return {
       status: "imported",
@@ -126,19 +103,12 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
       skipped: widgets.length - newWidgetsToImport.length,
     };
   },
-  setSortDirection: (sortDirection: "asc" | "desc") => {
-    const sortedWidgets = get().widgets.toSorted((a, b) => {
-      if (get().sortBy === "date") {
-        const aDate = new Date(a.date);
-        const bDate = new Date(b.date);
-        return sortDirection === "asc"
-          ? aDate.getTime() - bDate.getTime()
-          : bDate.getTime() - aDate.getTime();
-      }
-      return sortDirection === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    });
+  setSortDirection: (sortDirection: DurationSortDirection) => {
+    const sortedWidgets = sortDurationWidgets(
+      get().widgets,
+      get().sortBy,
+      sortDirection,
+    );
     set({ sortDirection, widgets: sortedWidgets });
   },
   startTimer: () => {

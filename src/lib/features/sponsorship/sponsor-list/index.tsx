@@ -5,9 +5,9 @@ import SponsorListError from "../sponsor-list-error";
 import SponsorListNotFound from "../sponsor-list-not-found";
 import SponsorListLoading from "../sponsor-list-loading";
 
-type SponsorListProps = {
+interface SponsorListProps {
   companyName?: string;
-};
+}
 
 export default function SponsorList({ companyName }: SponsorListProps) {
   const { data: results, isLoading, error, isError } = useSponsorshipSearch();

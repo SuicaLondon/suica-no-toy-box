@@ -31,10 +31,8 @@ import { Plus } from "lucide-react";
 import { memo, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import toolStyles from "@/app/tool-shell.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 import { DurationWidget } from "../../type/duration.type";
-import styles from "../../duration.module.css";
 import { DateCalendar } from "../date-calendar";
 
 export const AddDurationButton = memo(function AddDurationButton() {
@@ -66,28 +64,28 @@ export const AddDurationButton = memo(function AddDurationButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className={toolStyles.primaryButton}>
+        <Button className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full">
           <Plus aria-hidden="true" />
           {durationCopy.addDate}
         </Button>
       </DialogTrigger>
       <DialogContent
-        className={styles.dialogContent}
+        className="border-toy-line-strong bg-toy-bg text-toy-text max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto rounded-[2px] p-6 font-sans max-[640px]:p-5"
         ref={portalContainerRef}
         closeLabel={copy.common.close}
       >
         <DialogHeader>
-          <DialogTitle className={styles.dialogTitle}>
+          <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
             {durationCopy.addTitle}
           </DialogTitle>
-          <DialogDescription className={styles.dialogDescription}>
+          <DialogDescription className="text-toy-muted leading-[1.55]">
             {durationCopy.emptyDescription}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className={styles.dialogForm}
+            className="[&_[data-slot=form-label]]:text-toy-muted [&_[data-slot=form-message]]:text-toy-error grid gap-4 [&_[data-slot=form-item]]:min-w-0 [&_[data-slot=form-label]]:font-mono [&_[data-slot=form-label]]:text-[0.6875rem] [&_[data-slot=form-label]]:font-medium [&_[data-slot=form-label]]:tracking-[0.1em] [&_[data-slot=form-label]]:uppercase [&_[data-slot=form-message]]:text-xs"
           >
             <FormField
               control={form.control}
@@ -98,7 +96,7 @@ export const AddDurationButton = memo(function AddDurationButton() {
                   <FormControl>
                     <Input
                       {...field}
-                      className={toolStyles.input}
+                      className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-12 w-full rounded-[2px] bg-transparent px-3.5 shadow-none focus-visible:ring-1 focus-visible:ring-offset-2"
                       placeholder={durationCopy.namePlaceholder}
                       autoComplete="off"
                     />
@@ -107,7 +105,7 @@ export const AddDurationButton = memo(function AddDurationButton() {
                 </FormItem>
               )}
             />
-            <div className={toolStyles.formPair}>
+            <div className="grid grid-cols-2 gap-3 max-[767px]:grid-cols-1">
               <TypeSelect portalContainerRef={portalContainerRef} form={form} />
               <RepeatSelect
                 portalContainerRef={portalContainerRef}
@@ -116,7 +114,10 @@ export const AddDurationButton = memo(function AddDurationButton() {
             </div>
 
             <DateCalendar portalContainerRef={portalContainerRef} form={form} />
-            <Button type="submit" className={toolStyles.primaryButton}>
+            <Button
+              type="submit"
+              className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full"
+            >
               {durationCopy.addDate}
             </Button>
           </form>

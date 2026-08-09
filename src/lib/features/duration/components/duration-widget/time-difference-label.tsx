@@ -3,13 +3,12 @@ import { TypeOptionType } from "@/schemas/duration";
 import { differenceInYears, format, formatDistance, parseISO } from "date-fns";
 import { memo } from "react";
 import { getDurationDateLocale } from "../../date-locale";
-import styles from "../../duration.module.css";
 import { useDurationStore } from "../../stores/duration.store";
 
-type TimeDifferenceLabelProps = {
+interface TimeDifferenceLabelProps {
   date: Date;
   type?: TypeOptionType;
-};
+}
 
 export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
   date,
@@ -51,6 +50,6 @@ export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
   }
 
   return timeDifferenceLabel ? (
-    <span className={styles.relativeLabel}>{timeDifferenceLabel}</span>
+    <span className="text-toy-muted">{timeDifferenceLabel}</span>
   ) : null;
 });

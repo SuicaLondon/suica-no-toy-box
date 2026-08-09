@@ -1,13 +1,13 @@
-import { ToolShell } from "@/app/_components/tool-shell";
+import { ToolShell } from "@/components/site/tool-shell";
 import { isLocale } from "@/i18n/locales";
 import { getToolMetadata } from "@/i18n/tool-metadata";
 import { DurationTool } from "@/lib/features/duration/duration-tool";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type DurationPageProps = {
+interface DurationPageProps {
   params: Promise<{ locale: string }>;
-};
+}
 
 export async function generateMetadata({
   params,

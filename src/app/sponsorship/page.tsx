@@ -1,12 +1,12 @@
 import { getRequestLocale } from "@/i18n/server";
 import { redirect } from "next/navigation";
 
-type LegacySponsorshipPageProps = {
+interface LegacySponsorshipPageProps {
   searchParams: Promise<{
     companyName?: string | string[];
     selectedCompanyId?: string | string[];
   }>;
-};
+}
 
 function getFirstValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;

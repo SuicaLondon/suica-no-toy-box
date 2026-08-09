@@ -1,19 +1,18 @@
 "use client";
 
-import styles from "@/app/tool-shell.module.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSponsorshipDetail } from "@/hooks/use-sponsorship-detail";
 import { useSponsorshipSearch } from "@/hooks/use-sponsorship-search";
 import { useToolI18n } from "@/i18n/tool-i18n";
-import { Search } from "lucide-react";
+import { LoaderCircle, Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 
-type SponsorshipToolProps = {
+interface SponsorshipToolProps {
   companyName: string;
   selectedCompanyId: string;
-};
+}
 
 export function SponsorshipTool({
   companyName,
@@ -29,13 +28,13 @@ export function SponsorshipTool({
   const {
     data: results,
     isError: isSearchError,
-    isLoading: isSearchLoading,
+    isFetching: isSearchFetching,
     refetch: retrySearch,
   } = useSponsorshipSearch(companyName);
   const {
     data: companyDetail,
     isError: isDetailError,
-    isLoading: isDetailLoading,
+    isFetching: isDetailFetching,
     refetch: retryDetail,
   } = useSponsorshipDetail(selectedCompanyId || null);
 
@@ -73,16 +72,19 @@ export function SponsorshipTool({
   }
 
   return (
-    <div className={`${styles.workspaceBody} ${styles.stack}`}>
-      <section className={styles.panel}>
-        <form onSubmit={handleSearch} className={styles.field} role="search">
-          <label className={styles.fieldLabel} htmlFor="company-name">
+    <div className="mt-5 grid gap-3.5 max-[767px]:mt-[18px]">
+      <section className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]">
+        <form onSubmit={handleSearch} className="grid gap-[9px]" role="search">
+          <label
+            className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase"
+            htmlFor="company-name"
+          >
             {content.searchLabel}
           </label>
-          <div className={styles.toolbarGroup}>
+          <div className="flex flex-wrap items-center gap-2.5 max-[767px]:w-full max-[767px]:[&>*]:grow">
             <Input
               id="company-name"
-              className={`${styles.input} ${styles.grow}`}
+              className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-12 min-w-0 flex-[1_1_14rem] rounded-[2px] bg-transparent px-3.5 shadow-none focus-visible:ring-1 focus-visible:ring-offset-2"
               value={draftCompanyName}
               placeholder={content.searchPlaceholder}
               autoComplete="organization"
@@ -95,25 +97,45 @@ export function SponsorshipTool({
                 setValidationError("");
               }}
             />
-            <Button type="submit" className={styles.primaryButton}>
-              <Search aria-hidden="true" />
-              {content.searchAction}
+            <Button
+              type="submit"
+              className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full"
+              disabled={isSearchFetching}
+            >
+              {isSearchFetching ? (
+                <LoaderCircle
+                  className="animate-toy-spin size-[18px] shrink-0 motion-reduce:animate-none"
+                  aria-hidden="true"
+                />
+              ) : (
+                <Search aria-hidden="true" />
+              )}
+              {isSearchFetching ? common.loading : content.searchAction}
             </Button>
           </div>
           {validationError ? (
-            <p id="company-name-error" className={styles.errorText}>
+            <p
+              id="company-name-error"
+              className="text-toy-error m-0 text-[0.8125rem] leading-[1.45]"
+            >
               {validationError}
             </p>
           ) : null}
         </form>
       </section>
 
-      <div className={styles.splitGrid}>
-        <section className={styles.panel} aria-live="polite">
-          <div className={styles.panelHeader}>
+      <div className="grid grid-cols-2 gap-3.5 max-[1100px]:grid-cols-1">
+        <section
+          className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]"
+          aria-live="polite"
+          aria-busy={isSearchFetching}
+        >
+          <div className="border-toy-line mb-[22px] flex items-start justify-between gap-5 border-b pb-[18px] max-[520px]:flex-col max-[520px]:items-stretch">
             <div>
-              <span className={styles.panelLabel}>{content.results}</span>
-              <h2 className={styles.panelTitle}>
+              <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
+                {content.results}
+              </span>
+              <h2 className="mt-1.5 text-xl leading-tight font-semibold">
                 {content.resultCount(results?.length ?? 0)}
               </h2>
             </div>
@@ -125,7 +147,7 @@ export function SponsorshipTool({
               title={content.startTitle}
               description={content.startDescription}
             />
-          ) : isSearchLoading ? (
+          ) : isSearchFetching ? (
             <LoadingState label={common.loading} />
           ) : isSearchError ? (
             <ErrorState
@@ -134,29 +156,29 @@ export function SponsorshipTool({
               onRetry={() => void retrySearch()}
             />
           ) : results?.length ? (
-            <div className={styles.resultList}>
+            <div className="grid gap-2.5">
               {results.map((company) => (
                 <button
                   key={company.id}
                   type="button"
-                  className={styles.resultItem}
+                  className="border-toy-line hover:border-toy-accent hover:bg-toy-hover data-[selected=true]:border-toy-accent data-[selected=true]:bg-toy-hover grid w-full gap-3 rounded-[2px] border bg-transparent p-[18px] text-left text-inherit transition-colors duration-[180ms] motion-reduce:transition-none [&_h3]:m-0 [&_h3]:text-base [&_h3]:font-semibold"
                   data-selected={selectedCompanyId === company.id}
                   aria-pressed={selectedCompanyId === company.id}
                   aria-controls="sponsorship-company-detail"
                   onClick={() => selectCompany(company.id)}
                 >
                   <h3>{company.name}</h3>
-                  <div className={styles.resultMeta}>
-                    <span className={styles.statusPill}>
+                  <div className="flex flex-wrap gap-[7px]">
+                    <span className="border-toy-line text-toy-muted border px-[7px] py-1 font-mono text-[0.6875rem] tracking-[0.04em]">
                       {content.location}:{" "}
                       {[company.city, company.county]
                         .filter(Boolean)
                         .join(", ")}
                     </span>
-                    <span className={styles.statusPill}>
+                    <span className="border-toy-line text-toy-muted border px-[7px] py-1 font-mono text-[0.6875rem] tracking-[0.04em]">
                       {content.type}: {company.type}
                     </span>
-                    <span className={styles.statusPill}>
+                    <span className="border-toy-line text-toy-muted border px-[7px] py-1 font-mono text-[0.6875rem] tracking-[0.04em]">
                       {content.rating}: {company.rate}
                     </span>
                   </div>
@@ -174,15 +196,16 @@ export function SponsorshipTool({
 
         <section
           id="sponsorship-company-detail"
-          className={styles.panel}
+          className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]"
           aria-live="polite"
+          aria-busy={isDetailFetching}
         >
-          <div className={styles.panelHeader}>
+          <div className="border-toy-line mb-[22px] flex items-start justify-between gap-5 border-b pb-[18px] max-[520px]:flex-col max-[520px]:items-stretch">
             <div>
-              <span className={styles.panelLabel}>
+              <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
                 {content.companyDetails}
               </span>
-              <h2 className={styles.panelTitle}>
+              <h2 className="mt-1.5 text-xl leading-tight font-semibold">
                 {companyDetail?.name ?? content.selectCompany}
               </h2>
             </div>
@@ -194,7 +217,7 @@ export function SponsorshipTool({
               title={content.companyDetails}
               description={content.selectCompany}
             />
-          ) : isDetailLoading ? (
+          ) : isDetailFetching ? (
             <LoadingState label={common.loading} />
           ) : isDetailError ? (
             <ErrorState
@@ -203,7 +226,7 @@ export function SponsorshipTool({
               onRetry={() => void retryDetail()}
             />
           ) : companyDetail ? (
-            <div className={styles.detailSections}>
+            <div className="[&_section]:border-toy-line [&_h3]:text-toy-muted [&_p]:text-toy-text [&_a]:text-toy-accent grid gap-[22px] [&_a]:m-0 [&_a]:text-[0.9375rem] [&_a]:leading-[1.65] [&_a]:[overflow-wrap:anywhere] [&_a]:underline [&_a]:underline-offset-4 [&_h3]:mb-2 [&_h3]:font-mono [&_h3]:text-[0.6875rem] [&_h3]:font-medium [&_h3]:tracking-[0.1em] [&_h3]:uppercase [&_p]:m-0 [&_p]:text-[0.9375rem] [&_p]:leading-[1.65] [&_p]:[overflow-wrap:anywhere] [&_section]:border-t [&_section]:pt-[18px] [&_section:first-child]:border-t-0 [&_section:first-child]:pt-0">
               <section>
                 <h3>{content.location}</h3>
                 <p>
@@ -261,19 +284,19 @@ export function SponsorshipTool({
   );
 }
 
-function EmptyState({
-  index,
-  title,
-  description,
-}: {
+interface EmptyStateProps {
   index: string;
   title: string;
   description: string;
-}) {
+}
+
+function EmptyState({ index, title, description }: EmptyStateProps) {
   return (
-    <div className={styles.emptyState}>
+    <div className="border-toy-line-strong [&_p]:text-toy-muted flex min-h-60 items-center justify-center border border-dashed px-7 py-12 text-center [&_h3]:mt-2.5 [&_h3]:text-xl [&_h3]:font-semibold [&_p]:mx-auto [&_p]:mt-2.5 [&_p]:max-w-[430px] [&_p]:text-sm [&_p]:leading-[1.6]">
       <div>
-        <span className={styles.emptyKicker}>{index}</span>
+        <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
+          {index}
+        </span>
         <h3>{title}</h3>
         <p>{description}</p>
       </div>
@@ -281,34 +304,49 @@ function EmptyState({
   );
 }
 
-function LoadingState({ label }: { label: string }) {
+interface LoadingStateProps {
+  label: string;
+}
+
+function LoadingState({ label }: LoadingStateProps) {
   return (
-    <div className={styles.stack} role="status">
-      <span className="sr-only">{label}</span>
-      <div className={styles.loadingBlock} />
-      <div className={styles.loadingBlock} />
-      <div className={styles.loadingBlock} />
+    <div
+      className="border-toy-line-strong grid min-h-60 content-center gap-5 border border-dashed bg-[color-mix(in_srgb,var(--toy-accent)_4%,transparent)] p-6"
+      role="status"
+    >
+      <div className="text-toy-accent inline-flex items-center gap-[9px] justify-self-center font-mono text-xs font-semibold tracking-[0.08em] uppercase">
+        <LoaderCircle
+          className="animate-toy-spin size-[18px] shrink-0 motion-reduce:animate-none"
+          aria-hidden="true"
+        />
+        <span>{label}</span>
+      </div>
+      <div className="grid gap-2.5" aria-hidden="true">
+        <LoadingBlock />
+        <LoadingBlock />
+        <LoadingBlock />
+      </div>
     </div>
   );
 }
 
-function ErrorState({
-  message,
-  retryLabel,
-  onRetry,
-}: {
+interface ErrorStateProps {
   message: string;
   retryLabel: string;
   onRetry: () => void;
-}) {
+}
+
+function ErrorState({ message, retryLabel, onRetry }: ErrorStateProps) {
   return (
-    <div className={styles.emptyState}>
+    <div className="border-toy-line-strong flex min-h-60 items-center justify-center border border-dashed px-7 py-12 text-center [&_button]:mt-[18px] [&_h3]:mt-2.5 [&_h3]:text-xl [&_h3]:font-semibold">
       <div>
-        <span className={styles.emptyKicker}>!</span>
+        <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
+          !
+        </span>
         <h3>{message}</h3>
         <Button
           type="button"
-          className={styles.secondaryButton}
+          className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
           onClick={onRetry}
         >
           {retryLabel}
@@ -318,15 +356,19 @@ function ErrorState({
   );
 }
 
-function DetailSection({
-  title,
-  value,
-  fallback,
-}: {
+function LoadingBlock() {
+  return (
+    <div className="animate-toy-loading border-toy-line min-h-[54px] border bg-[linear-gradient(90deg,color-mix(in_srgb,var(--toy-text)_5%,transparent)_20%,color-mix(in_srgb,var(--toy-accent)_18%,transparent)_50%,color-mix(in_srgb,var(--toy-text)_5%,transparent)_80%)] bg-[length:200%_100%] motion-reduce:animate-none" />
+  );
+}
+
+interface DetailSectionProps {
   title: string;
   value: string | null;
   fallback: string;
-}) {
+}
+
+function DetailSection({ title, value, fallback }: DetailSectionProps) {
   return (
     <section>
       <h3>{title}</h3>
