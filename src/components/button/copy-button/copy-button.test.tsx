@@ -2,15 +2,24 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import CopyButton from "./index";
 
+const { mockToastError, mockToastSuccess } = vi.hoisted(() => ({
+  mockToastError: vi.fn(),
+  mockToastSuccess: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    error: mockToastError,
+    success: mockToastSuccess,
+  },
+}));
+
 const mockWriteText = vi.fn();
 Object.assign(navigator, {
   clipboard: {
     writeText: mockWriteText,
   },
 });
-
-const mockAlert = vi.fn();
-global.alert = mockAlert;
 
 describe("CopyButton", () => {
   beforeEach(() => {
@@ -38,7 +47,7 @@ describe("CopyButton", () => {
 
     await waitFor(() => {
       expect(mockWriteText).toHaveBeenCalledWith(testText);
-      expect(mockAlert).toHaveBeenCalledWith("Copied to clipboard!");
+      expect(mockToastSuccess).toHaveBeenCalledWith("Copied to clipboard");
     });
   });
 
@@ -58,6 +67,7 @@ describe("CopyButton", () => {
         "Failed to copy:",
         expect.any(Error),
       );
+      expect(mockToastError).toHaveBeenCalledWith("Could not copy text");
     });
 
     consoleSpy.mockRestore();
@@ -76,5 +86,11 @@ describe("CopyButton", () => {
 
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("type", "button");
+  });
+
+  it("is disabled when the text is empty or only whitespace", () => {
+    render(<CopyButton text="   " />);
+
+    expect(screen.getByRole("button")).toBeDisabled();
   });
 });

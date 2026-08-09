@@ -1,57 +1,55 @@
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { TypeOptionType } from "@/schemas/duration";
-import {
-  differenceInYears,
-  format,
-  formatDistanceToNow,
-  parseISO,
-} from "date-fns";
+import { differenceInYears, format, formatDistance, parseISO } from "date-fns";
 import { memo } from "react";
+import { getDurationDateLocale } from "../../date-locale";
 import { useDurationStore } from "../../stores/duration.store";
 
-const getTimeDifferenceLabel = (
-  todayString: string,
-  date: Date,
-  type: TypeOptionType,
-) => {
-  const parsedNow = parseISO(todayString);
-  switch (type) {
-    case "anniversary":
-      const nthAnniversary = differenceInYears(parsedNow, date);
-      return `${nthAnniversary}${nthAnniversary === 1 ? "st" : nthAnniversary === 2 ? "nd" : nthAnniversary === 3 ? "rd" : "th"} anniversary`;
-    case "birthday":
-      const age = differenceInYears(parsedNow, date);
-      return `${age} years old`;
-    case "bills":
-      return null;
-    default:
-      const isFuture = new Date(date) > parsedNow;
-      const distance = formatDistanceToNow(date);
-      return isFuture ? `in ${distance}` : `${distance} ago`;
-  }
-};
-
-type TimeDifferenceLabelProps = {
+interface TimeDifferenceLabelProps {
   date: Date;
   type?: TypeOptionType;
-};
+}
 
 export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
   date,
   type,
 }: TimeDifferenceLabelProps) {
-  const todayString = useDurationStore((state) => {
-    return format(state.now, "yyyy-MM-dd");
+  const { copy, locale } = useToolI18n();
+  const nowString = useDurationStore((state) => {
+    return format(state.now, "yyyy-MM-dd'T'HH:mm");
   });
+  const parsedNow = parseISO(nowString);
+  const dateLocale = getDurationDateLocale(locale);
+  const differenceType = type ?? "none";
+  let timeDifferenceLabel: string | null;
 
-  if (!todayString) return null;
+  switch (differenceType) {
+    case "anniversary": {
+      const count = differenceInYears(parsedNow, date);
+      timeDifferenceLabel =
+        count >= 0 ? copy.duration.anniversaryAge(count) : null;
+      break;
+    }
+    case "birthday": {
+      const age = differenceInYears(parsedNow, date);
+      timeDifferenceLabel = age >= 0 ? copy.duration.yearsOld(age) : null;
+      break;
+    }
+    case "bills":
+      timeDifferenceLabel = null;
+      break;
+    default: {
+      const isFuture = date > parsedNow;
+      const distance = formatDistance(date, parsedNow, {
+        locale: dateLocale,
+      });
+      timeDifferenceLabel = isFuture
+        ? copy.duration.inDistance(distance)
+        : copy.duration.distanceAgo(distance);
+    }
+  }
 
-  const timeDifferenceLabel = getTimeDifferenceLabel(
-    todayString,
-    date,
-    type ?? "none",
-  );
-
-  return (
-    <span className="ml-auto text-sm text-gray-500">{timeDifferenceLabel}</span>
-  );
+  return timeDifferenceLabel ? (
+    <span className="text-toy-muted">{timeDifferenceLabel}</span>
+  ) : null;
 });

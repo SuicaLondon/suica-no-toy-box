@@ -2,7 +2,12 @@ import * as z from "zod";
 import { LanguageCode } from "@/constants/languages";
 
 export const translateBaseSchema = z.object({
-  sourceText: z.string().min(1, "Please enter text to translate"),
+  sourceText: z
+    .string()
+    .refine(
+      (value) => value.trim().length > 0,
+      "Please enter text to translate",
+    ),
   sourceLang: z.string() as z.ZodType<LanguageCode>,
   targetLang: z.string() as z.ZodType<LanguageCode>,
 });

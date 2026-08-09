@@ -1,26 +1,32 @@
-import { DURATION_WIDGET_LOCAL_STORAGE_KEY } from "@/constants/duration";
-import { durationFormSchema } from "@/schemas/duration";
-import { toast } from "sonner";
-import { z } from "zod";
 import { create } from "zustand";
+import { parseDurationImportText } from "../duration-import";
+import {
+  type DurationSortBy,
+  type DurationSortDirection,
+  sortDurationWidgets,
+} from "../duration-sort";
+import { loadDurationWidgets, saveDurationWidgets } from "../duration-storage";
 import { DurationWidget } from "../type/duration.type";
+
+export type ImportDurationResult =
+  | { status: "imported"; count: number; skipped: number }
+  | { status: "exists"; count: 0 };
 
 interface DurationStore {
   now: Date;
   timer: NodeJS.Timeout | null;
   widgets: DurationWidget[];
-  sortBy: "date" | "name";
-  sortDirection: "asc" | "desc";
+  sortBy: DurationSortBy;
+  sortDirection: DurationSortDirection;
   addWidget: (widget: DurationWidget) => void;
   deleteWidget: (widget: DurationWidget) => void;
   editWidget: (widget: DurationWidget) => void;
   loadWidgets: () => void;
-  copyWidget: (widget: DurationWidget) => void;
-  copyAllWidgets: () => void;
-  importWidgetFromClipboard: () => Promise<void>;
-  importWidgetsFromClipboard: () => Promise<void>;
-  setSortBy: (sortBy: "date" | "name") => void;
-  setSortDirection: (sortDirection: "asc" | "desc") => void;
+  copyWidget: (widget: DurationWidget) => Promise<void>;
+  copyAllWidgets: () => Promise<number>;
+  importWidgetsFromText: (text: string) => ImportDurationResult;
+  setSortBy: (sortBy: DurationSortBy) => void;
+  setSortDirection: (sortDirection: DurationSortDirection) => void;
   startTimer: () => void;
   stopTimer: () => void;
 }
@@ -33,20 +39,15 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
   sortDirection: "asc",
   addWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
-    set({ widgets: [...currentWidgets, widget] });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify([...currentWidgets, widget]),
-    );
+    const widgets = [...currentWidgets, widget];
+    set({ widgets });
+    saveDurationWidgets(widgets);
   },
   deleteWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
     const updatedWidgets = currentWidgets.filter((w) => w.id !== widget.id);
     set({ widgets: updatedWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(updatedWidgets),
-    );
+    saveDurationWidgets(updatedWidgets);
   },
   editWidget: (widget: DurationWidget) => {
     const currentWidgets = get().widgets;
@@ -54,96 +55,67 @@ export const useDurationStore = create<DurationStore>((set, get) => ({
       w.id === widget.id ? widget : w,
     );
     set({ widgets: updatedWidgets });
-    localStorage.setItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-      JSON.stringify(updatedWidgets),
-    );
+    saveDurationWidgets(updatedWidgets);
   },
   loadWidgets: () => {
-    const storedWidgets = localStorage.getItem(
-      DURATION_WIDGET_LOCAL_STORAGE_KEY,
-    );
-    if (storedWidgets) {
-      const parsedWidgets = z
-        .array(durationFormSchema)
-        .parse(JSON.parse(storedWidgets));
-      set({ widgets: parsedWidgets });
+    const widgets = loadDurationWidgets();
+    if (widgets) {
+      set({ widgets });
     }
   },
-  setSortBy: (sortBy: "date" | "name") => {
-    const sortedWidgets = get().widgets.toSorted((a, b) => {
-      if (sortBy === "date") {
-        const aDate = new Date(a.date);
-        const bDate = new Date(b.date);
-        return get().sortDirection === "asc"
-          ? aDate.getTime() - bDate.getTime()
-          : bDate.getTime() - aDate.getTime();
-      }
-      return get().sortDirection === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    });
+  setSortBy: (sortBy: DurationSortBy) => {
+    const sortedWidgets = sortDurationWidgets(
+      get().widgets,
+      sortBy,
+      get().sortDirection,
+    );
     set({ sortBy, widgets: sortedWidgets });
   },
-  copyWidget: (widget: DurationWidget) => {
+  copyWidget: async (widget: DurationWidget) => {
     const widgetString = JSON.stringify(widget);
-    navigator.clipboard.writeText(widgetString);
-    toast.success("Widget copied to clipboard");
+    await navigator.clipboard.writeText(widgetString);
   },
-  copyAllWidgets: () => {
+  copyAllWidgets: async () => {
     const widgets = get().widgets;
     const widgetsString = JSON.stringify(widgets);
-    navigator.clipboard.writeText(widgetsString);
-    toast.success(`${widgets.length} widgets copied to clipboard`);
+    await navigator.clipboard.writeText(widgetsString);
+    return widgets.length;
   },
-  importWidgetFromClipboard: async () => {
-    const widgetsString = await navigator.clipboard.readText();
-    const widget = durationFormSchema.parse(JSON.parse(widgetsString));
+  importWidgetsFromText: (text: string) => {
+    const widgets = parseDurationImportText(text);
     const currentWidgets = get().widgets;
-    const isExist = currentWidgets.some((w) => w.id === widget.id);
-    if (isExist) {
-      toast.error("Widget already exists");
-      return;
-    }
-    const newWidgets = [...currentWidgets, widget];
-    set({ widgets: newWidgets });
-    const newWidgetJson = JSON.stringify(newWidgets);
-    localStorage.setItem(DURATION_WIDGET_LOCAL_STORAGE_KEY, newWidgetJson);
-  },
-  importWidgetsFromClipboard: async () => {
-    const widgetsString = await navigator.clipboard.readText();
-    const widgets = z
-      .array(durationFormSchema)
-      .parse(JSON.parse(widgetsString));
-    const currentWidgets = get().widgets;
-    const isExist = currentWidgets.some((w) =>
-      widgets.some((w2) => w2.id === w.id),
+    const existingIds = new Set(currentWidgets.map((widget) => widget.id));
+    const newWidgetsToImport = widgets.filter(
+      (widget) => !existingIds.has(widget.id),
     );
-    if (isExist) {
-      toast.error("Some of the widgets already exist");
-      return;
+
+    if (newWidgetsToImport.length === 0) {
+      return { status: "exists", count: 0 };
     }
-    const newWidgets = [...currentWidgets, ...widgets];
+
+    const newWidgets = [...currentWidgets, ...newWidgetsToImport];
     set({ widgets: newWidgets });
-    const newWidgetJson = JSON.stringify(newWidgets);
-    localStorage.setItem(DURATION_WIDGET_LOCAL_STORAGE_KEY, newWidgetJson);
+    saveDurationWidgets(newWidgets);
+
+    return {
+      status: "imported",
+      count: newWidgetsToImport.length,
+      skipped: widgets.length - newWidgetsToImport.length,
+    };
   },
-  setSortDirection: (sortDirection: "asc" | "desc") => {
-    const sortedWidgets = get().widgets.toSorted((a, b) => {
-      if (get().sortBy === "date") {
-        const aDate = new Date(a.date);
-        const bDate = new Date(b.date);
-        return sortDirection === "asc"
-          ? aDate.getTime() - bDate.getTime()
-          : bDate.getTime() - aDate.getTime();
-      }
-      return sortDirection === "asc"
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    });
+  setSortDirection: (sortDirection: DurationSortDirection) => {
+    const sortedWidgets = sortDurationWidgets(
+      get().widgets,
+      get().sortBy,
+      sortDirection,
+    );
     set({ sortDirection, widgets: sortedWidgets });
   },
   startTimer: () => {
+    if (get().timer) {
+      return;
+    }
+
     const timer = setInterval(() => {
       set({ now: new Date() });
     }, 1000);

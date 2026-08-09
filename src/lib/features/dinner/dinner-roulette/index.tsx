@@ -1,30 +1,16 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { memo, useEffect, useMemo, useState } from "react";
+import { getRouletteSegmentAngle } from "../roulette-geometry";
+import { RouletteWheelSvg } from "./roulette-wheel-svg";
 
-const radius = 150;
-const center = radius;
-
-const generateRandomColor = () => {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = 70 + Math.floor(Math.random() * 30); // 70-100%
-  const lightness = 40 + Math.floor(Math.random() * 20); // 40-60%
-  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-};
-
-const getCoordinates = (deg: number) => {
-  const rad = (deg * Math.PI) / 180;
-  return {
-    x: center + radius * Math.cos(rad),
-    y: center + radius * Math.sin(rad),
-  };
-};
-
-type DinnerRouletteProps = {
+interface DinnerRouletteProps {
   isSpinning: boolean;
   options: string[];
   result: string;
   duration?: number;
   onSpinComplete?: () => void;
-};
+  ariaLabel: string;
+}
 
 export const DinnerRoulette = memo(function DinnerRoulette({
   isSpinning,
@@ -32,18 +18,16 @@ export const DinnerRoulette = memo(function DinnerRoulette({
   result,
   duration = 3000,
   onSpinComplete,
+  ariaLabel,
 }: DinnerRouletteProps) {
-  const angle = 360 / options.length;
+  const angle = getRouletteSegmentAngle(options.length);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const effectiveDuration = prefersReducedMotion ? 1 : duration;
 
   const [rotation, setRotation] = useState(0);
-  const svgRef = useRef<HTMLDivElement>(null);
   const resultIndex = useMemo(
     () => options.findIndex((s) => s === result),
     [options, result],
-  );
-  const colors = useMemo(
-    () => options.map(() => generateRandomColor()),
-    [options],
   );
 
   useEffect(() => {
@@ -53,75 +37,43 @@ export const DinnerRoulette = memo(function DinnerRoulette({
 
     const targetAngle = (360 - (angle * resultIndex + angle / 2) + 270) % 360;
 
-    setRotation((rotation) => {
-      const spins = rotation < 360 ? 5 : 0;
-      const totalRotation = spins * 360 + targetAngle;
-      return totalRotation;
+    setRotation((currentRotation) => {
+      const delta = (targetAngle - (currentRotation % 360) + 360) % 360;
+      return currentRotation + 5 * 360 + delta;
     });
 
     const timer = setTimeout(() => {
       onSpinComplete?.();
-    }, duration);
+    }, effectiveDuration);
 
     return () => clearTimeout(timer);
-  }, [result, duration, onSpinComplete, isSpinning, resultIndex, angle]);
+  }, [
+    result,
+    effectiveDuration,
+    onSpinComplete,
+    isSpinning,
+    resultIndex,
+    angle,
+  ]);
 
   return (
-    <div className="relative flex items-center justify-center p-8">
-      <div
-        className="transition-transform duration-[5000ms] ease-out"
-        style={{
-          transform: `rotate(${rotation}deg)`,
-          transitionDuration: `${duration}ms`,
-        }}
-        ref={svgRef}
-      >
-        <svg
-          width={radius * 2}
-          height={radius * 2}
-          className="rounded-full shadow-lg"
+    <div className="border-toy-line bg-toy-hover relative flex min-h-[356px] items-center justify-center overflow-hidden border [--roulette-1:color-mix(in_srgb,var(--toy-accent)_85%,var(--toy-bg))] [--roulette-2:color-mix(in_srgb,var(--toy-accent)_58%,var(--toy-bg))] [--roulette-3:color-mix(in_srgb,var(--toy-accent)_36%,var(--toy-bg))] [--roulette-4:color-mix(in_srgb,var(--toy-accent)_70%,var(--toy-text))] max-[767px]:min-h-[310px]">
+      <div className="relative w-[min(300px,calc(100vw-96px))]">
+        <div
+          className="w-full transition-transform [transition-timing-function:cubic-bezier(0.16,0.76,0.2,1)] motion-reduce:!duration-[1ms]"
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            transitionDuration: `${effectiveDuration}ms`,
+          }}
         >
-          {options.map((option, index) => {
-            const startAngle = angle * index;
-            const endAngle = angle * (index + 1);
-            const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+          <RouletteWheelSvg options={options} ariaLabel={ariaLabel} />
+        </div>
 
-            const start = getCoordinates(startAngle);
-            const end = getCoordinates(endAngle);
-
-            const pathData = `
-                M ${center},${center}
-                L ${start.x},${start.y}
-                A ${radius},${radius} 0 ${largeArc} 1 ${end.x},${end.y}
-                Z
-              `;
-
-            const midAngle = startAngle + angle / 2;
-            const labelX =
-              center + radius * 0.6 * Math.cos((midAngle * Math.PI) / 180);
-            const labelY =
-              center + radius * 0.6 * Math.sin((midAngle * Math.PI) / 180);
-
-            return (
-              <g key={index}>
-                <path d={pathData} fill={colors[index] || "#000000"} />
-                <text
-                  x={labelX}
-                  y={labelY}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="text-xs font-semibold text-white"
-                >
-                  {option}
-                </text>
-              </g>
-            );
-          })}
-          <circle cx={center} cy={center} r="5" fill="#000" />
-        </svg>
+        <div
+          className="border-t-toy-accent absolute top-0.5 left-1/2 size-0 -translate-x-1/2 border-t-[16px] border-r-[10px] border-l-[10px] border-r-transparent border-l-transparent drop-shadow-[0_2px_3px_rgb(0_0_0_/_18%)]"
+          aria-hidden="true"
+        />
       </div>
-
-      <div className="absolute top-1/2 h-0 w-0 -translate-y-[150px] border-r-8 border-b-[20px] border-l-8 border-r-transparent border-b-black border-l-transparent" />
     </div>
   );
 });

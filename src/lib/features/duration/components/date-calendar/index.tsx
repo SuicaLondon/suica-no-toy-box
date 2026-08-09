@@ -3,31 +3,40 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { AddDurationFormValues, DurationFormValues } from "@/schemas/duration";
 import { addMonths, setYear, subMonths } from "date-fns";
 import { memo, RefObject, useCallback, useEffect, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
+import { getDurationDateLocale } from "../../date-locale";
 import { CalendarNavigator } from "./calendar-navigator";
 
-type DateCalendarProps = {
+interface DateCalendarProps {
   portalContainerRef?: RefObject<HTMLDivElement | null>;
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
-};
+}
 
 export const DateCalendar = memo(function DateCalendar({
   portalContainerRef,
   form,
 }: DateCalendarProps) {
+  const { copy, locale } = useToolI18n();
+  const durationCopy = copy.duration;
+  const dateLocale = getDurationDateLocale(locale);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const selectedDate = useWatch({
+    control: form.control,
+    name: "date",
+  });
 
   useEffect(() => {
-    const date = form.getValues("date");
-    if (date) {
-      setCurrentDate(new Date(date.toString()));
+    if (selectedDate) {
+      setCurrentDate(new Date(selectedDate.toString()));
     }
-  }, [form]);
+  }, [selectedDate]);
 
   const handleMonthChange = useCallback(
     (months: number) => {
@@ -53,29 +62,35 @@ export const DateCalendar = memo(function DateCalendar({
       name="date"
       render={({ field }) => {
         return (
-          <FormItem className="flex min-h-[300px] flex-col items-center">
+          <FormItem>
+            <FormLabel>{durationCopy.dateLabel}</FormLabel>
             <FormControl>
               <Calendar
                 mode="single"
-                className="flex h-full w-full"
+                locale={dateLocale}
+                className="text-toy-text pt-1"
                 classNames={{
-                  months:
-                    "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1",
-                  month: "space-y-4 w-full flex flex-col",
-                  table: "w-full h-full border-collapse space-y-1",
-                  head_row: "",
-                  row: "w-full mt-2",
-                  cell: "h-8 w-8 text-center text-sm p-0",
-                  day: "cursor-pointer w-8 h-8 rounded-full overflow-hidden",
-                  day_disabled: "hover:bg-none select-none cursor-not-allowed",
+                  months: "w-full",
+                  month: "grid w-full gap-3",
+                  table: "w-full border-collapse",
+                  head_row: "flex justify-between",
+                  head_cell:
+                    "w-9 text-center font-mono text-[0.6875rem] font-normal text-toy-muted max-[420px]:w-8",
+                  row: "mt-1.5 flex justify-between",
+                  cell: "w-9 text-center max-[420px]:w-8",
+                  day: "inline-flex size-9 items-center justify-center rounded-full bg-transparent text-[0.8125rem] text-toy-text transition-colors duration-150 hover:bg-toy-hover motion-reduce:transition-none max-[420px]:size-8",
+                  day_disabled: "cursor-not-allowed opacity-30",
                   day_selected:
-                    "cursor-pointer w-8 h-8 rounded-full bg-black text-white overflow-hidden",
+                    "bg-toy-accent text-toy-bg hover:bg-toy-accent hover:text-toy-bg",
+                  day_today:
+                    "outline outline-1 -outline-offset-1 outline-toy-line-strong",
+                  day_outside: "text-toy-muted opacity-45",
                 }}
                 selected={field.value}
                 onSelect={field.onChange}
                 month={currentDate}
                 disableNavigation
-                showOutsideDays
+                showOutsideDays={false}
                 components={{
                   Caption: () => (
                     <CalendarNavigator

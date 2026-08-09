@@ -3,14 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-type SponsorCardProps = {
+interface SponsorCardProps {
   id: string;
   name: string;
   city: string;
   county: string;
   type: string;
   rate: string;
-};
+}
 
 export default function SponsorCard({
   name,

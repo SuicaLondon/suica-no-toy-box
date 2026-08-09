@@ -1,6 +1,6 @@
-type SponsorListNotFoundProps = {
+interface SponsorListNotFoundProps {
   companyName?: string;
-};
+}
 
 export default function SponsorListNotFound({
   companyName,

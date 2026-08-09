@@ -1,102 +1,35 @@
-"use client";
+import { getRequestLocale } from "@/i18n/server";
+import { redirect } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Search } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useDebounceCallback } from "usehooks-ts";
-import * as z from "zod";
-
-const searchSchema = z.object({
-  companyName: z.string().min(1, "Please enter a company name"),
-});
-
-type SearchFormData = z.infer<typeof searchSchema>;
-
-function SponsorForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const form = useForm<SearchFormData>({
-    resolver: zodResolver(searchSchema),
-    defaultValues: {
-      companyName: searchParams.get("companyName") || "",
-    },
-  });
-  const companyName = form.watch("companyName");
-
-  const updateCompanyName = useCallback(
-    (name: string) => {
-      router.replace(`/sponsorship?companyName=${name}`);
-    },
-    [router],
-  );
-
-  const debouncedUpdateCompanyName = useDebounceCallback(
-    updateCompanyName,
-    200,
-  );
-
-  useEffect(() => {
-    if (companyName) {
-      debouncedUpdateCompanyName(companyName);
-    }
-  }, [companyName, debouncedUpdateCompanyName]);
-
-  const onSubmit = (data: SearchFormData) => {
-    updateCompanyName(data.companyName);
-  };
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="companyName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Company Name</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    {...field}
-                    placeholder="Enter company name..."
-                    className="h-12 text-lg"
-                  />
-                  <Button
-                    type="submit"
-                    className="absolute top-1/2 right-2 -translate-y-1/2"
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <Search className="h-5 w-5" />
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
-  );
+interface LegacySponsorshipPageProps {
+  searchParams: Promise<{
+    companyName?: string | string[];
+    selectedCompanyId?: string | string[];
+  }>;
 }
 
-export default function SponsorPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SponsorForm />
-    </Suspense>
+function getFirstValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function LegacySponsorshipPage({
+  searchParams,
+}: LegacySponsorshipPageProps) {
+  const query = await searchParams;
+  const nextSearchParams = new URLSearchParams();
+  const companyName = getFirstValue(query.companyName)?.trim();
+  const selectedCompanyId = getFirstValue(query.selectedCompanyId)?.trim();
+
+  if (companyName) {
+    nextSearchParams.set("companyName", companyName);
+  }
+
+  if (selectedCompanyId) {
+    nextSearchParams.set("selectedCompanyId", selectedCompanyId);
+  }
+
+  const queryString = nextSearchParams.toString();
+  redirect(
+    `/${await getRequestLocale()}/sponsorship${queryString ? `?${queryString}` : ""}`,
   );
 }

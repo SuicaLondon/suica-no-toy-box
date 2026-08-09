@@ -1,44 +1,64 @@
 import { isValid, parseISO } from "date-fns";
 import { z } from "zod";
 
-export const durationFormSchema = z.object({
-  id: z.string().uuid(),
-  name: z
-    .string({
-      required_error: "Please enter a name",
-    })
-    .min(1, {
-      message: "Name is required",
-    }),
-  date: z.preprocess(
-    (val) => {
-      if (typeof val === "string") {
-        const parsed = parseISO(val);
-        return isValid(parsed) ? parsed : undefined;
-      }
-      return val;
-    },
-    z.date({
-      required_error: "Please select a date",
-    }),
-  ),
-  repeat: z.preprocess(
-    (val) => {
-      if (val === "none" || val === undefined || val === null) {
-        return "never";
-      }
-      return val;
-    },
-    z.enum(["never", "week", "month", "year"], {
-      required_error: "Please select a repeat option",
-    }),
-  ),
-  type: z.enum(["none", "anniversary", "birthday", "bills"], {
-    required_error: "Please select a type",
-  }),
-});
+type DurationValidationMessages = {
+  nameRequired: string;
+  dateRequired: string;
+};
 
-export const addDurationFormSchema = durationFormSchema.omit({ id: true });
+const defaultValidationMessages: DurationValidationMessages = {
+  nameRequired: "Enter a name.",
+  dateRequired: "Select a date.",
+};
+
+export function createDurationFormSchema(
+  messages: DurationValidationMessages = defaultValidationMessages,
+) {
+  return z.object({
+    id: z.string().uuid(),
+    name: z
+      .string({
+        required_error: messages.nameRequired,
+      })
+      .trim()
+      .min(1, {
+        message: messages.nameRequired,
+      }),
+    date: z.preprocess(
+      (value) => {
+        if (typeof value === "string") {
+          const parsed = parseISO(value);
+          return isValid(parsed) ? parsed : undefined;
+        }
+        return value;
+      },
+      z.date({
+        required_error: messages.dateRequired,
+        invalid_type_error: messages.dateRequired,
+      }),
+    ),
+    repeat: z.preprocess(
+      (value) => {
+        if (value === "none" || value === undefined || value === null) {
+          return "never";
+        }
+        return value;
+      },
+      z.enum(["never", "week", "month", "year"]),
+    ),
+    type: z.enum(["none", "anniversary", "birthday", "bills"]),
+  });
+}
+
+export const durationFormSchema = createDurationFormSchema();
+
+export function createAddDurationFormSchema(
+  messages: DurationValidationMessages = defaultValidationMessages,
+) {
+  return createDurationFormSchema(messages).omit({ id: true });
+}
+
+export const addDurationFormSchema = createAddDurationFormSchema();
 
 export type AddDurationFormValues = z.infer<typeof addDurationFormSchema>;
 export type DurationFormValues = z.infer<typeof durationFormSchema>;
