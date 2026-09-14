@@ -1,4 +1,4 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert } from "suica-ui/alert";
 import { AlertCircle } from "lucide-react";
 
 interface SponsorListErrorProps {
@@ -7,13 +7,14 @@ interface SponsorListErrorProps {
 
 export default function SponsorListError({ error }: SponsorListErrorProps) {
   return (
-    <Alert variant="destructive" className="mb-4">
-      <AlertCircle className="h-4 w-4" />
-      <AlertDescription>
-        {error instanceof Error
-          ? error.message
-          : "Failed to fetch results. Please try again."}
-      </AlertDescription>
+    <Alert
+      variant="danger"
+      className="mb-4"
+      icon={<AlertCircle className="h-4 w-4" aria-hidden="true" />}
+    >
+      {error instanceof Error
+        ? error.message
+        : "Failed to fetch results. Please try again."}
     </Alert>
   );
 }

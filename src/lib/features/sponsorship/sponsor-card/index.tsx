@@ -1,6 +1,6 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "suica-ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "suica-ui/card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface SponsorCardProps {

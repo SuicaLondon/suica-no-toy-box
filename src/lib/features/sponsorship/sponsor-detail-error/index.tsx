@@ -1,18 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert } from "suica-ui/alert";
 
 interface SponsorDetailErrorProps {
   error: Error;
 }
-
 export default function SponsorDetailError({ error }: SponsorDetailErrorProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Error</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>{error.message}</p>
-      </CardContent>
-    </Card>
+    <Alert variant="danger" title="Error">
+      {error.message}
+    </Alert>
   );
 }

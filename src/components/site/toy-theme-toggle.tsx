@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "suica-ui/button";
 
 import { useToyTheme } from "@/hooks/use-toy-theme";
 import { Moon, Sun } from "lucide-react";
@@ -16,7 +17,9 @@ export function ToyThemeToggle({
   const label = isDark ? switchToLightLabel : switchToDarkLabel;
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       type="button"
       className="hover:text-toy-accent flex size-10 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent text-inherit transition-colors duration-180 motion-reduce:transition-none max-[767px]:h-11 max-[520px]:ml-auto"
       onClick={toggleTheme}
@@ -29,6 +32,6 @@ export function ToyThemeToggle({
       ) : (
         <Moon className="size-[18px]" aria-hidden="true" />
       )}
-    </button>
+    </Button>
   );
 }

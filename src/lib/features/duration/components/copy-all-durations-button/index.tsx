@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "suica-ui/button";
 import { useToolI18n } from "@/i18n/tool-i18n";
 import { Copy } from "lucide-react";
 import { memo } from "react";
@@ -12,8 +12,9 @@ export const CopyAllDurationsButton = memo(function CopyAllDurationsButton() {
 
   return (
     <Button
+      variant="outline"
       type="button"
-      className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
+      className="min-h-10 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
       onClick={handleCopy}
       disabled={widgetCount === 0}
     >

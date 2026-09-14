@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "suica-ui/button";
 import {
   Dialog,
   DialogClose,
@@ -29,7 +29,7 @@ export function DeleteDurationDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="border-toy-line-strong bg-toy-bg text-toy-text max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto rounded-[2px] p-6 font-sans max-[640px]:p-5"
+        className="max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto p-6 font-sans max-[640px]:p-5"
         closeLabel={copy.common.close}
       >
         <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
@@ -39,13 +39,17 @@ export function DeleteDurationDialog({
           {durationCopy.deleteDescription}
         </DialogDescription>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button
-              type="button"
-              className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
-            >
-              {durationCopy.cancelAction}
-            </Button>
+          <DialogClose
+            render={(props) => (
+              <Button
+                variant="outline"
+                {...props}
+                type="button"
+                className="min-h-10 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
+              />
+            )}
+          >
+            {durationCopy.cancelAction}
           </DialogClose>
           <Button
             type="button"

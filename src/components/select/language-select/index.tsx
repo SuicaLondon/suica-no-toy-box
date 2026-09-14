@@ -1,10 +1,5 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Field } from "suica-ui/field";
+import { Select } from "suica-ui/select";
 import { languages } from "@/constants/languages";
 import type { Locale } from "@/i18n/locales";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
@@ -32,23 +27,28 @@ export default function LanguageSelect<T extends FieldValues>({
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Select
-          value={field.value}
-          onValueChange={field.onChange}
-          disabled={disabled}
+      render={({ field, fieldState }) => (
+        <Field
+          label={ariaLabel ?? placeholder}
+          error={fieldState.error?.message}
         >
-          <SelectTrigger className={triggerClassName} aria-label={ariaLabel}>
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent>
+          <Select
+            {...field}
+            value={field.value ?? ""}
+            className={triggerClassName}
+            aria-label={ariaLabel ?? placeholder}
+            disabled={disabled}
+          >
+            <option value="" disabled>
+              {placeholder}
+            </option>
             {languages.map((lang) => (
-              <SelectItem key={lang.code} value={lang.code}>
+              <option key={lang.code} value={lang.code}>
                 {lang.name[locale]}
-              </SelectItem>
+              </option>
             ))}
-          </SelectContent>
-        </Select>
+          </Select>
+        </Field>
       )}
     />
   );
