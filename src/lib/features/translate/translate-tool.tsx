@@ -1,9 +1,15 @@
 "use client";
 
+import { Card } from "suica-ui/card";
+
+import { Spinner } from "suica-ui/spinner";
+
+import { Field } from "suica-ui/field";
+
 import CopyButton from "@/components/button/copy-button";
 import LanguageSelect from "@/components/select/language-select";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "suica-ui/button";
+import { Textarea } from "suica-ui/textarea";
 import { useTranslate } from "@/hooks/use-translate";
 import { useToolI18n } from "@/i18n/tool-i18n";
 import {
@@ -11,7 +17,7 @@ import {
   type TranslateFormValues,
 } from "@/schemas/translate";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftRight, ArrowRight, LoaderCircle } from "lucide-react";
+import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -84,7 +90,7 @@ export function TranslateTool() {
         <Button
           type="button"
           variant="outline"
-          className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
+          className="min-h-10 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
           onClick={handleSwapLanguages}
           disabled={isPending}
         >
@@ -94,11 +100,8 @@ export function TranslateTool() {
       </div>
 
       <div className="grid grid-cols-2 gap-3.5 max-[1100px]:grid-cols-1">
-        <section className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]">
+        <Card className="p-6 max-[767px]:p-[18px]">
           <div className="grid gap-[9px]">
-            <label className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-              {content.sourceLanguage}
-            </label>
             <LanguageSelect
               name="sourceLang"
               control={form.control}
@@ -106,7 +109,7 @@ export function TranslateTool() {
               placeholder={content.selectLanguage}
               ariaLabel={content.sourceLanguage}
               disabled={isPending}
-              triggerClassName="min-h-11 w-full justify-between rounded-[2px] border-toy-line-strong bg-transparent text-toy-text shadow-none focus-visible:border-toy-accent focus-visible:ring-1 focus-visible:ring-toy-accent focus-visible:ring-offset-2"
+              triggerClassName="min-h-11"
             />
           </div>
 
@@ -115,20 +118,19 @@ export function TranslateTool() {
               name="sourceText"
               control={form.control}
               render={({ field, fieldState: { error } }) => (
-                <>
+                <Field
+                  label={content.sourcePlaceholder}
+                  error={error ? content.required : undefined}
+                  className="[&_[data-slot=field-label]]:sr-only"
+                >
                   <Textarea
                     {...field}
                     disabled={isPending}
                     placeholder={content.sourcePlaceholder}
                     aria-label={content.sourcePlaceholder}
-                    className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-[360px] w-full resize-y rounded-[2px] bg-transparent p-4 pr-12 text-base leading-[1.65] shadow-none focus-visible:ring-1 focus-visible:ring-offset-2 max-[767px]:min-h-60"
+                    className="min-h-[360px] w-full resize-y p-4 pr-12 text-base leading-[1.65] max-[767px]:min-h-60"
                   />
-                  {error ? (
-                    <p className="text-toy-error m-0 text-[0.8125rem] leading-[1.45]">
-                      {content.required}
-                    </p>
-                  ) : null}
-                </>
+                </Field>
               )}
             />
             <CopyButton
@@ -139,16 +141,10 @@ export function TranslateTool() {
               errorMessage={content.copyFailed}
             />
           </div>
-        </section>
+        </Card>
 
-        <section
-          className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]"
-          aria-busy={isPending}
-        >
+        <Card className="p-6 max-[767px]:p-[18px]" aria-busy={isPending}>
           <div className="grid gap-[9px]">
-            <label className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-              {content.targetLanguage}
-            </label>
             <LanguageSelect
               name="targetLang"
               control={form.control}
@@ -156,7 +152,7 @@ export function TranslateTool() {
               placeholder={content.selectLanguage}
               ariaLabel={content.targetLanguage}
               disabled={isPending}
-              triggerClassName="min-h-11 w-full justify-between rounded-[2px] border-toy-line-strong bg-transparent text-toy-text shadow-none focus-visible:border-toy-accent focus-visible:ring-1 focus-visible:ring-toy-accent focus-visible:ring-offset-2"
+              triggerClassName="min-h-11"
             />
           </div>
 
@@ -169,7 +165,7 @@ export function TranslateTool() {
                   {...field}
                   placeholder={content.targetPlaceholder}
                   aria-label={content.targetPlaceholder}
-                  className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-[360px] w-full resize-y rounded-[2px] bg-transparent p-4 pr-12 text-base leading-[1.65] shadow-none focus-visible:ring-1 focus-visible:ring-offset-2 max-[767px]:min-h-60"
+                  className="min-h-[360px] w-full resize-y p-4 pr-12 text-base leading-[1.65] max-[767px]:min-h-60"
                   readOnly
                 />
               )}
@@ -182,19 +178,20 @@ export function TranslateTool() {
               errorMessage={content.copyFailed}
             />
           </div>
-        </section>
+        </Card>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 max-[767px]:flex-col max-[767px]:items-stretch">
         <div />
         <Button
           type="submit"
-          className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full"
+          className="min-h-11 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
           disabled={isPending}
         >
           {isPending ? (
-            <LoaderCircle
-              className="animate-toy-spin size-[18px] shrink-0 motion-reduce:animate-none"
+            <Spinner
+              label={copy.common.loading}
+              className="size-[18px] shrink-0 motion-reduce:animate-none"
               aria-hidden="true"
             />
           ) : (

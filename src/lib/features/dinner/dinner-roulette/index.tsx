@@ -1,3 +1,4 @@
+import { Card } from "suica-ui/card";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { memo, useEffect, useMemo, useState } from "react";
 import { getRouletteSegmentAngle } from "../roulette-geometry";
@@ -57,7 +58,7 @@ export const DinnerRoulette = memo(function DinnerRoulette({
   ]);
 
   return (
-    <div className="border-toy-line bg-toy-hover relative flex min-h-[356px] items-center justify-center overflow-hidden border [--roulette-1:color-mix(in_srgb,var(--toy-accent)_85%,var(--toy-bg))] [--roulette-2:color-mix(in_srgb,var(--toy-accent)_58%,var(--toy-bg))] [--roulette-3:color-mix(in_srgb,var(--toy-accent)_36%,var(--toy-bg))] [--roulette-4:color-mix(in_srgb,var(--toy-accent)_70%,var(--toy-text))] max-[767px]:min-h-[310px]">
+    <Card className="relative flex min-h-[356px] items-center justify-center overflow-hidden border [--roulette-1:color-mix(in_srgb,var(--toy-accent)_85%,var(--toy-bg))] [--roulette-2:color-mix(in_srgb,var(--toy-accent)_58%,var(--toy-bg))] [--roulette-3:color-mix(in_srgb,var(--toy-accent)_36%,var(--toy-bg))] [--roulette-4:color-mix(in_srgb,var(--toy-accent)_70%,var(--toy-text))] max-[767px]:min-h-[310px]">
       <div className="relative w-[min(300px,calc(100vw-96px))]">
         <div
           className="w-full transition-transform [transition-timing-function:cubic-bezier(0.16,0.76,0.2,1)] motion-reduce:!duration-[1ms]"
@@ -74,6 +75,6 @@ export const DinnerRoulette = memo(function DinnerRoulette({
           aria-hidden="true"
         />
       </div>
-    </div>
+    </Card>
   );
 });

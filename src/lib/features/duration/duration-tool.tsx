@@ -1,5 +1,9 @@
 "use client";
 
+import { SectionHeading } from "suica-ui/section-heading";
+
+import { Card } from "suica-ui/card";
+
 import { useToolI18n } from "@/i18n/tool-i18n";
 import { CalendarPlus } from "lucide-react";
 import { useEffect } from "react";
@@ -33,18 +37,18 @@ export function DurationTool() {
 
   return (
     <div className="mt-5 grid gap-3.5 max-[767px]:mt-[18px]">
-      <section
-        className="border-toy-line text-toy-text flex items-center justify-between gap-5 rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] px-4 py-3.5 max-[640px]:flex-col max-[640px]:items-stretch"
+      <Card
+        role="region"
+        className="flex items-center justify-between gap-5 px-4 py-3.5 max-[640px]:flex-col max-[640px]:items-stretch"
         aria-label={durationCopy.dates}
       >
-        <div className="min-w-max max-[640px]:min-w-0">
-          <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-            {durationCopy.dates}
-          </span>
-          <h2 className="mt-[3px] text-xl leading-tight font-semibold">
-            {durationCopy.dateCount(widgets.length)}
-          </h2>
-        </div>
+        <SectionHeading
+          titleId="duration-count-title"
+          eyebrow={durationCopy.dates}
+          title={durationCopy.dateCount(widgets.length)}
+          description={null}
+          className="shrink-0 flex-col items-start gap-1 px-0"
+        />
 
         <div className="flex flex-wrap items-center justify-end gap-2.5 max-[640px]:w-full max-[420px]:grid max-[420px]:grid-cols-2 max-[640px]:[&>*]:flex-auto max-[420px]:[&>*:first-child]:col-span-2 max-[420px]:[&>*:last-child]:col-span-2">
           <AddDurationButton />
@@ -52,7 +56,7 @@ export function DurationTool() {
           <ImportDurationsButton />
           <SortControls />
         </div>
-      </section>
+      </Card>
 
       {widgets.length > 0 ? (
         <section
@@ -64,7 +68,7 @@ export function DurationTool() {
           ))}
         </section>
       ) : (
-        <section className="border-toy-line-strong [&_p]:text-toy-muted flex min-h-60 items-center justify-center border border-dashed px-7 py-12 text-center [&_h2]:mt-2.5 [&_h2]:text-xl [&_h2]:font-semibold [&_p]:mx-auto [&_p]:mt-2.5 [&_p]:max-w-[430px] [&_p]:text-sm [&_p]:leading-[1.6]">
+        <Card className="[&_p]:text-toy-muted flex min-h-60 items-center justify-center border-dashed px-7 py-12 text-center [&_h2]:mt-2.5 [&_h2]:text-xl [&_h2]:font-semibold [&_p]:mx-auto [&_p]:mt-2.5 [&_p]:max-w-[430px] [&_p]:text-sm [&_p]:leading-[1.6]">
           <div>
             <CalendarPlus
               className="text-toy-accent mx-auto mb-3.5 block size-9 [stroke-width:1.35]"
@@ -76,7 +80,7 @@ export function DurationTool() {
             <h2>{durationCopy.emptyTitle}</h2>
             <p>{durationCopy.emptyDescription}</p>
           </div>
-        </section>
+        </Card>
       )}
     </div>
   );

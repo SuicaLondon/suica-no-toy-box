@@ -1,3 +1,5 @@
+import { Card } from "suica-ui/card";
+import { SectionHeading } from "suica-ui/section-heading";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { apps } from "@/constants/toys";
@@ -145,19 +147,17 @@ export default async function LocalizedHome({ params }: HomePageProps) {
             className="max-[1023px]:border-toy-line min-w-0 max-[1023px]:border-t max-[1023px]:pt-12 max-[767px]:pt-10"
             aria-labelledby="projects-title"
           >
-            <div
-              className={cn(
-                "text-toy-accent flex items-center justify-between font-mono text-lg font-medium tracking-[0.16em] uppercase max-[767px]:text-base",
-                locale === "zh" && "tracking-[0.1em]",
-              )}
-            >
-              <h2 id="projects-title" className="font-inherit">
-                {content.projects}
-              </h2>
-              <span aria-label={content.projectCount(apps.length)}>
-                {formatCount(apps.length)}
-              </span>
-            </div>
+            <SectionHeading
+              titleId="projects-title"
+              eyebrow={null}
+              title={content.projects}
+              description={
+                <span aria-label={content.projectCount(apps.length)}>
+                  {formatCount(apps.length)}
+                </span>
+              }
+              className="[&_h2]:text-accent px-0 [&_[data-slot=section-heading-description]]:block"
+            />
 
             <div className="mt-7 grid auto-rows-[minmax(276px,auto)] grid-cols-2 gap-3.5 max-[1023px]:auto-rows-[minmax(238px,auto)] max-[767px]:mt-[22px] max-[767px]:auto-rows-[minmax(232px,auto)] max-[767px]:grid-cols-1 max-[767px]:gap-3 min-[1024px]:max-[1279px]:auto-rows-[minmax(252px,auto)]">
               {apps.map((app, index) => {
@@ -167,38 +167,40 @@ export default async function LocalizedHome({ params }: HomePageProps) {
                   <Link
                     key={app.href}
                     href={`/${locale}${app.href}`}
-                    className="group border-toy-line hover:border-toy-line-strong hover:bg-toy-hover relative grid min-w-0 grid-rows-[minmax(104px,1fr)_auto_auto] rounded-[2px] border bg-transparent px-6 pt-[22px] text-inherit transition-[border-color,background-color] duration-180 [contain-intrinsic-size:276px] [content-visibility:auto] motion-reduce:transition-none max-[1023px]:px-[22px] max-[1023px]:pt-5 max-[1023px]:[contain-intrinsic-size:238px] max-[767px]:grid-rows-[minmax(82px,1fr)_auto_auto] max-[767px]:[contain-intrinsic-size:232px] min-[1024px]:max-[1279px]:px-[22px] min-[1024px]:max-[1279px]:pt-5 min-[1024px]:max-[1279px]:[contain-intrinsic-size:252px]"
+                    className="group block min-w-0"
                   >
-                    <span
-                      className="text-toy-muted absolute top-[22px] right-6 font-mono text-xs tracking-[0.12em] uppercase"
-                      aria-hidden="true"
-                    >
-                      {formatCount(index + 1)}
-                    </span>
+                    <Card className="hover:border-toy-line-strong hover:bg-toy-hover relative grid h-full min-w-0 grid-rows-[minmax(104px,1fr)_auto_auto] px-6 pt-[22px] text-inherit transition-[border-color,background-color] duration-180 [contain-intrinsic-size:276px] [content-visibility:auto] motion-reduce:transition-none max-[1023px]:px-[22px] max-[1023px]:pt-5 max-[1023px]:[contain-intrinsic-size:238px] max-[767px]:grid-rows-[minmax(82px,1fr)_auto_auto] max-[767px]:[contain-intrinsic-size:232px] min-[1024px]:max-[1279px]:px-[22px] min-[1024px]:max-[1279px]:pt-5 min-[1024px]:max-[1279px]:[contain-intrinsic-size:252px]">
+                      <span
+                        className="text-toy-muted absolute top-[22px] right-6 font-mono text-xs tracking-[0.12em] uppercase"
+                        aria-hidden="true"
+                      >
+                        {formatCount(index + 1)}
+                      </span>
 
-                    <Icon
-                      className="text-toy-icon size-[82px] self-center justify-self-start max-[1023px]:size-[68px] max-[767px]:size-16 min-[1024px]:max-[1279px]:size-[72px]"
-                      strokeWidth={1.35}
-                      aria-hidden="true"
-                    />
+                      <Icon
+                        className="text-toy-icon size-[82px] self-center justify-self-start max-[1023px]:size-[68px] max-[767px]:size-16 min-[1024px]:max-[1279px]:size-[72px]"
+                        strokeWidth={1.35}
+                        aria-hidden="true"
+                      />
 
-                    <div>
-                      <h3 className="m-0 text-[1.375rem] leading-[1.2] font-semibold tracking-[-0.02em] text-balance max-[767px]:text-[1.375rem] min-[1024px]:max-[1279px]:text-xl">
-                        {app.title[locale]}
-                      </h3>
-                      <p className="text-toy-muted mt-[7px] mb-0 text-[0.9375rem] leading-[1.55] text-pretty [overflow-wrap:anywhere]">
-                        {app.description[locale]}
-                      </p>
-                    </div>
+                      <div>
+                        <h3 className="m-0 text-[1.375rem] leading-[1.2] font-semibold tracking-[-0.02em] text-balance max-[767px]:text-[1.375rem] min-[1024px]:max-[1279px]:text-xl">
+                          {app.title[locale]}
+                        </h3>
+                        <p className="text-toy-muted mt-[7px] mb-0 text-[0.9375rem] leading-[1.55] text-pretty [overflow-wrap:anywhere]">
+                          {app.description[locale]}
+                        </p>
+                      </div>
 
-                    <span
-                      className={cn(
-                        "border-toy-line text-toy-muted group-hover:text-toy-accent mt-5 flex self-end justify-self-stretch border-t py-[15px] pb-4 font-mono text-xs tracking-[0.13em] uppercase transition-colors duration-180 motion-reduce:transition-none",
-                        locale === "zh" && "tracking-[0.1em]",
-                      )}
-                    >
-                      {content.viewProject}
-                    </span>
+                      <span
+                        className={cn(
+                          "border-toy-line text-toy-muted group-hover:text-toy-accent mt-5 flex self-end justify-self-stretch border-t py-[15px] pb-4 font-mono text-xs tracking-[0.13em] uppercase transition-colors duration-180 motion-reduce:transition-none",
+                          locale === "zh" && "tracking-[0.1em]",
+                        )}
+                      >
+                        {content.viewProject}
+                      </span>
+                    </Card>
                   </Link>
                 );
               })}

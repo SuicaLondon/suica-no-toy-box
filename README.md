@@ -14,7 +14,7 @@ You can access it from the [link](https://suica-no-toy-box.vercel.app/)
 ## Tech Stack
 
 - [Next.js 15](https://nextjs.org/) - React framework
-- [Shadcn UI](https://ui.shadcn.com/) - UI component library
+- [Suica UI](https://github.com/SuicaLondon/suica-ui) - UI component library
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [React Hook Form](https://react-hook-form.com/) - Form validation
 - [Zod](https://zod.dev/) - TypeScript-first schema validation
@@ -54,3 +54,13 @@ pnpm dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## UI migration
+
+Development writes to `.next-dev`, while production builds and `pnpm start` use
+`.next`. This keeps production build checks from overwriting a running development
+server's manifests and assets. Run only one development server per checkout.
+
+Shared controls, cards, forms, menus, and calendars use Suica UI. Toast notifications
+remain on Sonner, and the dinner roulette and other application-specific displays
+retain their custom rendering. Duration cards show type and repeat as separate tags.

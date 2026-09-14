@@ -1,11 +1,22 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card } from "suica-ui/card";
+
+import { SectionHeading } from "suica-ui/section-heading";
+import { Alert } from "suica-ui/alert";
+import { Badge } from "suica-ui/badge";
+import { Skeleton } from "suica-ui/skeleton";
+import { LoadingIndicator } from "suica-ui/loading-indicator";
+import { Spinner } from "suica-ui/spinner";
+
+import { Field } from "suica-ui/field";
+
+import { Button } from "suica-ui/button";
+import { Input } from "suica-ui/input";
 import { useSponsorshipDetail } from "@/hooks/use-sponsorship-detail";
 import { useSponsorshipSearch } from "@/hooks/use-sponsorship-search";
 import { useToolI18n } from "@/i18n/tool-i18n";
-import { LoaderCircle, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 
@@ -73,38 +84,36 @@ export function SponsorshipTool({
 
   return (
     <div className="mt-5 grid gap-3.5 max-[767px]:mt-[18px]">
-      <section className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]">
+      <Card className="p-6 max-[767px]:p-[18px]">
         <form onSubmit={handleSearch} className="grid gap-[9px]" role="search">
-          <label
-            className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase"
-            htmlFor="company-name"
-          >
-            {content.searchLabel}
-          </label>
-          <div className="flex flex-wrap items-center gap-2.5 max-[767px]:w-full max-[767px]:[&>*]:grow">
-            <Input
-              id="company-name"
-              className="border-toy-line-strong text-toy-text placeholder:text-toy-muted/75 focus-visible:border-toy-accent focus-visible:ring-toy-accent min-h-12 min-w-0 flex-[1_1_14rem] rounded-[2px] bg-transparent px-3.5 shadow-none focus-visible:ring-1 focus-visible:ring-offset-2"
-              value={draftCompanyName}
-              placeholder={content.searchPlaceholder}
-              autoComplete="organization"
-              aria-invalid={Boolean(validationError)}
-              aria-describedby={
-                validationError ? "company-name-error" : undefined
-              }
-              onChange={(event) => {
-                setDraftCompanyName(event.target.value);
-                setValidationError("");
-              }}
-            />
+          <div className="flex flex-wrap items-end gap-2.5 max-[767px]:w-full max-[767px]:[&>*]:grow">
+            <Field
+              label={content.searchLabel}
+              error={validationError || undefined}
+              className="min-w-0 flex-[1_1_14rem]"
+            >
+              <Input
+                id="company-name"
+                className="min-h-12 w-full min-w-0 px-3.5"
+                value={draftCompanyName}
+                placeholder={content.searchPlaceholder}
+                autoComplete="organization"
+                aria-invalid={Boolean(validationError)}
+                onChange={(event) => {
+                  setDraftCompanyName(event.target.value);
+                  setValidationError("");
+                }}
+              />
+            </Field>
             <Button
               type="submit"
-              className="border-toy-accent bg-toy-accent text-toy-bg hover:text-toy-bg min-h-11 rounded-[2px] border font-mono text-xs tracking-[0.08em] uppercase shadow-none hover:bg-[color-mix(in_srgb,var(--toy-accent)_88%,var(--toy-text))] max-[520px]:w-full"
+              className="min-h-11 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
               disabled={isSearchFetching}
             >
               {isSearchFetching ? (
-                <LoaderCircle
-                  className="animate-toy-spin size-[18px] shrink-0 motion-reduce:animate-none"
+                <Spinner
+                  label={common.loading}
+                  className="size-[18px] shrink-0 motion-reduce:animate-none"
                   aria-hidden="true"
                 />
               ) : (
@@ -113,33 +122,22 @@ export function SponsorshipTool({
               {isSearchFetching ? common.loading : content.searchAction}
             </Button>
           </div>
-          {validationError ? (
-            <p
-              id="company-name-error"
-              className="text-toy-error m-0 text-[0.8125rem] leading-[1.45]"
-            >
-              {validationError}
-            </p>
-          ) : null}
         </form>
-      </section>
+      </Card>
 
       <div className="grid grid-cols-2 gap-3.5 max-[1100px]:grid-cols-1">
-        <section
-          className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]"
+        <Card
+          className="p-6 max-[767px]:p-[18px]"
           aria-live="polite"
           aria-busy={isSearchFetching}
         >
-          <div className="border-toy-line mb-[22px] flex items-start justify-between gap-5 border-b pb-[18px] max-[520px]:flex-col max-[520px]:items-stretch">
-            <div>
-              <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-                {content.results}
-              </span>
-              <h2 className="mt-1.5 text-xl leading-tight font-semibold">
-                {content.resultCount(results?.length ?? 0)}
-              </h2>
-            </div>
-          </div>
+          <SectionHeading
+            titleId="sponsorship-results-title"
+            eyebrow={content.results}
+            title={content.resultCount(results?.length ?? 0)}
+            description={null}
+            className="border-line mb-5 flex-col items-start gap-1.5 border-b px-0 pb-4 [&_h2]:shrink [&_h2]:break-words"
+          />
 
           {!companyName ? (
             <EmptyState
@@ -158,10 +156,11 @@ export function SponsorshipTool({
           ) : results?.length ? (
             <div className="grid gap-2.5">
               {results.map((company) => (
-                <button
+                <Button
+                  variant="ghost"
                   key={company.id}
                   type="button"
-                  className="border-toy-line hover:border-toy-accent hover:bg-toy-hover data-[selected=true]:border-toy-accent data-[selected=true]:bg-toy-hover grid w-full gap-3 rounded-[2px] border bg-transparent p-[18px] text-left text-inherit transition-colors duration-[180ms] motion-reduce:transition-none [&_h3]:m-0 [&_h3]:text-base [&_h3]:font-semibold"
+                  className="border-toy-line hover:border-toy-accent hover:bg-toy-hover data-[selected=true]:border-toy-accent data-[selected=true]:bg-toy-hover grid w-full justify-stretch gap-3 rounded-[2px] border bg-transparent p-[18px] text-left whitespace-normal text-inherit transition-colors duration-[180ms] motion-reduce:transition-none [&_h3]:m-0 [&_h3]:text-base [&_h3]:font-semibold"
                   data-selected={selectedCompanyId === company.id}
                   aria-pressed={selectedCompanyId === company.id}
                   aria-controls="sponsorship-company-detail"
@@ -169,20 +168,20 @@ export function SponsorshipTool({
                 >
                   <h3>{company.name}</h3>
                   <div className="flex flex-wrap gap-[7px]">
-                    <span className="border-toy-line text-toy-muted border px-[7px] py-1 font-mono text-[0.6875rem] tracking-[0.04em]">
+                    <Badge variant="outline" className="whitespace-normal">
                       {content.location}:{" "}
                       {[company.city, company.county]
                         .filter(Boolean)
                         .join(", ")}
-                    </span>
-                    <span className="border-toy-line text-toy-muted border px-[7px] py-1 font-mono text-[0.6875rem] tracking-[0.04em]">
+                    </Badge>
+                    <Badge variant="outline" className="whitespace-normal">
                       {content.type}: {company.type}
-                    </span>
-                    <span className="border-toy-line text-toy-muted border px-[7px] py-1 font-mono text-[0.6875rem] tracking-[0.04em]">
+                    </Badge>
+                    <Badge variant="outline" className="whitespace-normal">
                       {content.rating}: {company.rate}
-                    </span>
+                    </Badge>
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           ) : (
@@ -192,24 +191,21 @@ export function SponsorshipTool({
               description={content.startDescription}
             />
           )}
-        </section>
+        </Card>
 
-        <section
+        <Card
           id="sponsorship-company-detail"
-          className="border-toy-line text-toy-text rounded-[2px] border bg-[color-mix(in_srgb,var(--toy-bg)_96%,transparent)] p-6 max-[767px]:p-[18px]"
+          className="p-6 max-[767px]:p-[18px]"
           aria-live="polite"
           aria-busy={isDetailFetching}
         >
-          <div className="border-toy-line mb-[22px] flex items-start justify-between gap-5 border-b pb-[18px] max-[520px]:flex-col max-[520px]:items-stretch">
-            <div>
-              <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-                {content.companyDetails}
-              </span>
-              <h2 className="mt-1.5 text-xl leading-tight font-semibold">
-                {companyDetail?.name ?? content.selectCompany}
-              </h2>
-            </div>
-          </div>
+          <SectionHeading
+            titleId="sponsorship-details-title"
+            eyebrow={content.companyDetails}
+            title={companyDetail?.name ?? content.selectCompany}
+            description={null}
+            className="border-line mb-5 flex-col items-start gap-1.5 border-b px-0 pb-4 [&_h2]:shrink [&_h2]:break-words"
+          />
 
           {!selectedCompanyId ? (
             <EmptyState
@@ -278,7 +274,7 @@ export function SponsorshipTool({
               description={content.detailsNotFound}
             />
           )}
-        </section>
+        </Card>
       </div>
     </div>
   );
@@ -292,7 +288,7 @@ interface EmptyStateProps {
 
 function EmptyState({ index, title, description }: EmptyStateProps) {
   return (
-    <div className="border-toy-line-strong [&_p]:text-toy-muted flex min-h-60 items-center justify-center border border-dashed px-7 py-12 text-center [&_h3]:mt-2.5 [&_h3]:text-xl [&_h3]:font-semibold [&_p]:mx-auto [&_p]:mt-2.5 [&_p]:max-w-[430px] [&_p]:text-sm [&_p]:leading-[1.6]">
+    <Card className="[&_p]:text-toy-muted flex min-h-60 items-center justify-center border-dashed px-7 py-12 text-center [&_h3]:mt-2.5 [&_h3]:text-xl [&_h3]:font-semibold [&_p]:mx-auto [&_p]:mt-2.5 [&_p]:max-w-[430px] [&_p]:text-sm [&_p]:leading-[1.6]">
       <div>
         <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
           {index}
@@ -300,7 +296,7 @@ function EmptyState({ index, title, description }: EmptyStateProps) {
         <h3>{title}</h3>
         <p>{description}</p>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -310,23 +306,17 @@ interface LoadingStateProps {
 
 function LoadingState({ label }: LoadingStateProps) {
   return (
-    <div
-      className="border-toy-line-strong grid min-h-60 content-center gap-5 border border-dashed bg-[color-mix(in_srgb,var(--toy-accent)_4%,transparent)] p-6"
+    <Card
+      className="grid min-h-60 content-center gap-5 border-dashed p-6"
       role="status"
     >
-      <div className="text-toy-accent inline-flex items-center gap-[9px] justify-self-center font-mono text-xs font-semibold tracking-[0.08em] uppercase">
-        <LoaderCircle
-          className="animate-toy-spin size-[18px] shrink-0 motion-reduce:animate-none"
-          aria-hidden="true"
-        />
-        <span>{label}</span>
-      </div>
+      <LoadingIndicator label={label} className="justify-self-center" />
       <div className="grid gap-2.5" aria-hidden="true">
         <LoadingBlock />
         <LoadingBlock />
         <LoadingBlock />
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -338,28 +328,21 @@ interface ErrorStateProps {
 
 function ErrorState({ message, retryLabel, onRetry }: ErrorStateProps) {
   return (
-    <div className="border-toy-line-strong flex min-h-60 items-center justify-center border border-dashed px-7 py-12 text-center [&_button]:mt-[18px] [&_h3]:mt-2.5 [&_h3]:text-xl [&_h3]:font-semibold">
-      <div>
-        <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-          !
-        </span>
-        <h3>{message}</h3>
-        <Button
-          type="button"
-          className="border-toy-line-strong text-toy-text hover:bg-toy-hover hover:text-toy-accent min-h-10 rounded-[2px] bg-transparent font-mono text-xs tracking-[0.08em] uppercase shadow-none max-[520px]:w-full"
-          onClick={onRetry}
-        >
+    <Alert
+      variant="danger"
+      title={message}
+      className="flex-wrap"
+      action={
+        <Button variant="outline" onClick={onRetry}>
           {retryLabel}
         </Button>
-      </div>
-    </div>
+      }
+    />
   );
 }
 
 function LoadingBlock() {
-  return (
-    <div className="animate-toy-loading border-toy-line min-h-[54px] border bg-[linear-gradient(90deg,color-mix(in_srgb,var(--toy-text)_5%,transparent)_20%,color-mix(in_srgb,var(--toy-accent)_18%,transparent)_50%,color-mix(in_srgb,var(--toy-text)_5%,transparent)_80%)] bg-[length:200%_100%] motion-reduce:animate-none" />
-  );
+  return <Skeleton className="min-h-[54px] rounded-[2px]" />;
 }
 
 interface DetailSectionProps {

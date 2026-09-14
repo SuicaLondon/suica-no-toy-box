@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "suica-ui/card";
 import { useSponsorshipDetail } from "@/hooks/use-sponsorship-detail";
 import { useSearchParams } from "next/navigation";
 import SponsorDetailLoading from "../sponsor-detail-loading";
