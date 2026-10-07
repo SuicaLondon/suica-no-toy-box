@@ -1,3 +1,5 @@
+import { imageCompressCopy } from "./image-compress-copy";
+
 export const siteCopy = {
   en: {
     homeLabel: "SuicaのToy Box home",
@@ -25,17 +27,9 @@ export const siteCopy = {
   },
 } as const;
 
-const imageCompressCopy = {
-  index: "05",
-  title: "Image Studio",
-  description: "Compress and convert images on your device or our server.",
-  metaDescription:
-    "Compress JPEG, PNG, WebP and HEIC images locally or with remote server processing. Choose a size limit or manual settings, compare the result and download.",
-} as const;
-
 export const toolCopy = {
   en: {
-    "image-compress": imageCompressCopy,
+    "image-compress": imageCompressCopy.en,
     common: {
       loading: "Loading…",
       retry: "Try again",
@@ -197,7 +191,7 @@ export const toolCopy = {
     },
   },
   zh: {
-    "image-compress": imageCompressCopy,
+    "image-compress": imageCompressCopy.zh,
     common: {
       loading: "載入中…",
       retry: "再試一次",
