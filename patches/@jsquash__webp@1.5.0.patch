@@ -1,0 +1,14 @@
+diff --git a/codec/enc/webp_enc.js b/codec/enc/webp_enc.js
+--- a/codec/enc/webp_enc.js
++++ b/codec/enc/webp_enc.js
+@@ -6 +6,2 @@
+-function(Module = {})  {
++function(moduleOptions = {})  {
++var Module = moduleOptions;
+diff --git a/codec/enc/webp_enc_simd.js b/codec/enc/webp_enc_simd.js
+--- a/codec/enc/webp_enc_simd.js
++++ b/codec/enc/webp_enc_simd.js
+@@ -6 +6,2 @@
+-function(Module = {})  {
++function(moduleOptions = {})  {
++var Module = moduleOptions;

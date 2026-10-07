@@ -25,8 +25,17 @@ export const siteCopy = {
   },
 } as const;
 
+const imageCompressCopy = {
+  index: "05",
+  title: "Image Studio",
+  description: "Compress and convert images on your device or our server.",
+  metaDescription:
+    "Compress JPEG, PNG, WebP and HEIC images locally or with remote server processing. Choose a size limit or manual settings, compare the result and download.",
+} as const;
+
 export const toolCopy = {
   en: {
+    "image-compress": imageCompressCopy,
     common: {
       loading: "Loading…",
       retry: "Try again",
@@ -188,6 +197,7 @@ export const toolCopy = {
     },
   },
   zh: {
+    "image-compress": imageCompressCopy,
     common: {
       loading: "載入中…",
       retry: "再試一次",
@@ -340,4 +350,9 @@ export const toolCopy = {
   },
 } as const;
 
-export type ToolKey = "translate" | "sponsorship" | "dinner" | "duration";
+export type ToolKey =
+  | "translate"
+  | "sponsorship"
+  | "dinner"
+  | "duration"
+  | "image-compress";

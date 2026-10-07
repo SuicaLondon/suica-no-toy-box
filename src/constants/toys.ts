@@ -2,6 +2,7 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   Languages,
+  ImageDown,
   Utensils,
 } from "lucide-react";
 
@@ -53,5 +54,14 @@ export const apps = [
     },
     icon: CalendarDays,
     href: "/duration",
+  },
+  {
+    title: { en: "Image Studio", zh: "Image Studio" },
+    description: {
+      en: "Compress images locally or on our server.",
+      zh: "Compress images locally or on our server.",
+    },
+    icon: ImageDown,
+    href: "/image-compress",
   },
 ] as const;
