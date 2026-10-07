@@ -10,6 +10,7 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   Languages,
+  ImageDown,
   Utensils,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -21,6 +22,7 @@ const toolIcons = {
   sponsorship: BriefcaseBusiness,
   dinner: Utensils,
   duration: CalendarDays,
+  "image-compress": ImageDown,
 } as const;
 
 interface ToolShellProps {

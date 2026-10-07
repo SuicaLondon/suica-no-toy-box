@@ -1,0 +1,240 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { ShieldCheck } from "lucide-react";
+import { Card } from "suica-ui/card";
+import { Input } from "suica-ui/input";
+import { Field } from "suica-ui/field";
+import {
+  type CompressionMode,
+  MAX_IMAGE_DIMENSION,
+  type CompressionSettings,
+  type ImageFormat,
+  type ProcessingLocation,
+} from "./compression";
+import { useImageCompression } from "@/hooks/use-image-compression";
+import { ImageSourcePicker } from "./image-source-picker";
+import { ImagePreview } from "./image-preview";
+
+const selectClass =
+  "border-toy-line bg-background w-full rounded-md border px-3 py-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toy-accent";
+
+export function ImageCompressTool() {
+  const [location, setLocation] = useState<ProcessingLocation>("local");
+  const [file, setFile] = useState<File | null>(null);
+  const [format, setFormat] = useState<ImageFormat | "">("");
+  const [mode, setMode] = useState<CompressionMode>("size");
+  const [targetMB, setTargetMB] = useState("1");
+  const [quality, setQuality] = useState(90);
+  const validTarget =
+    Number.isSafeInteger(Math.floor(Number(targetMB) * 1_000_000)) &&
+    Number(targetMB) >= 0.001;
+  const settings = useMemo<CompressionSettings | null>(() => {
+    if (!format || (mode === "size" && !validTarget)) return null;
+    return {
+      format,
+      mode,
+      targetBytes:
+        mode === "size" ? Math.floor(Number(targetMB) * 1_000_000) : 1,
+      quality,
+      // The encoder clamps this limit to the source width without upscaling.
+      width: MAX_IMAGE_DIMENSION,
+    };
+  }, [format, mode, validTarget, targetMB, quality]);
+  const compression = useImageCompression(file, settings, location);
+  const { source } = compression;
+
+  return (
+    <div
+      className="mt-6 grid items-start gap-4 lg:grid-cols-[340px_minmax(0,1fr)]"
+      lang="en"
+    >
+      <Card className="grid gap-4 p-5">
+        <fieldset className="grid gap-2">
+          <legend className="mb-2 text-sm font-medium">
+            Processing location
+          </legend>
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              [
+                ["local", "On device"],
+                ["remote", "Remote server"],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className={`border-toy-line flex cursor-pointer items-center gap-2 rounded-md border p-3 text-sm ${location === value ? "bg-toy-hover border-toy-accent" : ""}`}
+              >
+                <input
+                  type="radio"
+                  name="processing-location"
+                  checked={location === value}
+                  onChange={() => setLocation(value)}
+                  aria-describedby="processing-note"
+                  className="accent-toy-accent"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          <p
+            id="processing-note"
+            className="text-toy-muted text-xs leading-relaxed"
+          >
+            On device: no uploads. Remote: uploads each update, up to 4 MB and
+            20 MP.
+          </p>
+        </fieldset>
+        <ImageSourcePicker
+          file={file}
+          source={source}
+          location={location}
+          onSelect={(nextFile, nextFormat) => {
+            setFile(nextFile);
+            setFormat(nextFormat);
+          }}
+        />
+
+        <div className="border-toy-line grid gap-4 border-t pt-5">
+          <p className="text-toy-muted font-mono text-xs tracking-widest uppercase">
+            02 / Output settings
+          </p>
+          <Field label="Output format">
+            <select
+              id="image-format"
+              required
+              value={format}
+              onChange={(event) =>
+                setFormat(event.target.value as ImageFormat | "")
+              }
+              className={selectClass}
+            >
+              <option value="" disabled>
+                Choose a format
+              </option>
+              <option value="jpeg">JPEG</option>
+              <option value="webp">WebP</option>
+              <option value="png">PNG</option>
+            </select>
+          </Field>
+          <fieldset className="grid gap-2">
+            <legend className="mb-2 text-sm font-medium">Mode</legend>
+            <div className="grid grid-cols-2 gap-2">
+              {(
+                [
+                  ["size", "Size priority"],
+                  ["manual", "Manual"],
+                ] as const
+              ).map(([value, label]) => (
+                <label
+                  key={value}
+                  className={`border-toy-line flex cursor-pointer items-center gap-2 rounded-md border p-3 text-sm ${mode === value ? "bg-toy-hover border-toy-accent" : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="image-mode"
+                    value={value}
+                    checked={mode === value}
+                    onChange={() => setMode(value)}
+                    className="accent-toy-accent"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <div className="grid">
+            <fieldset
+              disabled={mode !== "size"}
+              aria-hidden={mode !== "size"}
+              className={`grid content-start gap-3 [grid-area:1/1] ${mode !== "size" ? "invisible" : ""}`}
+            >
+              <Field label="Maximum file size (MB)">
+                <Input
+                  id="image-target"
+                  type="number"
+                  min="0.001"
+                  step="0.1"
+                  value={targetMB}
+                  aria-invalid={!validTarget}
+                  aria-describedby="image-target-error"
+                  onChange={(event) => setTargetMB(event.target.value)}
+                />
+              </Field>
+              <p
+                id="image-target-error"
+                role={!validTarget ? "alert" : undefined}
+                className={`min-h-9 text-xs leading-relaxed ${validTarget ? "text-toy-muted" : "text-toy-error"}`}
+              >
+                {validTarget
+                  ? "Adjusts quality, then dimensions if needed. 1 MB = 1,000,000 bytes."
+                  : "Enter at least 0.001 MB."}
+              </p>
+            </fieldset>
+            <fieldset
+              disabled={mode !== "manual"}
+              aria-hidden={mode !== "manual"}
+              className={`grid content-start gap-3 [grid-area:1/1] ${mode !== "manual" ? "invisible" : ""}`}
+            >
+              <Field
+                label={
+                  format === "png"
+                    ? "Quality · lossless PNG"
+                    : `Quality · ${quality}`
+                }
+              >
+                <input
+                  id="image-quality"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={format === "png" ? 100 : quality}
+                  disabled={format === "png" || mode !== "manual"}
+                  onChange={(event) => setQuality(Number(event.target.value))}
+                  className="accent-toy-accent h-9 w-full disabled:opacity-40"
+                />
+              </Field>
+              <p className="text-toy-muted text-xs leading-relaxed">
+                Keeps original dimensions. PNG is lossless; other formats use
+                the selected quality.
+              </p>
+            </fieldset>
+          </div>
+          <p className="text-toy-muted text-xs">
+            JPEG fills transparent areas with white.
+          </p>
+        </div>
+        <details className="border-toy-line relative border-t pt-3 text-xs">
+          <summary className="text-toy-muted flex cursor-pointer items-center gap-2">
+            <ShieldCheck className="size-4" aria-hidden="true" />
+            Privacy & processing notes
+          </summary>
+          <div className="border-toy-line bg-background absolute right-0 left-0 z-20 mt-2 grid gap-2 rounded-md border p-3 leading-relaxed shadow-lg">
+            <p>
+              Local mode keeps images on your device. Remote mode uploads the
+              original, including camera metadata, for each update and processes
+              it in memory without file storage or history.
+            </p>
+            <p>
+              Remote uploads and downloads are limited to 4 MB, with a 20 MP
+              input limit. Use local mode for larger images.
+            </p>
+            <p>
+              Outputs omit camera metadata. Local and remote encoders may
+              produce different results. HEIC defaults to JPEG output.
+            </p>
+          </div>
+        </details>
+      </Card>
+
+      <ImagePreview
+        file={file}
+        settings={settings}
+        format={format}
+        location={location}
+        compression={compression}
+        onUseLocal={() => setLocation("local")}
+      />
+    </div>
+  );
+}
