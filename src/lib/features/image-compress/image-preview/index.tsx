@@ -2,6 +2,8 @@
 
 /* Object URLs keep local images out of the server optimizer. */
 /* eslint-disable @next/next/no-img-element */
+import { getImageCompressionError } from "@/i18n/image-compress-copy";
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { useEffect, useRef, useState } from "react";
 import { ArrowDownToLine, ImagePlus } from "lucide-react";
 import { Card } from "suica-ui/card";
@@ -32,6 +34,8 @@ export function ImagePreview({
   compression,
   onUseLocal,
 }: ImagePreviewProps) {
+  const { copy, locale } = useToolI18n();
+  const t = copy["image-compress"];
   const {
     source,
     result,
@@ -81,11 +85,9 @@ export function ImagePreview({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-toy-muted font-mono text-xs tracking-widest uppercase">
-            03 / Live preview
+            {t.livePreview}
           </p>
-          <p className="text-toy-muted mt-1 text-xs">
-            Updates automatically after you stop adjusting.
-          </p>
+          <p className="text-toy-muted mt-1 text-xs">{t.previewHint}</p>
         </div>
         <a
           href={result?.url}
@@ -95,7 +97,7 @@ export function ImagePreview({
           tabIndex={result ? 0 : -1}
           className={`text-sm underline ${!result ? "pointer-events-none opacity-40" : ""}`}
         >
-          Open full-size result
+          {t.fullSize}
         </a>
       </div>
       <div className="mb-3 flex h-12 items-center gap-3">
@@ -106,28 +108,28 @@ export function ImagePreview({
         >
           <span>
             {error
-              ? "Processing stopped. See details below."
+              ? t.stopped
               : !file
-                ? "Choose an image to get started."
+                ? t.getStarted
                 : !source
-                  ? "Reading image locally…"
+                  ? t.reading
                   : !settings
-                    ? "Check your settings to continue."
+                    ? t.checkSettings
                     : !result
                       ? location === "remote"
                         ? !remoteProgress
-                          ? "Waiting for your latest settings…"
+                          ? t.waiting
                           : remoteProgress.phase === "uploading"
-                            ? `Uploading${remoteProgress.percent === null ? "…" : ` · ${remoteProgress.percent}%`}`
+                            ? `${t.uploading}${remoteProgress.percent === null ? "…" : ` · ${remoteProgress.percent}%`}`
                             : remoteProgress.phase === "processing"
-                              ? "Converting on server…"
-                              : `Downloading${remoteProgress.percent === null ? "…" : ` · ${remoteProgress.percent}%`}`
+                              ? t.converting
+                              : `${t.downloading}${remoteProgress.percent === null ? "…" : ` · ${remoteProgress.percent}%`}`
                         : estimate === null
-                          ? "Processing locally · estimating time…"
-                          : `Estimated next pass: ${Math.max(1, Math.floor(estimate / 2))}–${Math.ceil(estimate * 1.5)} seconds`
+                          ? t.estimating
+                          : `${t.nextPass} ${Math.max(1, Math.floor(estimate / 2))}–${Math.ceil(estimate * 1.5)} ${t.seconds}`
                       : missedTarget
-                        ? "Target not reached. See details below."
-                        : `Ready · ${location === "remote" ? "server" : "local"} · ${result.elapsed.toFixed(1)} seconds`}
+                        ? t.targetMissed
+                        : `${t.ready} · ${location === "remote" ? t.server : t.local} · ${result.elapsed.toFixed(1)} ${t.seconds}`}
           </span>
         </div>
         <Button
@@ -136,7 +138,7 @@ export function ImagePreview({
           disabled={!pending && !error}
           className="min-w-20"
         >
-          {pending ? "Cancel" : error ? "Retry" : "Ready"}
+          {pending ? t.cancel : error ? t.retry : t.ready}
         </Button>
       </div>
       <div
@@ -144,7 +146,7 @@ export function ImagePreview({
         data-testid="image-preview-frame"
         className="border-toy-line relative flex items-center justify-center overflow-hidden rounded-lg border bg-[conic-gradient(#d9ddd8_25%,#f4f5f2_0_50%,#d9ddd8_0_75%,#f4f5f2_0)] bg-[length:20px_20px]"
         style={{ height: "clamp(240px, 55svh, 640px)" }}
-        aria-label="Image comparison preview"
+        aria-label={t.comparisonPreview}
         aria-busy={pending}
       >
         {source ? (
@@ -157,7 +159,7 @@ export function ImagePreview({
           >
             <img
               src={source.url}
-              alt="Original image"
+              alt={t.originalImage}
               className="block h-full w-full"
               draggable={false}
             />
@@ -169,7 +171,7 @@ export function ImagePreview({
                 >
                   <img
                     src={displayResult?.url ?? source.url}
-                    alt={displayResult ? "Converted image" : "Preparing output"}
+                    alt={displayResult ? t.convertedImage : t.preparing}
                     className={`h-full w-full ${styles.outputImage}`}
                     data-processing={pending}
                     data-location={location}
@@ -199,7 +201,7 @@ export function ImagePreview({
                 </div>
                 <input
                   type="range"
-                  aria-label="Compare original and converted image"
+                  aria-label={t.compare}
                   min="0"
                   max="100"
                   value={split}
@@ -214,7 +216,7 @@ export function ImagePreview({
         ) : (
           <div className="text-toy-muted bg-background/80 flex h-full w-full flex-col items-center justify-center gap-3">
             <ImagePlus className="size-10" strokeWidth={1} aria-hidden="true" />
-            <p className="text-sm">Your image, a little lighter.</p>
+            <p className="text-sm">{t.emptyPreview}</p>
           </div>
         )}
         {error || missedTarget ? (
@@ -223,8 +225,9 @@ export function ImagePreview({
             className="border-toy-line bg-background/95 absolute inset-x-3 bottom-3 z-10 rounded-md border p-3 text-sm shadow-sm"
           >
             <p>
-              {error ||
-                "Target not reached. Download the smallest result found, or increase the size limit."}
+              {error
+                ? getImageCompressionError(error, locale)
+                : t.targetMissedDetail}
             </p>
             {error && location === "remote" ? (
               <button
@@ -232,14 +235,18 @@ export function ImagePreview({
                 className="text-toy-accent mt-2 underline"
                 onClick={onUseLocal}
               >
-                Use on-device mode
+                {t.useLocal}
               </button>
             ) : null}
           </div>
         ) : null}
         {pending && location === "remote" && remoteProgress?.percent != null ? (
           <progress
-            aria-label={`${remoteProgress.phase === "uploading" ? "Upload" : "Download"} progress`}
+            aria-label={
+              remoteProgress.phase === "uploading"
+                ? t.uploadProgress
+                : t.downloadProgress
+            }
             value={remoteProgress.percent}
             max={100}
             className="accent-toy-accent absolute inset-x-0 bottom-0 z-10 h-1 w-full"
@@ -248,29 +255,29 @@ export function ImagePreview({
         {source && (displayResult || pending) ? (
           <>
             <span className="pointer-events-none absolute top-3 left-3 rounded bg-black/65 px-2 py-1 text-xs text-white">
-              Original
+              {t.original}
             </span>
             <span className="pointer-events-none absolute top-3 right-3 rounded bg-black/65 px-2 py-1 text-xs text-white">
-              {pending ? "Processing output" : "Result"}
+              {pending ? t.processingOutput : t.result}
             </span>
           </>
         ) : null}
       </div>
       <div className="my-3 grid gap-2 tabular-nums sm:grid-cols-3">
         <div className="grid grid-cols-[5rem_1fr] items-start gap-x-2 text-right sm:block sm:min-h-16 sm:text-left">
-          <p className="text-toy-muted text-xs">File size</p>
+          <p className="text-toy-muted text-xs">{t.fileSize}</p>
           <p className="mt-1 text-sm font-medium">
             {file ? formatBytes(file.size) : "—"} →{" "}
             {displayResult ? formatBytes(displayResult.blob.size) : "—"}
           </p>
           <p className="text-toy-muted col-start-2 mt-1 text-xs">
             {displayResult
-              ? `${Math.abs(savings).toFixed(1)}% ${savings >= 0 ? "smaller" : "larger"}`
-              : "Awaiting result"}
+              ? `${Math.abs(savings).toFixed(1)}% ${savings >= 0 ? t.smaller : t.larger}`
+              : t.awaiting}
           </p>
         </div>
         <div className="grid grid-cols-[5rem_1fr] items-start gap-x-2 text-right sm:block sm:min-h-16 sm:text-left">
-          <p className="text-toy-muted text-xs">Dimensions</p>
+          <p className="text-toy-muted text-xs">{t.dimensions}</p>
           <p className="mt-1 text-sm font-medium">
             {source ? `${source.bitmap.width} × ${source.bitmap.height}` : "—"}{" "}
             →{" "}
@@ -280,10 +287,10 @@ export function ImagePreview({
           </p>
         </div>
         <div className="grid grid-cols-[5rem_1fr] items-start gap-x-2 text-right sm:block sm:min-h-16 sm:text-left">
-          <p className="text-toy-muted text-xs">Output</p>
+          <p className="text-toy-muted text-xs">{t.output}</p>
           <p className="mt-1 text-sm font-medium">
             {displayResult
-              ? `${displayResult.settings.format.toUpperCase()} · ${displayResult.settings.format === "png" ? "Lossless" : `Quality ${displayResult.quality}`}`
+              ? `${displayResult.settings.format.toUpperCase()} · ${displayResult.settings.format === "png" ? t.lossless : `${t.quality} ${displayResult.quality}`}`
               : "—"}
           </p>
         </div>
@@ -296,7 +303,7 @@ export function ImagePreview({
         className={`bg-toy-accent inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-medium text-white focus-visible:outline-2 focus-visible:outline-offset-4 ${!result ? "pointer-events-none opacity-40" : ""}`}
       >
         <ArrowDownToLine className="size-4" aria-hidden="true" />
-        Download {format ? format.toUpperCase() : "image"}
+        {t.download} {format ? format.toUpperCase() : t.image}
       </a>
     </Card>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { useMemo, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { Card } from "suica-ui/card";
@@ -20,6 +21,8 @@ const selectClass =
   "border-toy-line bg-background w-full rounded-md border px-3 py-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toy-accent";
 
 export function ImageCompressTool() {
+  const { copy } = useToolI18n();
+  const t = copy["image-compress"];
   const [location, setLocation] = useState<ProcessingLocation>("local");
   const [file, setFile] = useState<File | null>(null);
   const [format, setFormat] = useState<ImageFormat | "">("");
@@ -45,20 +48,17 @@ export function ImageCompressTool() {
   const { source } = compression;
 
   return (
-    <div
-      className="mt-6 grid items-start gap-4 lg:grid-cols-[340px_minmax(0,1fr)]"
-      lang="en"
-    >
+    <div className="mt-6 grid items-start gap-4 lg:grid-cols-[340px_minmax(0,1fr)]">
       <Card className="grid gap-4 p-5">
         <fieldset className="grid gap-2">
           <legend className="mb-2 text-sm font-medium">
-            Processing location
+            {t.processingLocation}
           </legend>
           <div className="grid grid-cols-2 gap-2">
             {(
               [
-                ["local", "On device"],
-                ["remote", "Remote server"],
+                ["local", t.onDevice],
+                ["remote", t.remoteServer],
               ] as const
             ).map(([value, label]) => (
               <label
@@ -81,8 +81,7 @@ export function ImageCompressTool() {
             id="processing-note"
             className="text-toy-muted text-xs leading-relaxed"
           >
-            On device: no uploads. Remote: uploads each update, up to 4 MB and
-            20 MP.
+            {t.processingNote}
           </p>
         </fieldset>
         <ImageSourcePicker
@@ -97,9 +96,9 @@ export function ImageCompressTool() {
 
         <div className="border-toy-line grid gap-4 border-t pt-5">
           <p className="text-toy-muted font-mono text-xs tracking-widest uppercase">
-            02 / Output settings
+            {t.outputSettings}
           </p>
-          <Field label="Output format">
+          <Field label={t.outputFormat}>
             <select
               id="image-format"
               required
@@ -110,7 +109,7 @@ export function ImageCompressTool() {
               className={selectClass}
             >
               <option value="" disabled>
-                Choose a format
+                {t.chooseFormat}
               </option>
               <option value="jpeg">JPEG</option>
               <option value="webp">WebP</option>
@@ -118,12 +117,12 @@ export function ImageCompressTool() {
             </select>
           </Field>
           <fieldset className="grid gap-2">
-            <legend className="mb-2 text-sm font-medium">Mode</legend>
+            <legend className="mb-2 text-sm font-medium">{t.mode}</legend>
             <div className="grid grid-cols-2 gap-2">
               {(
                 [
-                  ["size", "Size priority"],
-                  ["manual", "Manual"],
+                  ["size", t.sizePriority],
+                  ["manual", t.manual],
                 ] as const
               ).map(([value, label]) => (
                 <label
@@ -149,7 +148,7 @@ export function ImageCompressTool() {
               aria-hidden={mode !== "size"}
               className={`grid content-start gap-3 [grid-area:1/1] ${mode !== "size" ? "invisible" : ""}`}
             >
-              <Field label="Maximum file size (MB)">
+              <Field label={t.maximumSize}>
                 <Input
                   id="image-target"
                   type="number"
@@ -166,9 +165,7 @@ export function ImageCompressTool() {
                 role={!validTarget ? "alert" : undefined}
                 className={`min-h-9 text-xs leading-relaxed ${validTarget ? "text-toy-muted" : "text-toy-error"}`}
               >
-                {validTarget
-                  ? "Adjusts quality, then dimensions if needed. 1 MB = 1,000,000 bytes."
-                  : "Enter at least 0.001 MB."}
+                {validTarget ? t.targetHint : t.targetError}
               </p>
             </fieldset>
             <fieldset
@@ -179,8 +176,8 @@ export function ImageCompressTool() {
               <Field
                 label={
                   format === "png"
-                    ? "Quality · lossless PNG"
-                    : `Quality · ${quality}`
+                    ? t.losslessQuality
+                    : `${t.quality} · ${quality}`
                 }
               >
                 <input
@@ -195,34 +192,21 @@ export function ImageCompressTool() {
                 />
               </Field>
               <p className="text-toy-muted text-xs leading-relaxed">
-                Keeps original dimensions. PNG is lossless; other formats use
-                the selected quality.
+                {t.manualHint}
               </p>
             </fieldset>
           </div>
-          <p className="text-toy-muted text-xs">
-            JPEG fills transparent areas with white.
-          </p>
+          <p className="text-toy-muted text-xs">{t.jpegHint}</p>
         </div>
         <details className="border-toy-line relative border-t pt-3 text-xs">
           <summary className="text-toy-muted flex cursor-pointer items-center gap-2">
             <ShieldCheck className="size-4" aria-hidden="true" />
-            Privacy & processing notes
+            {t.privacyNotes}
           </summary>
           <div className="border-toy-line bg-background absolute right-0 left-0 z-20 mt-2 grid gap-2 rounded-md border p-3 leading-relaxed shadow-lg">
-            <p>
-              Local mode keeps images on your device. Remote mode uploads the
-              original, including camera metadata, for each update and processes
-              it in memory without file storage or history.
-            </p>
-            <p>
-              Remote uploads and downloads are limited to 4 MB, with a 20 MP
-              input limit. Use local mode for larger images.
-            </p>
-            <p>
-              Outputs omit camera metadata. Local and remote encoders may
-              produce different results. HEIC defaults to JPEG output.
-            </p>
+            <p>{t.privacyDetail}</p>
+            <p>{t.remoteLimits}</p>
+            <p>{t.metadataNote}</p>
           </div>
         </details>
       </Card>

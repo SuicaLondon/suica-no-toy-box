@@ -1,5 +1,6 @@
 "use client";
 
+import { useToolI18n } from "@/i18n/tool-i18n";
 import { useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import {
@@ -23,14 +24,18 @@ export function ImageSourcePicker({
   location,
   onSelect,
 }: ImageSourcePickerProps) {
-  const [inputError, setInputError] = useState("");
+  const { copy } = useToolI18n();
+  const t = copy["image-compress"];
+  const [inputError, setInputError] = useState<
+    "oneImage" | "supportedImage" | "fileSizeError" | ""
+  >("");
   const [dragging, setDragging] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   function selectFile(files: FileList | File[] | null) {
     setInputError("");
     if (!files?.length) return;
     if (files.length !== 1) {
-      setInputError("Please choose one image at a time.");
+      setInputError("oneImage");
       return;
     }
     const nextFile = files[0];
@@ -38,11 +43,11 @@ export function ImageSourcePicker({
       !/\.(jpe?g|png|webp|heic|heif)$/i.test(nextFile.name) &&
       !/^image\/(jpeg|png|webp|heic|heif)$/.test(nextFile.type)
     ) {
-      setInputError("Choose a JPEG, PNG, WebP or HEIC image.");
+      setInputError("supportedImage");
       return;
     }
     if (!nextFile.size || nextFile.size > MAX_FILE_BYTES) {
-      setInputError("Choose a non-empty image no larger than 50 MB.");
+      setInputError("fileSizeError");
       return;
     }
     const mimeFormat = nextFile.type.toLowerCase().split("/")[1];
@@ -59,7 +64,7 @@ export function ImageSourcePicker({
   return (
     <div>
       <p className="text-toy-muted mb-3 font-mono text-xs tracking-widest uppercase">
-        01 / Source image
+        {t.sourceImage}
       </p>
       <button
         type="button"
@@ -78,19 +83,17 @@ export function ImageSourcePicker({
       >
         <ImagePlus className="text-toy-accent size-7" aria-hidden="true" />
         <span className="text-sm font-medium">
-          {file
-            ? "Drop or choose another image"
-            : "Drop an image or click to browse"}
+          {file ? t.replaceImage : t.dropImage}
         </span>
         <span className="text-toy-muted text-xs">
           JPEG, PNG, WebP, HEIC ·{" "}
-          {location === "remote" ? "Up to 4 MB remotely" : "Up to 50 MB"}
+          {location === "remote" ? t.remoteSize : t.localSize}
         </span>
       </button>
       <input
         ref={input}
         type="file"
-        aria-label="Choose an image"
+        aria-label={t.chooseImage}
         className="sr-only"
         tabIndex={-1}
         accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
@@ -112,7 +115,7 @@ export function ImageSourcePicker({
       ) : null}
       {inputError ? (
         <p role="alert" className="text-toy-error mt-3 text-sm">
-          {inputError}
+          {t[inputError]}
         </p>
       ) : null}
     </div>

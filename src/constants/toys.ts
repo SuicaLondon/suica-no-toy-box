@@ -56,10 +56,10 @@ export const apps = [
     href: "/duration",
   },
   {
-    title: { en: "Image Studio", zh: "Image Studio" },
+    title: { en: "Image Studio", zh: "圖片工作室" },
     description: {
       en: "Compress images locally or on our server.",
-      zh: "Compress images locally or on our server.",
+      zh: "在本機或伺服器上壓縮圖片。",
     },
     icon: ImageDown,
     href: "/image-compress",
