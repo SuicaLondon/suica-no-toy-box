@@ -15,6 +15,12 @@ import {
   type ProcessingLocation,
 } from "../compression";
 import type { useImageCompression } from "@/hooks/use-image-compression";
+import { cropRectangle } from "../crop";
+import {
+  useCropGestures,
+  zoomCrop,
+  type CropPosition,
+} from "./use-crop-gestures";
 import styles from "./image-preview.module.css";
 
 interface ImagePreviewProps {
@@ -24,6 +30,7 @@ interface ImagePreviewProps {
   location: ProcessingLocation;
   compression: ReturnType<typeof useImageCompression>;
   onUseLocal: () => void;
+  onReposition?: (position: CropPosition) => void;
 }
 
 export function ImagePreview({
@@ -33,6 +40,7 @@ export function ImagePreview({
   location,
   compression,
   onUseLocal,
+  onReposition,
 }: ImagePreviewProps) {
   const { copy, locale } = useToolI18n();
   const t = copy["image-compress"];
@@ -47,6 +55,7 @@ export function ImagePreview({
     retry,
   } = compression;
   const [split, setSplit] = useState(50);
+  const comparisonPointer = useRef<number | null>(null);
   const displayResult = result ?? previousResult;
   const previewFrame = useRef<HTMLDivElement>(null);
   const [frameSize, setFrameSize] = useState({ width: 0, height: 0 });
@@ -62,7 +71,60 @@ export function ImagePreview({
     observer.observe(frame);
     return () => observer.disconnect();
   }, []);
-  const aspectRatio = source ? source.bitmap.width / source.bitmap.height : 1;
+  const previewOutput = settings
+    ? settings.output
+    : displayResult?.settings.output;
+  const canReposition = Boolean(settings?.output && onReposition);
+  const gestures = useCropGestures(
+    source?.bitmap.width ?? 0,
+    source?.bitmap.height ?? 0,
+    settings?.output,
+    onReposition,
+  );
+  const changeZoom = (zoom: number) => {
+    if (source && settings?.output)
+      onReposition?.(
+        zoomCrop(
+          source.bitmap.width,
+          source.bitmap.height,
+          settings.output,
+          zoom,
+        ),
+      );
+  };
+  // Show the current crop immediately while its encoded result is being prepared.
+  const previewResult =
+    displayResult?.settings.output === previewOutput ? displayResult : null;
+  const reposition = (x: number, y: number) =>
+    onReposition?.({
+      x: Math.max(0, Math.min(1, x)),
+      y: Math.max(0, Math.min(1, y)),
+    });
+  const crop =
+    source && previewOutput
+      ? cropRectangle(source.bitmap.width, source.bitmap.height, previewOutput)
+      : null;
+  const isEnlarged = Boolean(
+    crop &&
+      previewOutput &&
+      (previewOutput.width > crop.width || previewOutput.height > crop.height),
+  );
+  const originalStyle =
+    crop && source
+      ? {
+          position: "absolute" as const,
+          maxWidth: "none",
+          width: `${(source.bitmap.width / crop.width) * 100}%`,
+          height: `${(source.bitmap.height / crop.height) * 100}%`,
+          left: `${(-crop.left / crop.width) * 100}%`,
+          top: `${(-crop.top / crop.height) * 100}%`,
+        }
+      : undefined;
+  const aspectRatio = previewOutput
+    ? previewOutput.width / previewOutput.height
+    : source
+      ? source.bitmap.width / source.bitmap.height
+      : 1;
   const previewWidth = Math.min(
     frameSize.width,
     frameSize.height * aspectRatio,
@@ -87,7 +149,11 @@ export function ImagePreview({
           <p className="text-toy-muted font-mono text-xs tracking-widest uppercase">
             {t.livePreview}
           </p>
-          <p className="text-toy-muted mt-1 text-xs">{t.previewHint}</p>
+          <p className="text-toy-muted mt-1 text-xs">
+            {canReposition
+              ? "Drag the divider to compare, or drag the image to reposition. Scroll or pinch to zoom. Arrow keys move the crop; + and - zoom."
+              : t.previewHint}
+          </p>
         </div>
         <a
           href={result?.url}
@@ -151,7 +217,50 @@ export function ImagePreview({
       >
         {source ? (
           <div
-            className="relative shrink-0"
+            className={`relative shrink-0 overflow-hidden ${canReposition ? "focus-visible:outline-toy-accent cursor-move touch-none select-none focus-visible:outline-2" : ""}`}
+            role={canReposition ? "group" : undefined}
+            aria-label={
+              canReposition ? "Reposition crop in preview" : undefined
+            }
+            tabIndex={canReposition ? 0 : undefined}
+            {...gestures}
+            onKeyDown={(event) => {
+              if (
+                canReposition &&
+                previewOutput &&
+                ["+", "=", "-"].includes(event.key)
+              ) {
+                event.preventDefault();
+                changeZoom(
+                  previewOutput.zoom * (event.key === "-" ? 1 / 1.1 : 1.1),
+                );
+                return;
+              }
+              if (
+                !canReposition ||
+                !previewOutput ||
+                !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(
+                  event.key,
+                )
+              )
+                return;
+              event.preventDefault();
+              const step = event.shiftKey ? 0.1 : 0.01;
+              reposition(
+                previewOutput.x +
+                  (event.key === "ArrowLeft"
+                    ? step
+                    : event.key === "ArrowRight"
+                      ? -step
+                      : 0),
+                previewOutput.y +
+                  (event.key === "ArrowUp"
+                    ? step
+                    : event.key === "ArrowDown"
+                      ? -step
+                      : 0),
+              );
+            }}
             style={{
               width: previewWidth,
               height: previewWidth / aspectRatio,
@@ -160,18 +269,20 @@ export function ImagePreview({
             <img
               src={source.url}
               alt={t.originalImage}
+              style={originalStyle}
               className="block h-full w-full"
               draggable={false}
             />
-            {displayResult || pending ? (
+            {previewResult || (pending && !canReposition) ? (
               <>
                 <div
                   className="absolute inset-0 bg-[conic-gradient(#d9ddd8_25%,#f4f5f2_0_50%,#d9ddd8_0_75%,#f4f5f2_0)] bg-[length:20px_20px]"
                   style={{ clipPath: `inset(0 0 0 ${split}%)` }}
                 >
                   <img
-                    src={displayResult?.url ?? source.url}
-                    alt={displayResult ? t.convertedImage : t.preparing}
+                    src={previewResult?.url ?? source.url}
+                    alt={previewResult ? t.convertedImage : t.preparing}
+                    style={previewResult ? undefined : originalStyle}
                     className={`h-full w-full ${styles.outputImage}`}
                     data-processing={pending}
                     data-location={location}
@@ -199,15 +310,97 @@ export function ImagePreview({
                     ↔
                   </span>
                 </div>
-                <input
-                  type="range"
-                  aria-label={t.compare}
-                  min="0"
-                  max="100"
-                  value={split}
-                  onChange={(event) => setSplit(Number(event.target.value))}
-                  className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:opacity-30"
-                />
+                {canReposition ? (
+                  <div
+                    role="slider"
+                    aria-label={t.compare}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(split)}
+                    aria-orientation="horizontal"
+                    tabIndex={0}
+                    className="focus-visible:outline-toy-accent absolute inset-y-0 z-10 w-11 -translate-x-1/2 cursor-ew-resize touch-none focus-visible:outline-2"
+                    style={{ left: `${split}%` }}
+                    onPointerDown={(event) => {
+                      event.stopPropagation();
+                      if (event.button !== 0) return;
+                      comparisonPointer.current = event.pointerId;
+                      event.currentTarget.setPointerCapture(event.pointerId);
+                    }}
+                    onPointerMove={(event) => {
+                      event.stopPropagation();
+                      if (comparisonPointer.current !== event.pointerId) return;
+                      const frame =
+                        event.currentTarget.parentElement?.getBoundingClientRect();
+                      if (frame?.width)
+                        setSplit(
+                          Math.max(
+                            0,
+                            Math.min(
+                              100,
+                              ((event.clientX - frame.left) / frame.width) *
+                                100,
+                            ),
+                          ),
+                        );
+                    }}
+                    onPointerUp={(event) => {
+                      event.stopPropagation();
+                      comparisonPointer.current = null;
+                    }}
+                    onPointerCancel={(event) => {
+                      event.stopPropagation();
+                      comparisonPointer.current = null;
+                    }}
+                    onLostPointerCapture={() => {
+                      comparisonPointer.current = null;
+                    }}
+                    onKeyDown={(event) => {
+                      event.stopPropagation();
+                      if (
+                        ![
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "ArrowUp",
+                          "ArrowDown",
+                          "Home",
+                          "End",
+                        ].includes(event.key)
+                      )
+                        return;
+                      event.preventDefault();
+                      const step = event.shiftKey ? 10 : 1;
+                      setSplit((value) =>
+                        event.key === "Home"
+                          ? 0
+                          : event.key === "End"
+                            ? 100
+                            : Math.max(
+                                0,
+                                Math.min(
+                                  100,
+                                  value +
+                                    (["ArrowRight", "ArrowUp"].includes(
+                                      event.key,
+                                    )
+                                      ? step
+                                      : -step),
+                                ),
+                              ),
+                      );
+                    }}
+                  />
+                ) : (
+                  <input
+                    type="range"
+                    aria-label={t.compare}
+                    min="0"
+                    max="100"
+                    value={split}
+                    onChange={(event) => setSplit(Number(event.target.value))}
+                    className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus-visible:opacity-30"
+                  />
+                )}
               </>
             ) : null}
           </div>
@@ -227,7 +420,9 @@ export function ImagePreview({
             <p>
               {error
                 ? getImageCompressionError(error, locale)
-                : t.targetMissedDetail}
+                : settings?.output
+                  ? "The size limit could not be reached at these fixed dimensions. Download the smallest result found, increase the limit, or choose another format."
+                  : t.targetMissedDetail}
             </p>
             {error && location === "remote" ? (
               <button
@@ -255,7 +450,7 @@ export function ImagePreview({
         {source && (displayResult || pending) ? (
           <>
             <span className="pointer-events-none absolute top-3 left-3 rounded bg-black/65 px-2 py-1 text-xs text-white">
-              {t.original}
+              {previewOutput ? "Original crop" : t.original}
             </span>
             <span className="pointer-events-none absolute top-3 right-3 rounded bg-black/65 px-2 py-1 text-xs text-white">
               {pending ? t.processingOutput : t.result}
@@ -263,6 +458,45 @@ export function ImagePreview({
           </>
         ) : null}
       </div>
+      {canReposition && previewOutput ? (
+        <div className="mt-3 grid gap-1">
+          <div className="text-toy-muted flex items-start justify-between gap-3 text-xs">
+            <label
+              htmlFor="preview-zoom"
+              className="w-24 shrink-0 tabular-nums"
+            >
+              Zoom · {previewOutput.zoom.toFixed(2)}×
+            </label>
+            <p
+              role="status"
+              aria-hidden={!isEnlarged}
+              className={`text-right ${isEnlarged ? "" : "invisible"}`}
+            >
+              This crop will be enlarged. The result may look blurry.
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <input
+              id="preview-zoom"
+              type="range"
+              aria-label="Zoom"
+              min="1"
+              max="10"
+              step="0.01"
+              value={previewOutput.zoom}
+              onChange={(event) => changeZoom(Number(event.target.value))}
+              className="accent-toy-accent min-w-0 flex-1"
+            />
+            <button
+              type="button"
+              className="text-toy-accent shrink-0 text-sm underline"
+              onClick={() => onReposition?.({ x: 0.5, y: 0.5, zoom: 1 })}
+            >
+              Reset crop
+            </button>
+          </div>
+        </div>
+      ) : null}
       <div className="my-3 grid gap-2 tabular-nums sm:grid-cols-3">
         <div className="grid grid-cols-[5rem_1fr] items-start gap-x-2 text-right sm:block sm:min-h-16 sm:text-left">
           <p className="text-toy-muted text-xs">{t.fileSize}</p>

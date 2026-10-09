@@ -101,3 +101,100 @@ describe("Image Studio localization", () => {
     expect(screen.getByRole("radio", { name: "本機處理" })).toBeChecked();
   });
 });
+
+describe("crop controls", () => {
+  function renderTool() {
+    render(
+      <ToolI18nProvider locale="en">
+        <ImageCompressTool />
+      </ToolI18nProvider>,
+    );
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "jpeg" },
+    });
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Set exact dimensions" }),
+    );
+  }
+
+  it("sends exact pixel dimensions and preserves physical size across units", () => {
+    renderTool();
+    expect(useImageCompression).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({
+        output: { width: 413, height: 531, ppi: 300, x: 0.5, y: 0.5, zoom: 1 },
+      }),
+      "local",
+    );
+    fireEvent.change(screen.getByLabelText("Size units"), {
+      target: { value: "cm" },
+    });
+    expect(screen.getByLabelText("Output width")).toHaveValue(3.5);
+    expect(screen.getByLabelText("Output height")).toHaveValue(4.5);
+    fireEvent.change(screen.getByLabelText("Resolution (PPI)"), {
+      target: { value: "600" },
+    });
+    expect(useImageCompression).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({
+        output: expect.objectContaining({ width: 827, height: 1063 }),
+      }),
+      "local",
+    );
+  });
+
+  it("pauses compression for invalid dimensions and restores ordinary compression when disabled", () => {
+    renderTool();
+    fireEvent.change(screen.getByLabelText("Output width"), {
+      target: { value: "" },
+    });
+    expect(useImageCompression).toHaveBeenLastCalledWith(null, null, "local");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Enter positive dimensions",
+    );
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Set exact dimensions" }),
+    );
+    const settings = vi.mocked(useImageCompression).mock.lastCall?.[1];
+    expect(settings).not.toBeNull();
+    expect(settings).not.toHaveProperty("output");
+  });
+
+  it("supports keyboard composition, zoom and reset with a small source", () => {
+    vi.mocked(useImageCompression).mockReturnValue({
+      ...useImageCompression(null, null),
+      source: {
+        file: new File(["image"], "image.png"),
+        url: "blob:source",
+        bitmap: { width: 100, height: 100 } as ImageBitmap,
+      },
+    });
+    renderTool();
+    expect(screen.getByText(/This crop will be enlarged/)).toBeInTheDocument();
+    fireEvent.keyDown(
+      screen.getByRole("group", { name: "Reposition crop in preview" }),
+      { key: "ArrowLeft" },
+    );
+    expect(useImageCompression).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({ output: expect.objectContaining({ x: 0.51 }) }),
+      "local",
+    );
+    fireEvent.change(screen.getByRole("slider", { name: "Zoom" }), {
+      target: { value: "2" },
+    });
+    expect(useImageCompression).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({ output: expect.objectContaining({ zoom: 2 }) }),
+      "local",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Reset crop" }));
+    expect(useImageCompression).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({
+        output: expect.objectContaining({ x: 0.5, y: 0.5, zoom: 1 }),
+      }),
+      "local",
+    );
+  });
+});

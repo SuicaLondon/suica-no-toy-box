@@ -6,6 +6,9 @@ import {
   type CompressionSettings,
 } from "./compression";
 
+import { cropRectangle } from "./crop";
+import { withResolution } from "./resolution";
+
 export class ImageRequestError extends Error {
   constructor(
     message: string,
@@ -45,6 +48,8 @@ export async function compressOnServer(
     }
   }
   checkActive();
+  if (settings.output)
+    checkDimensions(settings.output.width, settings.output.height);
   let pixels: Buffer;
   let width: number;
   let height: number;
@@ -105,17 +110,21 @@ export async function compressOnServer(
     );
   }
   checkActive();
+  const crop = settings.output
+    ? cropRectangle(width, height, settings.output)
+    : null;
   return compressImage(
     width,
     height,
     settings,
     async (outputWidth, outputHeight, quality) => {
       checkActive();
-      let pipeline = sharp(pixels, { raw: { width, height, channels } }).resize(
-        outputWidth,
-        outputHeight,
-        { fit: "fill", withoutEnlargement: true },
-      );
+      let pipeline = sharp(pixels, { raw: { width, height, channels } });
+      if (crop) pipeline = pipeline.extract(crop);
+      pipeline = pipeline.resize(outputWidth, outputHeight, {
+        fit: "fill",
+        withoutEnlargement: !settings.output,
+      });
       if (settings.format === "jpeg")
         pipeline = pipeline
           .flatten({ background: "#ffffff" })
@@ -129,9 +138,10 @@ export async function compressOnServer(
         })
         .toBuffer();
       checkActive();
-      return new Blob([new Uint8Array(output)], {
+      const blob = new Blob([new Uint8Array(output)], {
         type: `image/${settings.format}`,
       });
+      return settings.output ? withResolution(blob, settings.output) : blob;
     },
   );
 }
