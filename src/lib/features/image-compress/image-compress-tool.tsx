@@ -9,6 +9,8 @@ import { Field } from "suica-ui/field";
 import {
   type CompressionMode,
   MAX_IMAGE_DIMENSION,
+  MAX_PIXELS,
+  REMOTE_MAX_PIXELS,
   type CompressionSettings,
   type ImageFormat,
   type ProcessingLocation,
@@ -16,6 +18,8 @@ import {
 import { useImageCompression } from "@/hooks/use-image-compression";
 import { ImageSourcePicker } from "./image-source-picker";
 import { ImagePreview } from "./image-preview";
+
+import { CropControls, initialCrop, resolveOutput } from "./crop-controls";
 
 const selectClass =
   "border-toy-line bg-background w-full rounded-md border px-3 py-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-toy-accent";
@@ -29,11 +33,23 @@ export function ImageCompressTool() {
   const [mode, setMode] = useState<CompressionMode>("size");
   const [targetMB, setTargetMB] = useState("1");
   const [quality, setQuality] = useState(90);
+  const [crop, setCrop] = useState(initialCrop);
+  const maxOutputPixels =
+    location === "remote" ? REMOTE_MAX_PIXELS : MAX_PIXELS;
+  const output = useMemo(
+    () => resolveOutput(crop, maxOutputPixels),
+    [crop, maxOutputPixels],
+  );
   const validTarget =
     Number.isSafeInteger(Math.floor(Number(targetMB) * 1_000_000)) &&
     Number(targetMB) >= 0.001;
   const settings = useMemo<CompressionSettings | null>(() => {
-    if (!format || (mode === "size" && !validTarget)) return null;
+    if (
+      !format ||
+      (mode === "size" && !validTarget) ||
+      (crop.enabled && !output)
+    )
+      return null;
     return {
       format,
       mode,
@@ -42,8 +58,9 @@ export function ImageCompressTool() {
       quality,
       // The encoder clamps this limit to the source width without upscaling.
       width: MAX_IMAGE_DIMENSION,
+      ...(crop.enabled && output ? { output } : {}),
     };
-  }, [format, mode, validTarget, targetMB, quality]);
+  }, [format, mode, validTarget, targetMB, quality, crop.enabled, output]);
   const compression = useImageCompression(file, settings, location);
   const { source } = compression;
 
@@ -90,6 +107,7 @@ export function ImageCompressTool() {
           location={location}
           onSelect={(nextFile, nextFormat) => {
             setFile(nextFile);
+            setCrop((previous) => ({ ...previous, x: 0.5, y: 0.5, zoom: 1 }));
             setFormat(nextFormat);
           }}
         />
@@ -116,6 +134,12 @@ export function ImageCompressTool() {
               <option value="png">PNG</option>
             </select>
           </Field>
+          <CropControls
+            draft={crop}
+            onChange={setCrop}
+            output={output}
+            maxPixels={maxOutputPixels}
+          />
           <fieldset className="grid gap-2">
             <legend className="mb-2 text-sm font-medium">{t.mode}</legend>
             <div className="grid grid-cols-2 gap-2">
@@ -165,7 +189,11 @@ export function ImageCompressTool() {
                 role={!validTarget ? "alert" : undefined}
                 className={`min-h-9 text-xs leading-relaxed ${validTarget ? "text-toy-muted" : "text-toy-error"}`}
               >
-                {validTarget ? t.targetHint : t.targetError}
+                {validTarget
+                  ? crop.enabled
+                    ? "Adjusts quality only. Output dimensions stay fixed; PNG remains lossless. 1 MB = 1,000,000 bytes."
+                    : t.targetHint
+                  : t.targetError}
               </p>
             </fieldset>
             <fieldset
@@ -192,7 +220,9 @@ export function ImageCompressTool() {
                 />
               </Field>
               <p className="text-toy-muted text-xs leading-relaxed">
-                {t.manualHint}
+                {crop.enabled
+                  ? "Uses the selected output dimensions and quality. PNG remains lossless."
+                  : t.manualHint}
               </p>
             </fieldset>
           </div>
@@ -211,14 +241,19 @@ export function ImageCompressTool() {
         </details>
       </Card>
 
-      <ImagePreview
-        file={file}
-        settings={settings}
-        format={format}
-        location={location}
-        compression={compression}
-        onUseLocal={() => setLocation("local")}
-      />
+      <div className="grid min-w-0 gap-4">
+        <ImagePreview
+          file={file}
+          settings={settings}
+          format={format}
+          location={location}
+          compression={compression}
+          onUseLocal={() => setLocation("local")}
+          onReposition={(position) =>
+            setCrop((previous) => ({ ...previous, ...position }))
+          }
+        />
+      </div>
     </div>
   );
 }

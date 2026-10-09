@@ -49,8 +49,8 @@ export function validateSettings(settings: CompressionSettings) {
 }
 
 // Search actual encoded bytes, since quality values do not predict file size.
-// Preserve dimensions first, then try smaller versions. Keep the smallest
-// candidate even when the bounded search cannot meet the requested limit.
+// Preserve dimensions first; only allow resizing when output size is not fixed.
+// Keep the smallest candidate when the bounded search cannot meet the limit.
 export async function compressImage(
   originalWidth: number,
   originalHeight: number,
@@ -58,11 +58,13 @@ export async function compressImage(
   encode: EncodeImage,
 ): Promise<EncodedImage> {
   validateSettings(settings);
-  const initial = dimensionsAtWidth(
-    settings.mode === "manual" ? settings.width : originalWidth,
-    originalWidth,
-    originalHeight,
-  );
+  const initial =
+    settings.output ??
+    dimensionsAtWidth(
+      settings.mode === "manual" ? settings.width : originalWidth,
+      originalWidth,
+      originalHeight,
+    );
   const attempt = async (width: number, height: number, quality: number) => ({
     blob: await encode(width, height, quality),
     width,
@@ -79,21 +81,28 @@ export async function compressImage(
 
   let width = initial.width;
   let best: EncodedImage | undefined;
-  for (let resize = 0; resize < 12; resize++) {
-    const dimensions = dimensionsAtWidth(width, originalWidth, originalHeight);
+  for (let resize = 0; resize < (settings.output ? 1 : 12); resize++) {
+    const dimensions =
+      settings.output ??
+      dimensionsAtWidth(width, originalWidth, originalHeight);
     const high = await attempt(dimensions.width, dimensions.height, 100);
     if (!best || high.blob.size < best.blob.size) best = high;
     if (high.blob.size <= settings.targetBytes) return high;
 
     let small = high;
     if (settings.format !== "png") {
-      small = await attempt(dimensions.width, dimensions.height, 35);
+      const minimumQuality = settings.output ? 1 : 35;
+      small = await attempt(
+        dimensions.width,
+        dimensions.height,
+        minimumQuality,
+      );
       if (small.blob.size < best.blob.size) best = small;
       if (small.blob.size <= settings.targetBytes) {
         let fit = small;
-        let lowQuality = 35;
+        let lowQuality = minimumQuality;
         let highQuality = 100;
-        for (let step = 0; step < 6; step++) {
+        for (let step = 0; step < 7 && highQuality - lowQuality > 1; step++) {
           const quality = Math.floor((lowQuality + highQuality) / 2);
           const candidate = await attempt(
             dimensions.width,

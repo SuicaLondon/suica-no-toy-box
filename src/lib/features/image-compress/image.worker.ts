@@ -6,6 +6,9 @@ import {
   type EncodedImage,
 } from "./compression";
 
+import { cropRectangle } from "./crop";
+import { withResolution } from "./resolution";
+
 export type WorkerRequest =
   | { kind: "decode"; file: File }
   | { kind: "compress"; bitmap: ImageBitmap; settings: CompressionSettings };
@@ -73,6 +76,9 @@ async function decode(file: File) {
 
 async function compress(bitmap: ImageBitmap, settings: CompressionSettings) {
   const start = performance.now();
+  const crop = settings.output
+    ? cropRectangle(bitmap.width, bitmap.height, settings.output)
+    : { left: 0, top: 0, width: bitmap.width, height: bitmap.height };
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context)
@@ -145,7 +151,17 @@ async function compress(bitmap: ImageBitmap, settings: CompressionSettings) {
           }
           context.imageSmoothingEnabled = true;
           context.imageSmoothingQuality = "high";
-          context.drawImage(bitmap, 0, 0, width, height);
+          context.drawImage(
+            bitmap,
+            crop.left,
+            crop.top,
+            crop.width,
+            crop.height,
+            0,
+            0,
+            width,
+            height,
+          );
           pixels = context.getImageData(0, 0, width, height);
           currentWidth = width;
           currentHeight = height;
@@ -164,7 +180,8 @@ async function compress(bitmap: ImageBitmap, settings: CompressionSettings) {
               (settings.mode === "size" ? 8 : 1),
           ),
         });
-        return new Blob([buffer], { type: `image/${settings.format}` });
+        const blob = new Blob([buffer], { type: `image/${settings.format}` });
+        return settings.output ? withResolution(blob, settings.output) : blob;
       },
     );
     send({
