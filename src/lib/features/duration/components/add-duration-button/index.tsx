@@ -30,17 +30,17 @@ import { DurationWidget } from "../../type/duration.type";
 import { DateCalendar } from "../date-calendar";
 
 export const AddDurationButton = memo(function AddDurationButton() {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const addWidget = useDurationStore((state) => state.addWidget);
   const [open, setOpen] = useState(false);
   const schema = useMemo(
     () =>
       createAddDurationFormSchema({
-        nameRequired: durationCopy.nameRequired,
-        dateRequired: durationCopy.dateRequired,
+        nameRequired: durationMessages.nameRequired,
+        dateRequired: durationMessages.dateRequired,
       }),
-    [durationCopy.dateRequired, durationCopy.nameRequired],
+    [durationMessages.dateRequired, durationMessages.nameRequired],
   );
   type FormValues = z.infer<typeof schema>;
 
@@ -65,18 +65,18 @@ export const AddDurationButton = memo(function AddDurationButton() {
         )}
       >
         <Plus aria-hidden="true" />
-        {durationCopy.addDate}
+        {durationMessages.addDate}
       </DialogTrigger>
       <DialogContent
         className="max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto p-6 font-sans max-[640px]:p-5"
-        closeLabel={copy.common.close}
+        closeLabel={messages.common.close}
       >
         <DialogHeader>
           <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
-            {durationCopy.addTitle}
+            {durationMessages.addTitle}
           </DialogTitle>
           <DialogDescription className="text-toy-muted leading-[1.55]">
-            {durationCopy.emptyDescription}
+            {durationMessages.emptyDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -89,13 +89,13 @@ export const AddDurationButton = memo(function AddDurationButton() {
             name="name"
             render={({ field, fieldState }) => (
               <Field
-                label={durationCopy.nameLabel}
+                label={durationMessages.nameLabel}
                 error={fieldState.error?.message}
               >
                 <Input
                   {...field}
                   className="min-h-12 w-full px-3.5"
-                  placeholder={durationCopy.namePlaceholder}
+                  placeholder={durationMessages.namePlaceholder}
                   autoComplete="off"
                 />
               </Field>
@@ -111,7 +111,7 @@ export const AddDurationButton = memo(function AddDurationButton() {
             type="submit"
             className="min-h-11 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
           >
-            {durationCopy.addDate}
+            {durationMessages.addDate}
           </Button>
         </form>
       </DialogContent>

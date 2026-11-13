@@ -48,15 +48,15 @@ export const EditDurationDialog = memo(function EditDurationDialog({
   type,
   repeat,
 }: EditDurationDialogProps) {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const schema = useMemo(
     () =>
       createDurationFormSchema({
-        nameRequired: durationCopy.nameRequired,
-        dateRequired: durationCopy.dateRequired,
+        nameRequired: durationMessages.nameRequired,
+        dateRequired: durationMessages.dateRequired,
       }),
-    [durationCopy.dateRequired, durationCopy.nameRequired],
+    [durationMessages.dateRequired, durationMessages.nameRequired],
   );
   const form = useForm<DurationFormValues>({
     resolver: zodResolver(schema),
@@ -87,14 +87,14 @@ export const EditDurationDialog = memo(function EditDurationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto p-6 font-sans max-[640px]:p-5"
-        closeLabel={copy.common.close}
+        closeLabel={messages.common.close}
       >
         <DialogHeader>
           <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
-            {durationCopy.editTitle}
+            {durationMessages.editTitle}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            {durationCopy.editTitle}
+            {durationMessages.editTitle}
           </DialogDescription>
         </DialogHeader>
 
@@ -107,13 +107,13 @@ export const EditDurationDialog = memo(function EditDurationDialog({
             name="name"
             render={({ field, fieldState }) => (
               <Field
-                label={durationCopy.nameLabel}
+                label={durationMessages.nameLabel}
                 error={fieldState.error?.message}
               >
                 <Input
                   {...field}
                   className="min-h-12 w-full px-3.5"
-                  placeholder={durationCopy.namePlaceholder}
+                  placeholder={durationMessages.namePlaceholder}
                   autoComplete="off"
                 />
               </Field>
@@ -152,13 +152,13 @@ export const EditDurationDialog = memo(function EditDurationDialog({
                 />
               )}
             >
-              {durationCopy.cancelAction}
+              {durationMessages.cancelAction}
             </DialogClose>
             <Button
               type="submit"
               className="min-h-11 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
             >
-              {durationCopy.saveAction}
+              {durationMessages.saveAction}
             </Button>
           </div>
         </form>

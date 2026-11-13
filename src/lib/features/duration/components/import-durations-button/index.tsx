@@ -20,8 +20,8 @@ import { toast } from "sonner";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const ImportDurationsButton = memo(function ImportDurationsButton() {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const importWidgetsFromText = useDurationStore(
     (state) => state.importWidgetsFromText,
   );
@@ -41,18 +41,18 @@ export const ImportDurationsButton = memo(function ImportDurationsButton() {
         )}
       >
         <Download aria-hidden="true" />
-        {durationCopy.importDates}
+        {durationMessages.importDates}
       </DialogTrigger>
       <DialogContent
         className="max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto p-6 font-sans max-[640px]:p-5"
-        closeLabel={copy.common.close}
+        closeLabel={messages.common.close}
       >
         <DialogHeader>
           <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
-            {durationCopy.importTitle}
+            {durationMessages.importTitle}
           </DialogTitle>
           <DialogDescription className="text-toy-muted leading-[1.55]">
-            {durationCopy.importDescription}
+            {durationMessages.importDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -61,13 +61,13 @@ export const ImportDurationsButton = memo(function ImportDurationsButton() {
             className="text-toy-muted font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase"
             htmlFor="duration-import"
           >
-            {durationCopy.importLabel}
+            {durationMessages.importLabel}
           </Label>
           <Textarea
             id="duration-import"
             value={importText}
             onChange={(event) => setImportText(event.target.value)}
-            placeholder={durationCopy.importPlaceholder}
+            placeholder={durationMessages.importPlaceholder}
             className="max-h-[42svh] min-h-[180px] w-full resize-y p-4 pr-12 font-mono text-[0.8125rem] leading-[1.55]"
             autoFocus
           />
@@ -83,14 +83,14 @@ export const ImportDurationsButton = memo(function ImportDurationsButton() {
                 />
               )}
             >
-              {durationCopy.cancelAction}
+              {durationMessages.cancelAction}
             </DialogClose>
             <Button
               type="submit"
               className="min-h-11 font-mono text-xs tracking-[0.08em] uppercase max-[520px]:w-full"
               disabled={!importText.trim()}
             >
-              {durationCopy.importAction}
+              {durationMessages.importAction}
             </Button>
           </div>
         </form>
@@ -105,18 +105,18 @@ export const ImportDurationsButton = memo(function ImportDurationsButton() {
       const result = importWidgetsFromText(importText);
 
       if (result.status === "exists") {
-        toast.error(durationCopy.someAlreadyExist);
+        toast.error(durationMessages.someAlreadyExist);
         return;
       }
 
-      toast.success(durationCopy.imported);
+      toast.success(durationMessages.imported);
       if (result.skipped > 0) {
-        toast.warning(durationCopy.someAlreadyExist);
+        toast.warning(durationMessages.someAlreadyExist);
       }
       setImportText("");
       setOpen(false);
     } catch {
-      toast.error(durationCopy.importFailed);
+      toast.error(durationMessages.importFailed);
     }
   }
 });

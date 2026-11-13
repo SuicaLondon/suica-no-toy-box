@@ -11,7 +11,7 @@ export const RepeatSelect = memo(function RepeatSelect({
 }: {
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
 }) {
-  const { copy } = useToolI18n();
+  const { messages } = useToolI18n();
   const selectedType = useWatch({ control: form.control, name: "type" });
   return (
     <Controller
@@ -19,7 +19,7 @@ export const RepeatSelect = memo(function RepeatSelect({
       name="repeat"
       render={({ field, fieldState }) => (
         <Field
-          label={copy.duration.repeatLabel}
+          label={messages.duration.repeatLabel}
           error={fieldState.error?.message}
         >
           <Select
@@ -32,11 +32,11 @@ export const RepeatSelect = memo(function RepeatSelect({
             }}
           >
             <option value="" disabled>
-              {copy.duration.repeatPlaceholder}
+              {messages.duration.repeatPlaceholder}
             </option>
             {repeatOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {copy.duration.repeatOptions[option.value]}
+                {messages.duration.repeatOptions[option.value]}
               </option>
             ))}
           </Select>

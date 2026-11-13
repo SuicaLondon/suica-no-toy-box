@@ -1,14 +1,14 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ToolI18nProvider } from "@/i18n/tool-i18n";
-import { useImageCompression } from "@/hooks/use-image-compression";
+import { useImageCompression } from "./hooks/use-image-compression";
 import { ImageCompressTool } from "./image-compress-tool";
 
-vi.mock("./image-preview/image-preview.module.css", () => ({
+vi.mock("./components/image-preview/image-preview.module.css", () => ({
   default: { outputImage: "outputImage", loading: "loading" },
 }));
 
-vi.mock("@/hooks/use-image-compression", () => ({
+vi.mock("./hooks/use-image-compression", () => ({
   useImageCompression: vi.fn(),
 }));
 

@@ -22,21 +22,21 @@ export function DeleteDurationDialog({
   setOpen,
   widget,
 }: DeleteDurationDialogProps) {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const deleteWidget = useDurationStore((state) => state.deleteWidget);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         className="max-h-[calc(100svh_-_32px)] w-[min(540px,calc(100%_-_32px))] gap-[22px] overflow-y-auto p-6 font-sans max-[640px]:p-5"
-        closeLabel={copy.common.close}
+        closeLabel={messages.common.close}
       >
         <DialogTitle className="text-[1.375rem] tracking-[-0.025em]">
-          {durationCopy.deleteTitle}
+          {durationMessages.deleteTitle}
         </DialogTitle>
         <DialogDescription className="text-toy-muted leading-[1.55]">
-          {durationCopy.deleteDescription}
+          {durationMessages.deleteDescription}
         </DialogDescription>
         <DialogFooter>
           <DialogClose
@@ -49,7 +49,7 @@ export function DeleteDurationDialog({
               />
             )}
           >
-            {durationCopy.cancelAction}
+            {durationMessages.cancelAction}
           </DialogClose>
           <Button
             type="button"
@@ -59,7 +59,7 @@ export function DeleteDurationDialog({
               setOpen(false);
             }}
           >
-            {durationCopy.deleteAction}
+            {durationMessages.deleteAction}
           </Button>
         </DialogFooter>
       </DialogContent>

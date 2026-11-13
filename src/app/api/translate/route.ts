@@ -3,45 +3,35 @@ import {
   SYSTEM_PROMPT,
 } from "@/lib/prompts/translate-prompt";
 import { translateRequestSchema } from "@/schemas/translate";
+import { errorResponse } from "@/utils/http";
+import { tryCatch, tryCatchAsync } from "@/utils/try-catch";
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
-import { NextResponse } from "next/server";
-import { z } from "zod";
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { sourceText, sourceLang, targetLang } =
-      translateRequestSchema.parse(body);
+  const { data: json } = await tryCatchAsync(() => request.json());
+  const parsed = translateRequestSchema.safeParse(json);
+  if (!parsed.success) return errorResponse("Invalid request data", 400);
+  const { sourceText, sourceLang, targetLang } = parsed.data;
 
-    const { textStream } = streamText({
-      model: openai("gpt-4o"),
+  const translation = tryCatch(() =>
+    streamText({
+      // A reasoning model: it takes no penalties, and its reasoning counts
+      // towards maxOutputTokens.
+      model: openai.responses("gpt-6-luna"),
       system: SYSTEM_PROMPT,
       messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT,
-        },
         {
           role: "user",
           content: createTranslationPrompt(sourceLang, targetLang, sourceText),
         },
       ],
-      maxTokens: 4000,
-      presencePenalty: -0.1,
-      frequencyPenalty: 0.1,
-    });
-
-    return new Response(textStream);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid request data" },
-        { status: 400 },
-      );
-    }
-
-    console.error("Translation error:", error);
-    return NextResponse.json({ error: "Translation failed" }, { status: 500 });
+      maxOutputTokens: 4000,
+    }),
+  );
+  if (translation.error) {
+    console.error("Translation error:", translation.error);
+    return errorResponse("Translation failed", 500);
   }
+  return new Response(translation.data.textStream);
 }

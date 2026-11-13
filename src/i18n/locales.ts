@@ -6,6 +6,12 @@ export function isLocale(value: string): value is Locale {
   return value === "en" || value === "zh";
 }
 
+/** Each language by its own name, the same on every page. */
+export const LOCALE_NAMES: Record<Locale, string> = {
+  en: "English",
+  zh: "中文",
+};
+
 export function getAlternateLocale(locale: Locale): Locale {
   return locale === "en" ? "zh" : "en";
 }

@@ -12,9 +12,9 @@ export const TypeLabel = memo(function TypeLabel({
   type,
   repeat,
 }: TypeLabelProps) {
-  const { copy } = useToolI18n();
-  const typeLabel = copy.duration.typeOptions[type ?? "none"];
-  const repeatLabel = copy.duration.repeatOptions[repeat ?? "never"];
+  const { messages } = useToolI18n();
+  const typeLabel = messages.duration.typeOptions[type ?? "none"];
+  const repeatLabel = messages.duration.repeatOptions[repeat ?? "never"];
   const tagClassName =
     "border-toy-accent/20 bg-toy-accent/10 text-toy-accent rounded-full px-3 py-1 font-sans text-sm leading-relaxed font-medium whitespace-nowrap";
 

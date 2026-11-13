@@ -4,11 +4,12 @@ import {
   type Locale,
 } from "@/i18n/locales";
 import { ToolI18nProvider } from "@/i18n/tool-i18n";
-import { toolCopy, type ToolKey } from "@/i18n/tool-copy";
+import { toolMessages, type ToolKey } from "@/i18n/tool-messages";
 import { cn } from "@/utils/cn";
 import {
   BriefcaseBusiness,
   CalendarDays,
+  Flame,
   Languages,
   ImageDown,
   Utensils,
@@ -23,6 +24,7 @@ const toolIcons = {
   dinner: Utensils,
   duration: CalendarDays,
   "image-compress": ImageDown,
+  "grill-restaurant": Flame,
 } as const;
 
 interface ToolShellProps {
@@ -38,7 +40,7 @@ export function ToolShell({
   languageHref,
   children,
 }: ToolShellProps) {
-  const content = toolCopy[locale][tool];
+  const content = toolMessages[locale][tool];
   const Icon = toolIcons[tool];
   const nextLocale = getAlternateLocale(locale);
 

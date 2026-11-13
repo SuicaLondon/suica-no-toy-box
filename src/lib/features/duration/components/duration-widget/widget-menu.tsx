@@ -20,8 +20,8 @@ interface WidgetMenuProps {
 export const WidgetMenu = memo(function WidgetMenu({
   widget,
 }: WidgetMenuProps) {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const [activeDialog, setActiveDialog] = useState<"delete" | "edit" | null>(
     null,
   );
@@ -38,8 +38,8 @@ export const WidgetMenu = memo(function WidgetMenu({
               type="button"
               size="icon"
               className="size-10 min-h-10 shrink-0 p-0 font-mono text-xs tracking-[0.08em] uppercase"
-              aria-label={durationCopy.menuLabel(widget.name)}
-              title={durationCopy.menuLabel(widget.name)}
+              aria-label={durationMessages.menuLabel(widget.name)}
+              title={durationMessages.menuLabel(widget.name)}
             />
           )}
         >
@@ -54,19 +54,19 @@ export const WidgetMenu = memo(function WidgetMenu({
             data-variant="destructive"
             onSelect={() => setActiveDialog("delete")}
           >
-            {durationCopy.deleteMenu}
+            {durationMessages.deleteMenu}
           </DropdownMenuItem>
           <DropdownMenuItem
             className="min-h-[38px] cursor-pointer"
             onSelect={() => setActiveDialog("edit")}
           >
-            {durationCopy.editMenu}
+            {durationMessages.editMenu}
           </DropdownMenuItem>
           <DropdownMenuItem
             className="min-h-[38px] cursor-pointer"
             onSelect={() => void handleCopy()}
           >
-            {durationCopy.copyMenu}
+            {durationMessages.copyMenu}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -90,9 +90,9 @@ export const WidgetMenu = memo(function WidgetMenu({
   async function handleCopy() {
     try {
       await copyWidget(widget);
-      toast.success(durationCopy.copiedOne);
+      toast.success(durationMessages.copiedOne);
     } catch {
-      toast.error(durationCopy.copyFailed);
+      toast.error(durationMessages.copyFailed);
     }
   }
 });
