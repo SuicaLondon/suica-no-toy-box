@@ -10,7 +10,9 @@ import { errorResponse, isSameOrigin } from "@/utils/http";
 import { tryCatch, tryCatchAsync } from "@/utils/try-catch";
 
 export const runtime = "nodejs";
-// A check takes one to two minutes.
+// A check takes one to two minutes. Vercel's Hobby plan allows 300 s only
+// with Fluid compute, which vercel.json turns on; without it the limit is
+// 60 s and the deployment fails.
 export const maxDuration = 300;
 
 export async function POST(request: Request) {

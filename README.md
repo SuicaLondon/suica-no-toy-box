@@ -76,6 +76,16 @@ pnpm dev
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Deploying
+
+The site runs on Vercel with Node 22, which `package.json` pins (the AI SDK
+needs it). `vercel.json` turns on Fluid compute: without it, the Hobby plan
+stops functions at 60 s, and a Grill Restaurant check is allowed up to 300 s.
+Set the environment variables above in the Vercel project, plus `DATABASE_URL`
+for Sponsor Me. On any public deployment, previews included, set
+`GRILL_RESTAURANT_ACCESS_CODE`: every check costs money, and nothing else stops
+a stranger from starting one.
+
 ## UI migration
 
 Development writes to `.next-dev`, while production builds and `pnpm start` use
