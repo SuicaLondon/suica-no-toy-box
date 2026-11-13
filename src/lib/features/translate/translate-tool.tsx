@@ -27,8 +27,8 @@ import {
 } from "@/utils/language-preferences";
 
 export function TranslateTool() {
-  const { locale, copy } = useToolI18n();
-  const content = copy.translate;
+  const { locale, messages } = useToolI18n();
+  const content = messages.translate;
   const form = useForm<TranslateFormValues>({
     resolver: zodResolver(translateFormSchema),
     defaultValues: {
@@ -190,7 +190,7 @@ export function TranslateTool() {
         >
           {isPending ? (
             <Spinner
-              label={copy.common.loading}
+              label={messages.common.loading}
               className="size-[18px] shrink-0 motion-reduce:animate-none"
               aria-hidden="true"
             />

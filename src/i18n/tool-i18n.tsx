@@ -1,12 +1,12 @@
 "use client";
 
 import type { Locale } from "./locales";
-import { toolCopy } from "./tool-copy";
+import { toolMessages } from "./tool-messages";
 import { createContext, type ReactNode, useContext } from "react";
 
 const contextValues = {
-  en: { locale: "en", copy: toolCopy.en },
-  zh: { locale: "zh", copy: toolCopy.zh },
+  en: { locale: "en", messages: toolMessages.en },
+  zh: { locale: "zh", messages: toolMessages.zh },
 } as const;
 
 type ToolI18nContextValue = (typeof contextValues)[Locale];

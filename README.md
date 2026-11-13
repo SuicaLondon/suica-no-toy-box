@@ -10,6 +10,8 @@ You can access it from the [link](https://suica-no-toy-box.vercel.app/)
 - **Sponsor Me**: Search for sponsorships for the company you want to apply to in the UK
 - **What for dinner?**: Decide what to eat for dinner
 - **Duration Board**: A board for tracking important dates to make your life have hope
+- **Image Studio**: Compress and convert images on your device or on the server
+- **Grill Restaurant**: Paste a Google Maps link and get a go, maybe or skip verdict on whether it is worth the trip, checked against its Google Maps reviews, other review sites and the MICHELIN Guide
 
 ## Tech Stack
 
@@ -47,6 +49,25 @@ pnpm install
 OPENAI_API_KEY=your_api_key_here
 ```
 
+Grill Restaurant also needs a Gemini key, and takes a few optional settings:
+
+```
+GEMINI_API_KEY=your_gemini_key_here
+# Optional: models (defaults: gemini-3.8-flash, gpt-6-luna, gpt-6-luna)
+GEMINI_MODEL=
+OPENAI_MODEL=
+SUMMARY_MODEL=            # verdict and translation: OpenAI, gemini-… or claude-… (needs ANTHROPIC_API_KEY)
+# Optional: require a code before anyone can start a paid run
+GRILL_RESTAURANT_ACCESS_CODE=
+```
+
+Each Grill Restaurant run costs roughly $0.15 to $0.45 in API fees. The same
+check runs from the terminal and prints each source's full result:
+
+```bash
+pnpm grill-restaurant "https://maps.app.goo.gl/…"
+```
+
 4. Run the development server:
 
 ```bash
@@ -54,6 +75,16 @@ pnpm dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Deploying
+
+The site runs on Vercel with Node 22, which `package.json` pins (the AI SDK
+needs it). `vercel.json` turns on Fluid compute: without it, the Hobby plan
+stops functions at 60 s, and a Grill Restaurant check is allowed up to 300 s.
+Set the environment variables above in the Vercel project, plus `DATABASE_URL`
+for Sponsor Me. On any public deployment, previews included, set
+`GRILL_RESTAURANT_ACCESS_CODE`: every check costs money, and nothing else stops
+a stranger from starting one.
 
 ## UI migration
 

@@ -1,6 +1,7 @@
 import {
   BriefcaseBusiness,
   CalendarDays,
+  Flame,
   Languages,
   ImageDown,
   Utensils,
@@ -63,5 +64,14 @@ export const apps = [
     },
     icon: ImageDown,
     href: "/image-compress",
+  },
+  {
+    title: { en: "Grill Restaurant", zh: "Grill Restaurant" },
+    description: {
+      en: "Find out if a restaurant is worth the trip, or just hype.",
+      zh: "看一家餐廳是實至名歸，還是名過其實。",
+    },
+    icon: Flame,
+    href: "/grill-restaurant",
   },
 ] as const;

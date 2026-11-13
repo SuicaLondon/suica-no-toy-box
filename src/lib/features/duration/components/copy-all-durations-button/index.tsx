@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const CopyAllDurationsButton = memo(function CopyAllDurationsButton() {
-  const { copy } = useToolI18n();
+  const { messages } = useToolI18n();
   const copyAllWidgets = useDurationStore((state) => state.copyAllWidgets);
   const widgetCount = useDurationStore((state) => state.widgets.length);
 
@@ -19,16 +19,16 @@ export const CopyAllDurationsButton = memo(function CopyAllDurationsButton() {
       disabled={widgetCount === 0}
     >
       <Copy aria-hidden="true" />
-      {copy.duration.copyDates}
+      {messages.duration.copyDates}
     </Button>
   );
 
   async function handleCopy() {
     try {
       const count = await copyAllWidgets();
-      toast.success(copy.duration.copiedMany(count));
+      toast.success(messages.duration.copiedMany(count));
     } catch {
-      toast.error(copy.duration.copyFailed);
+      toast.error(messages.duration.copyFailed);
     }
   }
 });

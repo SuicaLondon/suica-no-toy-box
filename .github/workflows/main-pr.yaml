@@ -16,7 +16,8 @@ permissions:
   pull-requests: write
 
 env:
-  NODE_VERSION: "20"
+  # The AI SDK needs Node 22; package.json pins it for Vercel too.
+  NODE_VERSION: "22"
 
 jobs:
   test:

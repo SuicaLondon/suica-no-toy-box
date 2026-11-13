@@ -11,7 +11,7 @@ export const TypeSelect = memo(function TypeSelect({
 }: {
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
 }) {
-  const { copy } = useToolI18n();
+  const { messages } = useToolI18n();
 
   return (
     <Controller
@@ -19,7 +19,7 @@ export const TypeSelect = memo(function TypeSelect({
       name="type"
       render={({ field, fieldState }) => (
         <Field
-          label={copy.duration.typeLabel}
+          label={messages.duration.typeLabel}
           error={fieldState.error?.message}
         >
           <Select
@@ -41,11 +41,11 @@ export const TypeSelect = memo(function TypeSelect({
             }}
           >
             <option value="" disabled>
-              {copy.duration.typePlaceholder}
+              {messages.duration.typePlaceholder}
             </option>
             {typeOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {copy.duration.typeOptions[option.value]}
+                {messages.duration.typeOptions[option.value]}
               </option>
             ))}
           </Select>

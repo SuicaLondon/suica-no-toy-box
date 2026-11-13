@@ -47,12 +47,12 @@ export const NextDayLabel = memo(function NextDayLabel({
   type,
   date,
 }: NextDayLabelProps) {
-  const { copy } = useToolI18n();
+  const { messages } = useToolI18n();
   const now = useDurationStore((state) => state.now);
   const nextDate = getNextOccurrence(date, repeat, now);
 
   if (!nextDate) {
-    return <span>{copy.duration.notRepeated}</span>;
+    return <span>{messages.duration.notRepeated}</span>;
   }
 
   const { days, hours, minutes, seconds } = getTimeDifferenceObject(
@@ -63,12 +63,12 @@ export const NextDayLabel = memo(function NextDayLabel({
 
   switch (type) {
     case "anniversary":
-      return <span>{copy.duration.nextAnniversary(days, time)}</span>;
+      return <span>{messages.duration.nextAnniversary(days, time)}</span>;
     case "birthday":
-      return <span>{copy.duration.nextBirthday(days, time)}</span>;
+      return <span>{messages.duration.nextBirthday(days, time)}</span>;
     case "bills":
-      return <span>{copy.duration.nextBill(days)}</span>;
+      return <span>{messages.duration.nextBill(days)}</span>;
     default:
-      return <span>{copy.duration.nextDefault(days)}</span>;
+      return <span>{messages.duration.nextDefault(days)}</span>;
   }
 });

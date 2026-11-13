@@ -6,8 +6,8 @@ import { memo } from "react";
 import { useDurationStore } from "../../stores/duration.store";
 
 export const SortControls = memo(function SortControls() {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const sortBy = useDurationStore((state) => state.sortBy);
   const sortDirection = useDurationStore((state) => state.sortDirection);
   const setSortBy = useDurationStore((state) => state.setSortBy);
@@ -21,20 +21,20 @@ export const SortControls = memo(function SortControls() {
           const value = event.target.value;
           if (value === "date" || value === "name") setSortBy(value);
         }}
-        aria-label={durationCopy.sortBy}
+        aria-label={durationMessages.sortBy}
         className="min-h-11"
       >
         <option
           className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
           value="date"
         >
-          {durationCopy.sortDate}
+          {durationMessages.sortDate}
         </option>
         <option
           className="focus:bg-toy-hover focus:text-toy-accent min-h-[38px] cursor-pointer rounded-[1px]"
           value="name"
         >
-          {durationCopy.sortName}
+          {durationMessages.sortName}
         </option>
       </Select>
       <Button
@@ -47,13 +47,13 @@ export const SortControls = memo(function SortControls() {
         }
         aria-label={
           sortDirection === "asc"
-            ? durationCopy.ascending
-            : durationCopy.descending
+            ? durationMessages.ascending
+            : durationMessages.descending
         }
         title={
           sortDirection === "asc"
-            ? durationCopy.ascending
-            : durationCopy.descending
+            ? durationMessages.ascending
+            : durationMessages.descending
         }
       >
         {sortDirection === "asc" ? (

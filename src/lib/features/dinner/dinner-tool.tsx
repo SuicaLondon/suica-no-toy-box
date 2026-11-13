@@ -22,8 +22,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function DinnerTool() {
-  const { copy } = useToolI18n();
-  const content = copy.dinner;
+  const { messages } = useToolI18n();
+  const content = messages.dinner;
   const [options, setOptions] = useState<string[]>([]);
   const [result, setResult] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);

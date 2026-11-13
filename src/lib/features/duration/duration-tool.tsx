@@ -16,8 +16,8 @@ import { SortControls } from "./components/sort-controls";
 import { useDurationStore } from "./stores/duration.store";
 
 export function DurationTool() {
-  const { copy } = useToolI18n();
-  const durationCopy = copy.duration;
+  const { messages } = useToolI18n();
+  const durationMessages = messages.duration;
   const widgets = useDurationStore((state) => state.widgets);
   const loadWidgets = useDurationStore((state) => state.loadWidgets);
   const startTimer = useDurationStore((state) => state.startTimer);
@@ -27,25 +27,25 @@ export function DurationTool() {
     try {
       loadWidgets();
     } catch {
-      toast.error(durationCopy.importFailed);
+      toast.error(durationMessages.importFailed);
     }
 
     startTimer();
 
     return stopTimer;
-  }, [durationCopy.importFailed, loadWidgets, startTimer, stopTimer]);
+  }, [durationMessages.importFailed, loadWidgets, startTimer, stopTimer]);
 
   return (
     <div className="mt-5 grid gap-3.5 max-[767px]:mt-[18px]">
       <Card
         role="region"
         className="flex items-center justify-between gap-5 px-4 py-3.5 max-[640px]:flex-col max-[640px]:items-stretch"
-        aria-label={durationCopy.dates}
+        aria-label={durationMessages.dates}
       >
         <SectionHeading
           titleId="duration-count-title"
-          eyebrow={durationCopy.dates}
-          title={durationCopy.dateCount(widgets.length)}
+          eyebrow={durationMessages.dates}
+          title={durationMessages.dateCount(widgets.length)}
           description={null}
           className="shrink-0 flex-col items-start gap-1 px-0"
         />
@@ -61,7 +61,7 @@ export function DurationTool() {
       {widgets.length > 0 ? (
         <section
           className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-3"
-          aria-label={durationCopy.dates}
+          aria-label={durationMessages.dates}
         >
           {widgets.map((widget) => (
             <DurationWidgetItem key={widget.id} widget={widget} />
@@ -75,10 +75,10 @@ export function DurationTool() {
               aria-hidden="true"
             />
             <span className="text-toy-accent font-mono text-[0.6875rem] font-medium tracking-[0.12em] uppercase">
-              {durationCopy.dates}
+              {durationMessages.dates}
             </span>
-            <h2>{durationCopy.emptyTitle}</h2>
-            <p>{durationCopy.emptyDescription}</p>
+            <h2>{durationMessages.emptyTitle}</h2>
+            <p>{durationMessages.emptyDescription}</p>
           </div>
         </Card>
       )}

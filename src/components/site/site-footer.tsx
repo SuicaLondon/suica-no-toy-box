@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/locales";
-import { siteCopy } from "@/i18n/tool-copy";
+import { siteMessages } from "@/i18n/tool-messages";
 import { cn } from "@/utils/cn";
 
 interface SiteFooterProps {
@@ -8,7 +8,7 @@ interface SiteFooterProps {
 }
 
 export function SiteFooter({ locale, compact = false }: SiteFooterProps) {
-  const content = siteCopy[locale];
+  const content = siteMessages[locale];
 
   return (
     <footer

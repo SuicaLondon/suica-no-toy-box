@@ -10,7 +10,7 @@ export const DateCalendar = memo(function DateCalendar({
 }: {
   form: UseFormReturn<DurationFormValues | AddDurationFormValues>;
 }) {
-  const { copy, locale } = useToolI18n();
+  const { messages, locale } = useToolI18n();
   return (
     <Controller
       control={form.control}
@@ -18,7 +18,7 @@ export const DateCalendar = memo(function DateCalendar({
       render={({ field, fieldState }) => (
         <fieldset className="grid min-w-0 gap-2">
           <legend className="text-toy-muted mb-2 font-mono text-xs">
-            {copy.duration.dateLabel}
+            {messages.duration.dateLabel}
           </legend>
           <DatePicker
             locale={getDurationDateLocale(locale)}

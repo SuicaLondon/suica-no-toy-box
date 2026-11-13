@@ -14,7 +14,7 @@ export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
   date,
   type,
 }: TimeDifferenceLabelProps) {
-  const { copy, locale } = useToolI18n();
+  const { messages, locale } = useToolI18n();
   const nowString = useDurationStore((state) => {
     return format(state.now, "yyyy-MM-dd'T'HH:mm");
   });
@@ -27,12 +27,12 @@ export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
     case "anniversary": {
       const count = differenceInYears(parsedNow, date);
       timeDifferenceLabel =
-        count >= 0 ? copy.duration.anniversaryAge(count) : null;
+        count >= 0 ? messages.duration.anniversaryAge(count) : null;
       break;
     }
     case "birthday": {
       const age = differenceInYears(parsedNow, date);
-      timeDifferenceLabel = age >= 0 ? copy.duration.yearsOld(age) : null;
+      timeDifferenceLabel = age >= 0 ? messages.duration.yearsOld(age) : null;
       break;
     }
     case "bills":
@@ -44,8 +44,8 @@ export const TimeDifferenceLabel = memo(function TimeDifferenceLabel({
         locale: dateLocale,
       });
       timeDifferenceLabel = isFuture
-        ? copy.duration.inDistance(distance)
-        : copy.duration.distanceAgo(distance);
+        ? messages.duration.inDistance(distance)
+        : messages.duration.distanceAgo(distance);
     }
   }
 

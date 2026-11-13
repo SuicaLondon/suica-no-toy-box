@@ -29,9 +29,9 @@ export function SponsorshipTool({
   companyName,
   selectedCompanyId,
 }: SponsorshipToolProps) {
-  const { copy } = useToolI18n();
-  const content = copy.sponsorship;
-  const common = copy.common;
+  const { messages } = useToolI18n();
+  const content = messages.sponsorship;
+  const common = messages.common;
   const pathname = usePathname();
   const router = useRouter();
   const [draftCompanyName, setDraftCompanyName] = useState(companyName);

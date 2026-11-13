@@ -14,7 +14,7 @@ interface HomePageProps {
   params: Promise<{ locale: string }>;
 }
 
-const copy = {
+const messages = {
   en: {
     lang: "en",
     metaDescription: "Small, useful projects for everyday decisions.",
@@ -52,7 +52,7 @@ export async function generateMetadata({
 
   return {
     title: "SuicaのToy Box",
-    description: copy[locale].metaDescription,
+    description: messages[locale].metaDescription,
     alternates: {
       canonical: `/${locale}`,
       languages: {
@@ -71,7 +71,7 @@ export default async function LocalizedHome({ params }: HomePageProps) {
     notFound();
   }
 
-  const content = copy[locale];
+  const content = messages[locale];
 
   return (
     <main

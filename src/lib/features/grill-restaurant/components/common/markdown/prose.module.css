@@ -1,0 +1,128 @@
+/* Rendered Markdown from the agents, in the toy box's type. */
+.prose {
+  max-width: 68ch;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose p {
+  margin: 0 0 0.8em;
+}
+
+.prose h3 {
+  margin: 1.5em 0 0.45em;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 0.9em;
+  padding-left: 1.25em;
+}
+
+.prose ul {
+  list-style: disc;
+}
+
+.prose ul ul {
+  list-style: circle;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose li {
+  margin: 0.35em 0;
+  padding-left: 0.15em;
+}
+
+.prose li::marker {
+  color: var(--toy-muted);
+}
+
+.prose li > p {
+  margin: 0;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin: 0.35em 0 0;
+}
+
+.prose strong {
+  font-weight: 650;
+}
+
+.prose hr {
+  margin: 1.25em 0;
+  border: 0;
+  border-top: 1px solid var(--toy-line);
+}
+
+.prose a {
+  color: var(--toy-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.prose a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.prose code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.875em;
+}
+
+.prose blockquote {
+  margin: 0 0 0.9em;
+  padding-left: 1em;
+  border-left: 1px solid var(--toy-line-strong);
+  color: var(--toy-muted);
+}
+
+.prose table {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 0.9em;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.4em 0.75em 0.4em 0;
+  border-bottom: 1px solid var(--toy-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+/* A single line of Markdown inside a list item or a sentence. */
+.inline {
+  overflow-wrap: anywhere;
+}
+
+.inline a {
+  color: var(--toy-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.inline strong {
+  font-weight: 650;
+}
